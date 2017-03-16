@@ -11,8 +11,7 @@ typedef struct _cell{
 
 } cell;
 
-typedef struct _node
-{
+typedef struct _node{
   cell *this;
   struct _node *left;
   struct _node *right;
