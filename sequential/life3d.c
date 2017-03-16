@@ -3,6 +3,8 @@
 #include <string.h>
 
 
+#define DEBUG 0
+
 typedef struct _cell{
 
   int x, y, z;
@@ -27,7 +29,7 @@ typedef struct _world{
 
   int alive_cells;
   int size;
-  bintree *data;
+  bintree *cells;
 
 } world;
 
@@ -66,6 +68,7 @@ world *create_world(int size){
   world *new = (world*)malloc(sizeof(world));
   new->alive_cells = 0;
   new->size = size;
+  new->cells = create_bintree();
 
   return new;
 
@@ -82,20 +85,19 @@ void destroy_bintree_nodes(node *root){
   if(root->left != NULL)
     destroy_bintree_nodes(root->left);
 
-  else if(root->right != NULL)
+  if(root->right != NULL)
     destroy_bintree_nodes(root->right);
 
-  else{
-    destroy_cell(root->this);
-    free(root);
-  }
+  destroy_cell(root->this);
+  free(root);
 
 }
 
-// function to free the data structures
+// function to free the cell structures
 void destroy_bintree(bintree *tree){
 
-  destroy_bintree_nodes(tree->root);
+  if(tree->root!=NULL)
+    destroy_bintree_nodes(tree->root);
   free(tree);
 
 }
@@ -103,7 +105,7 @@ void destroy_bintree(bintree *tree){
 // function to free the game world
 void destroy_world(world *game){
 
-  destroy_bintree(game->data);
+  destroy_bintree(game->cells);
   free(game);
 
 }
@@ -139,10 +141,14 @@ int compare_cells(cell *c1, cell *c2){
 void insert_bintree(bintree *tree, cell *new_cell){
 
   node *new_node = create_bintree_node(new_cell);
+  if(DEBUG)
+    printf("      Created tree node\n");
   node *aux, *parent;
 
   if(tree->root == NULL){
     tree->root = new_node;
+    if(DEBUG)
+      printf("      First tree node added\n");
   }else{
     aux = tree->root;
     while(aux!=NULL){
@@ -160,6 +166,44 @@ void insert_bintree(bintree *tree, cell *new_cell){
   }
 }
 
+void print_cell(cell *this){
+
+  printf("\t  %d %d %d\n", this->x, this->y, this->z);
+
+}
+
+
+void print_bintree(node *root){
+
+  if(root->left != NULL){
+    print_bintree(root->left);
+    if(DEBUG)
+      printf("\t  Not leaf\n");
+  }
+  if(root->right != NULL){
+    print_bintree(root->right);
+    if(DEBUG)
+      printf("\t  Not leaf\n");
+  }
+  print_cell(root->this);
+  if(DEBUG)
+    printf("\t  Leaf\n");
+
+}
+
+
+
+
+void print_world(world *game){
+
+  printf("################################\n\tWorld Size: %d\n", game->size);
+  printf("\tAlive Cells: %d\n", game->alive_cells);
+  if(DEBUG)
+    printf("\tPrinting Cells\n");
+  print_bintree((game->cells)->root);
+  printf("################################\n");
+
+}
 
 
 int check_alive(int x, int y, int z, bintree *tree){
@@ -179,12 +223,56 @@ int check_alive(int x, int y, int z, bintree *tree){
 
 }
 
+void insert_cell(world *game, cell *new_cell){
 
-// function usage
-void usage(){
-  printf("Life 3D\t\tPARALLEL AND DISTRIBUTED COMPUTING\t\tTecnico Lisboa\n\n");
-  printf("usage:\t life3d <input.in> <number of iterations>\n\n\n");
+  insert_bintree(game->cells, new_cell);
+  if(DEBUG)
+    printf("    Inserted in tree\n");
+  game->alive_cells++;
+
+  return;
+
 }
+
+
+
+
+// create initial world from input file
+world *file_to_world(FILE *file){
+  int size;
+  int x, y, z;
+
+  world *new_world;
+  cell *new_cell;
+
+
+  fscanf(file, "%d", &size);
+  if(DEBUG)
+    printf("World Size: %d\n\n", size);
+
+  if(DEBUG)
+    printf("Creating World\n");
+
+  new_world = create_world(size);
+  if(DEBUG)
+    printf("Populating World\n");
+
+  while(fscanf(file, "%d %d %d", &x, &y, &z) != EOF){
+
+    // handle coordinates read
+    if(DEBUG)
+      printf("  Adding: %d %d %d\n", x, y, z);
+    new_cell = create_cell(x, y, z);
+    if(DEBUG)
+      printf("    Cell created\n");
+    insert_cell(new_world, new_cell);
+    if(DEBUG)
+      printf("    Cell inserted\n");
+
+  }
+  return new_world;
+}
+
 
 
 
@@ -199,23 +287,10 @@ FILE *open_file(char *file_name){
 }
 
 
-
-
-// create initial world from input file
-world *createWorld(FILE *file){
-  int size;
-  int x, y, z;
-
-  fscanf(file, "%d", &size);
-  printf("World Size: %d\n", size);
-
-  while(fscanf(file, "%d %d %d", &x, &y, &z) != EOF){
-
-    // handle coordinates read
-    printf("%d %d %d\n", x, y, z);
-
-  }
-  return NULL;
+// function usage
+void usage(){
+  printf("Life 3D\t\tPARALLEL AND DISTRIBUTED COMPUTING\t\tTecnico Lisboa\n\n");
+  printf("usage:\t life3d <input.in> <number of iterations>\n\n\n");
 }
 
 
@@ -223,47 +298,47 @@ world *createWorld(FILE *file){
 
 // game rules
 
-int rules(int x, int y, int z, world* game) {
+int live_or_die(int x, int y, int z, world* game) {
 
   int live = 0;
 
   if(x+1 == game->size) {
-    if(check_alive(0,y, z, game->data)) live++;
+    if(check_alive(0,y, z, game->cells)) live++;
   } else {
-    if(check_alive(x+1,y, z, game->data)) live++;
+    if(check_alive(x+1,y, z, game->cells)) live++;
   }
 
   if(x-1 == -1) {
-    if(check_alive(game->size-1,y, z, game->data)) live++;
+    if(check_alive(game->size-1,y, z, game->cells)) live++;
   } else {
-    if(check_alive(x-1,y, z, game->data)) live++;
+    if(check_alive(x-1,y, z, game->cells)) live++;
   }
 
   if(y+1 == game->size) {
-    if(check_alive(x,0, z, game->data)) live++;
+    if(check_alive(x,0, z, game->cells)) live++;
   } else {
-    if(check_alive(x,y+1, z, game->data)) live++;
+    if(check_alive(x,y+1, z, game->cells)) live++;
   }
 
   if(y-1 == -1) {
-    if(check_alive(x,game->size-1, z, game->data)) live++;
+    if(check_alive(x,game->size-1, z, game->cells)) live++;
   } else {
-    if(check_alive(x,y-1, z, game->data)) live++;
+    if(check_alive(x,y-1, z, game->cells)) live++;
   }
 
   if(z+1 == game->size) {
-    if(check_alive(x,y,0, game->data)) live++;
+    if(check_alive(x,y,0, game->cells)) live++;
   } else {
-    if(check_alive(x,y,z+1, game->data)) live++;
+    if(check_alive(x,y,z+1, game->cells)) live++;
   }
 
   if(z-1 == -1) {
-    if(check_alive(x,y,game->size-1, game->data)) live++;
+    if(check_alive(x,y,game->size-1, game->cells)) live++;
   } else {
-    if(check_alive(x,y,z-1, game->data)) live++;
+    if(check_alive(x,y,z-1, game->cells)) live++;
   }
 
-  if(check_alive(x,y,z, game->data)) {
+  if(check_alive(x,y,z, game->cells)) {
     if(live < 2) /*a live cell with fewer than two live nieghbors dies*/
       return 0;
     if(live > 2 && live < 5) /*a live cell with two to four live nieghbors lives on to the next generation*/
@@ -284,6 +359,8 @@ int rules(int x, int y, int z, world* game) {
 
 
 
+
+
 int main(int argc, char* argv[]){
 
   // if argc not expected, print program usage
@@ -296,14 +373,30 @@ int main(int argc, char* argv[]){
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1]));
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
-  printf("%d\n", num_iterations);
+  if(DEBUG)
+    printf("Iterations to do: %d\n\n", num_iterations);
 
   // read file
   FILE *file;
+  if(DEBUG)
+    printf("Opening file\n");
   file = open_file(file_name);
-  world *game = createWorld(file);
+  if(DEBUG)
+    printf("Reading file\n");
+  world *game = file_to_world(file);
 
+  if(DEBUG)
+    printf("\nPrinting World\n");
+  print_world(game);
+
+  if(DEBUG)
+    printf("\nDestroying World\n");
+  destroy_world(game);
+
+  if(DEBUG)
+    printf("Freeing other variables\n");
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
+
 }

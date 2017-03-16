@@ -1,2 +1,2 @@
 all:
-	gcc -Wall life3d.c -o life3d
+	gcc -Wall -g life3d.c -o life3d
