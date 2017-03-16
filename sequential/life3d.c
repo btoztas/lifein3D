@@ -111,19 +111,16 @@ void destroy_world(world *game){
 }
 
 // function to compare two cell positions in the tree
-int most_priority_index(int x1, int y1, int z1, int x2, int y2, int z2)
-{
+int most_priority_index(int x1, int y1, int z1, int x2, int y2, int z2){
   if(x1>x2)
     return(1);
-  if(x1==x2)
-  {
+  else if(x1==x2){
     if(y1>y2)
       return(1);
-    if(y1==y2)
-    {
+    else if(y1==y2){
       if(z1>z2)
         return(1);
-      if(z1==z2)
+      else if(z1==z2)
         return(0);
     }
   }
@@ -148,7 +145,7 @@ void insert_bintree(bintree *tree, cell *new_cell){
   if(tree->root == NULL){
     tree->root = new_node;
     if(DEBUG)
-      printf("      First tree node added\n");
+      printf("        First tree node added\n");
   }else{
     aux = tree->root;
     while(aux!=NULL){
@@ -168,20 +165,23 @@ void insert_bintree(bintree *tree, cell *new_cell){
 
 void print_cell(cell *this){
 
-  printf("\t  %d %d %d\n", this->x, this->y, this->z);
+  if(DEBUG)
+    printf("\t  %d %d %d\n", this->x, this->y, this->z);
+  else
+    printf("%d %d %d\n", this->x, this->y, this->z);
 
 }
 
 
 void print_bintree(node *root){
 
-  if(root->left != NULL){
-    print_bintree(root->left);
+  if(root->right != NULL){
+    print_bintree(root->right);
     if(DEBUG)
       printf("\t  Not leaf\n");
   }
-  if(root->right != NULL){
-    print_bintree(root->right);
+  if(root->left != NULL){
+    print_bintree(root->left);
     if(DEBUG)
       printf("\t  Not leaf\n");
   }
@@ -196,38 +196,24 @@ void print_bintree(node *root){
 
 void print_world(world *game){
 
-  printf("################################\n\tWorld Size: %d\n", game->size);
-  printf("\tAlive Cells: %d\n", game->alive_cells);
+  if(DEBUG)
+    printf("################################\n\tWorld Size: %d\n\tAlive Cells: %d\n", game->size, game->alive_cells);
   if(DEBUG)
     printf("\tPrinting Cells\n");
   print_bintree((game->cells)->root);
-  printf("################################\n");
+  if(DEBUG)
+    printf("################################\n");
 
 }
 
 
-int check_alive(int x, int y, int z, bintree *tree){
 
-  node *aux = tree->root;
-  int ret;
-  while(aux!=NULL){
-    ret = most_priority_index((aux->this)->x, (aux->this)->y, (aux->this)->z, x, y, z);
-    if(ret==-1)
-      aux=aux->right;
-    if(ret==1)
-      aux=aux->left;
-    else
-      return 1;
-  }
-  return 0;
-
-}
 
 void insert_cell(world *game, cell *new_cell){
 
   insert_bintree(game->cells, new_cell);
   if(DEBUG)
-    printf("    Inserted in tree\n");
+    printf("      Inserted in tree\n");
   game->alive_cells++;
 
   return;
@@ -293,12 +279,28 @@ void usage(){
   printf("usage:\t life3d <input.in> <number of iterations>\n\n\n");
 }
 
+int check_alive(int x, int y, int z, bintree *tree){
 
+  node *aux = tree->root;
+  int ret;
+
+  while(aux!=NULL){
+    ret = most_priority_index((aux->this)->x, (aux->this)->y, (aux->this)->z, x, y, z);
+    if(ret==-1)
+      aux=aux->right;
+    else if(ret==1)
+      aux=aux->left;
+    else
+      return 1;
+  }
+  return 0;
+
+}
 
 
 // game rules
 
-int live_or_die(int x, int y, int z, world* game) {
+int test_cell(int x, int y, int z, world* game) {
 
   int live = 0;
 
@@ -339,14 +341,14 @@ int live_or_die(int x, int y, int z, world* game) {
   }
 
   if(check_alive(x,y,z, game->cells)) {
-    if(live < 2) /*a live cell with fewer than two live nieghbors dies*/
+    if(live < 2) // a live cell with fewer than two live nieghbors dies
       return 0;
-    if(live > 2 && live < 5) /*a live cell with two to four live nieghbors lives on to the next generation*/
+    if(live > 2 && live < 5) // a live cell with two to four live nieghbors lives on to the next generation
       return 1;
-    if(live > 4) /*a live cell with more than four live nieghbors dies*/
+    if(live > 4) // a live cell with more than four live nieghbors dies
       return 0;
   } else {
-    if(live == 2 || live == 3) /*a dead cell with two or three live neighbors becomes a live cell*/
+    if(live == 2 || live == 3) // a dead cell with two or three live neighbors becomes a live cell
       return 1;
     else
       return 0;
@@ -357,11 +359,43 @@ int live_or_die(int x, int y, int z, world* game) {
 }
 
 
+world *get_next_world(world *actual_world){
+
+  if(DEBUG)
+    printf("    Creating next world\n");
+  world *next_world = create_world(actual_world->size);
+
+  if(DEBUG)
+    printf("    Testing cells\n");
+  for(int x=0; x<next_world->size; x++)
+    for(int y=0; y<next_world->size; y++)
+      for(int z=0; z<next_world->size; z++){
+
+        if(test_cell(x, y, z, actual_world)){
+          if(DEBUG)
+            printf("      %d %d %d will be alive\n",x, y, z);
+          cell *new_cell = create_cell(x, y, z);
+          insert_cell(next_world, new_cell);
+        }
+        else
+          if(DEBUG)
+            printf("      %d %d %d will be dead\n",x, y, z);
+
+      }
+
+  if(DEBUG)
+    printf("    Finished testing cells\n");
+  return next_world;
+
+}
+
 
 
 
 
 int main(int argc, char* argv[]){
+
+  world *next_world;
 
   // if argc not expected, print program usage
   if(argc!=3){
@@ -383,18 +417,41 @@ int main(int argc, char* argv[]){
   file = open_file(file_name);
   if(DEBUG)
     printf("Reading file\n");
-  world *game = file_to_world(file);
+  world *actual_world = file_to_world(file);
 
   if(DEBUG)
     printf("\nPrinting World\n");
-  print_world(game);
+  if(DEBUG)
+    print_world(actual_world);
+
+  if(DEBUG)
+    printf("\nStarting to iterate\n");
+  for(int i=0; i<num_iterations; i++){
+
+    if(DEBUG)
+      printf("  Iteration number %d\n", i+1);
+    next_world = get_next_world(actual_world);
+    if(DEBUG)
+      printf("    Printing new world\n");
+    if(DEBUG)
+      print_world(next_world);
+    if(DEBUG)
+      printf("    Destroying previous world\n");
+    destroy_world(actual_world);
+
+    actual_world = next_world;
+  }
+
 
   if(DEBUG)
     printf("\nDestroying World\n");
-  destroy_world(game);
+  if(!DEBUG)
+    print_world(actual_world);
+  destroy_world(actual_world);
 
   if(DEBUG)
     printf("Freeing other variables\n");
+
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
