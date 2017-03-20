@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#define DEBUG 0
-
 typedef struct _cell{
 
   int x, y, z;
@@ -13,6 +10,7 @@ typedef struct _cell{
 
 typedef struct _node{
   cell *this;
+  int height;
   struct _node *left;
   struct _node *right;
 
@@ -32,12 +30,15 @@ typedef struct _world{
 
 } world;
 
+
 cell *create_cell(int x, int y, int z){
 
   cell *new = (cell*)malloc(sizeof(cell));
-  new->x = x;
-  new->y = y;
-  new->z = z;
+  if(new == NULL)
+    printf("Error allocating memory for a new cell.\n");
+  new->x    = x;
+  new->y    = y;
+  new->z    = z;
 
   return new;
 }
@@ -45,9 +46,12 @@ cell *create_cell(int x, int y, int z){
 node *create_bintree_node(cell *this){
 
   node *new   = (node*)malloc(sizeof(node));
-  new->this  = this;
-  new->left  = NULL;
-  new->right = NULL;
+  if(new == NULL)
+    printf("Error allocating memory for a new node.\n");
+  new->this   = this;
+  new->left   = NULL;
+  new->right  = NULL;
+  new->height = 1;
 
   return new;
 
@@ -56,7 +60,9 @@ node *create_bintree_node(cell *this){
 bintree *create_bintree(){
 
   bintree *tree = (bintree*)malloc(sizeof(bintree));
-  tree->root = NULL;
+  if(tree == NULL)
+    printf("Error allocating memory for a new tree.\n");
+  tree->root    = NULL;
 
   return tree;
 
@@ -64,10 +70,12 @@ bintree *create_bintree(){
 
 world *create_world(int size){
 
-  world *new = (world*)malloc(sizeof(world));
+  world *new       = (world*)malloc(sizeof(world));
+  if(new == NULL)
+    printf("Error allocating memory for a new world.\n");
   new->alive_cells = 0;
-  new->size = size;
-  new->cells = create_bintree();
+  new->size        = size;
+  new->cells       = create_bintree();
 
   return new;
 
@@ -109,17 +117,60 @@ void destroy_world(world *game){
 
 }
 
+
+
+void print_cell(cell *this){
+
+  #ifdef DEBUG
+    printf("\t  %d %d %d\n", this->x, this->y, this->z);
+  #else
+    printf("%d %d %d\n", this->x, this->y, this->z);
+  #endif
+
+}
+
+
+void print_bintree(node *root){
+  if(root->left != NULL){
+    print_bintree(root->left);
+  }
+  print_cell(root->this);
+
+  if(root->right != NULL){
+    print_bintree(root->right);
+  }
+
+}
+
+
+
+
+void print_world(world *game){
+
+  #ifdef DEBUG
+    printf("################################\n\tWorld Size: %d\n\tAlive Cells: %d\n\tPrinting Cells\n", game->size, game->alive_cells);
+  #endif
+
+  print_bintree((game->cells)->root);
+
+  #ifdef DEBUG
+    printf("################################\n");
+  #endif
+}
+
+
+
 // function to compare two cell positions in the tree
 int most_priority_index(int x1, int y1, int z1, int x2, int y2, int z2){
-  if(x1>x2)
+  if(x1 > x2)
     return(1);
-  else if(x1==x2){
-    if(y1>y2)
+  else if(x1 == x2){
+    if(y1 > y2)
       return(1);
-    else if(y1==y2){
-      if(z1>z2)
+    else if(y1 == y2){
+      if(z1 > z2)
         return(1);
-      else if(z1==z2)
+      else if(z1 == z2)
         return(0);
     }
   }
@@ -133,86 +184,88 @@ int compare_cells(cell *c1, cell *c2){
 
 }
 
+int max(int l, int r){
 
-void insert_bintree(bintree *tree, cell *new_cell){
+    return l > r ? l: r;
+}
 
-  node *new_node = create_bintree_node(new_cell);
-  if(DEBUG)
-    printf("      Created tree node\n");
-  node *aux, *parent;
+int height(node *this){
 
-  if(tree->root == NULL){
-    tree->root = new_node;
-    if(DEBUG)
-      printf("        First tree node added\n");
-  }else{
-    aux = tree->root;
-    while(aux!=NULL){
-      parent = aux;
-      if(compare_cells(new_node->this, aux->this)==1)
-        aux=aux->right;
-      else
-        aux=aux->left;
+  if(this == NULL)
+    return 0;
+  return this->height;
+
+}
+
+
+
+/*
+  node *new_node;
+  if(root == NULL){
+    printf("        ROOT\n");
+
+
+    new_node = create_bintree_node(new_cell);
+
+    printf("          JUST ADDED: %d, %d, %d\n", (new_node->this)->x, (new_node->this)->y, (new_node->this)->z);
+
+  }
+  if(root->left == NULL && root->right != NULL){
+    root->height = height(root->right) + 1;
+  }else if(root->right == NULL && root->left != NULL){
+    root->height = height(root->left) + 1;
+  }else if(root->right != NULL && root->left != NULL){
+    root->height = max(height(root->left), height(root->right))+1;
+  }
+  printf("        SUBTREE HEIGHT: %d\n", root->height);
+
+  return new_node;
+}
+
+*/
+
+
+node  *insert_bintree(node *root, cell *new_cell){
+
+    if(root == NULL){
+
+      root = create_bintree_node(new_cell);
+
+    }else if(compare_cells(new_cell, root->this)==1){
+
+      root->right = insert_bintree(root->right, new_cell);
+
+    }else{
+
+      root->left = insert_bintree(root->left, new_cell);
+
     }
-    if(compare_cells(new_node->this, parent->this)==1)
-      parent->right = new_node;
-    else
-      parent->left = new_node;
 
-  }
-}
+    root->height = max(height(root->left), height(root->right))+1;
 
-void print_cell(cell *this){
+    #ifdef DEBUG
+      printf("        HEIGHT: %d\n", root->height);
+    #endif
 
-  if(DEBUG)
-    printf("\t  %d %d %d\n", this->x, this->y, this->z);
-  else
-    printf("%d %d %d\n", this->x, this->y, this->z);
-
+    return root;
 }
 
 
-void print_bintree(node *root){
+void insert_data(bintree *tree, cell *new_cell){
 
-  if(root->right != NULL){
-    print_bintree(root->right);
-    if(DEBUG)
-      printf("\t  Not leaf\n");
-  }
-  if(root->left != NULL){
-    print_bintree(root->left);
-    if(DEBUG)
-      printf("\t  Not leaf\n");
-  }
-  print_cell(root->this);
-  if(DEBUG)
-    printf("\t  Leaf\n");
+  tree->root = insert_bintree(tree->root, new_cell);
 
 }
-
-
-
-
-void print_world(world *game){
-
-  if(DEBUG)
-    printf("################################\n\tWorld Size: %d\n\tAlive Cells: %d\n", game->size, game->alive_cells);
-  if(DEBUG)
-    printf("\tPrinting Cells\n");
-  print_bintree((game->cells)->root);
-  if(DEBUG)
-    printf("################################\n");
-
-}
-
-
 
 
 void insert_cell(world *game, cell *new_cell){
 
-  insert_bintree(game->cells, new_cell);
-  if(DEBUG)
+  insert_data(game->cells, new_cell);
+
+  #ifdef DEBUG
     printf("      Inserted in tree\n");
+  #endif
+
   game->alive_cells++;
 
   return;
@@ -224,6 +277,7 @@ void insert_cell(world *game, cell *new_cell){
 
 // create initial world from input file
 world *file_to_world(FILE *file){
+
   int size;
   int x, y, z;
 
@@ -232,27 +286,36 @@ world *file_to_world(FILE *file){
 
 
   fscanf(file, "%d", &size);
-  if(DEBUG)
-    printf("World Size: %d\n\n", size);
 
-  if(DEBUG)
-    printf("Creating World\n");
+  #ifdef DEBUG
+    printf("World Size: %d\n\nCreating World\n", size);
+  #endif
 
   new_world = create_world(size);
-  if(DEBUG)
+
+
+  #ifdef DEBUG
     printf("Populating World\n");
+  #endif
 
   while(fscanf(file, "%d %d %d", &x, &y, &z) != EOF){
 
     // handle coordinates read
-    if(DEBUG)
+    #ifdef DEBUG
       printf("  Adding: %d %d %d\n", x, y, z);
+    #endif
+
     new_cell = create_cell(x, y, z);
-    if(DEBUG)
+
+    #ifdef DEBUG
       printf("    Cell created\n");
+    #endif
+
     insert_cell(new_world, new_cell);
-    if(DEBUG)
+
+    #ifdef DEBUG
       printf("    Cell inserted\n");
+    #endif
 
   }
   return new_world;
@@ -360,30 +423,35 @@ int test_cell(int x, int y, int z, world* game) {
 
 world *get_next_world(world *actual_world){
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("    Creating next world\n");
+  #endif
   world *next_world = create_world(actual_world->size);
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("    Testing cells\n");
+  #endif
   for(int x=0; x<next_world->size; x++)
     for(int y=0; y<next_world->size; y++)
       for(int z=0; z<next_world->size; z++){
 
         if(test_cell(x, y, z, actual_world)){
-          if(DEBUG)
+          #ifdef DEBUG
             printf("      %d %d %d will be alive\n",x, y, z);
+          #endif
           cell *new_cell = create_cell(x, y, z);
           insert_cell(next_world, new_cell);
         }
-        else
-          if(DEBUG)
+        else{
+          #ifdef DEBUG
             printf("      %d %d %d will be dead\n",x, y, z);
-
+          #endif
+        }
       }
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("    Finished testing cells\n");
+  #endif
   return next_world;
 
 }
@@ -404,52 +472,67 @@ int main(int argc, char* argv[]){
 
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1]));
+  if(file_name == NULL)
+    printf("Error allocating memory for filename.\n");
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
-  if(DEBUG)
+  #ifdef DEBUG
     printf("Iterations to do: %d\n\n", num_iterations);
+  #endif
 
   // read file
   FILE *file;
-  if(DEBUG)
+
+  #ifdef DEBUG
     printf("Opening file\n");
+  #endif
+
   file = open_file(file_name);
-  if(DEBUG)
+
+  #ifdef DEBUG
     printf("Reading file\n");
+  #endif
+
   world *actual_world = file_to_world(file);
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("\nPrinting World\n");
-  if(DEBUG)
     print_world(actual_world);
-
-  if(DEBUG)
     printf("\nStarting to iterate\n");
+  #endif
+
   for(int i=0; i<num_iterations; i++){
 
-    if(DEBUG)
+    #ifdef DEBUG
       printf("  Iteration number %d\n", i+1);
-    next_world = get_next_world(actual_world);
-    if(DEBUG)
-      printf("    Printing new world\n");
-    if(DEBUG)
-      print_world(next_world);
-    if(DEBUG)
-      printf("    Destroying previous world\n");
-    destroy_world(actual_world);
+    #endif
 
+    next_world = get_next_world(actual_world);
+
+    #ifdef DEBUG
+      printf("    Printing new world\n");
+      print_world(next_world);
+      printf("    Destroying previous world\n");
+    #endif
+
+    destroy_world(actual_world);
     actual_world = next_world;
+
+
   }
 
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("\nDestroying World\n");
-  if(!DEBUG)
+  #else
     print_world(actual_world);
+  #endif
+
   destroy_world(actual_world);
 
-  if(DEBUG)
+  #ifdef DEBUG
     printf("Freeing other variables\n");
+  #endif
 
   fclose(file);
   free(file_name);
