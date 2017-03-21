@@ -131,16 +131,23 @@ void print_cell(cell *this){
 
 
 void print_bintree(node *root){
+
   if(root->left != NULL){
     print_bintree(root->left);
   }
+  #ifdef DEBUG
+    printf("\t  Height: %d", root->height);
+  #endif
   print_cell(root->this);
+
+
 
   if(root->right != NULL){
     print_bintree(root->right);
   }
 
 }
+
 
 
 
@@ -198,31 +205,53 @@ int height(node *this){
 }
 
 
+// A utility function to right rotate subtree rooted with y
+// See the diagram given above.
+node *right_rotate(node *y)
+{
+    node *x = y->left;
+    node *T2 = x->right;
 
-/*
-  node *new_node;
-  if(root == NULL){
-    printf("        ROOT\n");
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
 
+    // Update heights
+    y->height = max(height(y->left), height(y->right))+1;
+    x->height = max(height(x->left), height(x->right))+1;
 
-    new_node = create_bintree_node(new_cell);
-
-    printf("          JUST ADDED: %d, %d, %d\n", (new_node->this)->x, (new_node->this)->y, (new_node->this)->z);
-
-  }
-  if(root->left == NULL && root->right != NULL){
-    root->height = height(root->right) + 1;
-  }else if(root->right == NULL && root->left != NULL){
-    root->height = height(root->left) + 1;
-  }else if(root->right != NULL && root->left != NULL){
-    root->height = max(height(root->left), height(root->right))+1;
-  }
-  printf("        SUBTREE HEIGHT: %d\n", root->height);
-
-  return new_node;
+    // Return new root
+    return x;
 }
 
-*/
+// A utility function to left rotate subtree rooted with x
+// See the diagram given above.
+node *left_rotate(node *x)
+{
+    node *y = x->right;
+    node *T2 = y->left;
+
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+
+    //  Update heights
+    x->height = max(height(x->left), height(x->right))+1;
+    y->height = max(height(y->left), height(y->right))+1;
+
+    // Return new root
+    return y;
+}
+
+// Get Balance factor of node N
+int get_balance(node *N)
+{
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
+
 
 
 node  *insert_bintree(node *root, cell *new_cell){
@@ -243,12 +272,41 @@ node  *insert_bintree(node *root, cell *new_cell){
 
     root->height = max(height(root->left), height(root->right))+1;
 
+
+    int balance = get_balance(root);
+
+    // If this node becomes unbalanced, then
+    // there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && compare_cells(new_cell, root->left->this)==-1)
+        return right_rotate(root);
+
+    // Right Right Case
+    if (balance < -1 && compare_cells(new_cell, root->right->this)==1)
+        return left_rotate(root);
+
+    // Left Right Case
+    if (balance > 1 && compare_cells(new_cell, root->left->this)==1)
+    {
+        root->left =  left_rotate(root->left);
+        return right_rotate(root);
+    }
+
+    // Right Left Case
+    if (balance < -1 && compare_cells(new_cell, root->right->this)==-1)
+    {
+        root->right = right_rotate(root->right);
+        return left_rotate(root);
+    }
+
     #ifdef DEBUG
       printf("        HEIGHT: %d\n", root->height);
     #endif
 
     return root;
 }
+
 
 
 void insert_data(bintree *tree, cell *new_cell){
@@ -456,6 +514,26 @@ world *get_next_world(world *actual_world){
 
 }
 
+void padding ( char ch, int n ){
+  int i;
+
+  for ( i = 0; i < n; i++ )
+    putchar ( ch );
+}
+
+void print_tree_padding ( node *root, int level ){
+
+
+  if ( root == NULL ) {
+    padding ( '\t', level );
+    puts ( "~" );
+  } else {
+    print_tree_padding ( root->right, level + 1 );
+    padding ( '\t', level );
+    printf ( "%d %d %d\n", root->this->x, root->this->y, root->this->z );
+    print_tree_padding ( root->left, level + 1 );
+  }
+}
 
 
 
@@ -471,7 +549,7 @@ int main(int argc, char* argv[]){
   }
 
   // handle file_name
-  char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1]));
+  char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
   if(file_name == NULL)
     printf("Error allocating memory for filename.\n");
   strcpy(file_name, argv[1]);
@@ -503,7 +581,7 @@ int main(int argc, char* argv[]){
 
   for(int i=0; i<num_iterations; i++){
 
-    #ifdef DEBUG
+    #if defined(DEBUG) || defined(ITERATION)
       printf("  Iteration number %d\n", i+1);
     #endif
 
@@ -524,6 +602,7 @@ int main(int argc, char* argv[]){
 
   #ifdef DEBUG
     printf("\nDestroying World\n");
+    //print_tree_padding(actual_world->cells->root, 0 );
   #else
     print_world(actual_world);
   #endif
