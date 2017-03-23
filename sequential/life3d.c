@@ -119,6 +119,7 @@ void destroy_bintree(bintree **tree, int size){
       destroy_bintree_nodes(tree[i]->root);
     free(tree[i]);
   }
+  free(tree);
 }
 
 // function to free the game world
