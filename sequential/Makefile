@@ -4,3 +4,5 @@ debug:
 	gcc -Wall -DDEBUG -g life3d.c -o life3d
 iteration:
 	gcc -Wall -DITERATION -g life3d.c -o life3d
+opt:
+	gcc -Wall -o3 life3d.c -o life3d 
