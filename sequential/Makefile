@@ -8,3 +8,5 @@ opt:
 	gcc -Wall -O3 life3d.c -o life3d 
 optiter:
 	gcc -Wall -O3 -DITERATION -o life3d life3d.c
+optdebug:
+	gcc -Wall -O3 -DDEGUG -o life3d life3d.c
