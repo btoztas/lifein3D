@@ -281,6 +281,14 @@ node  *insert_bintree(node *root, cell *new_cell){
 
       root = create_bintree_node(new_cell);
 
+    }else if(compare_cells(new_cell, root->this)==0){
+
+      #ifdef DEBUG
+      printf("Cell already exists\n");
+      #endif
+      
+      return root;
+
     }else if(compare_cells(new_cell, root->this)==1){
 
       root->right = insert_bintree(root->right, new_cell);
@@ -497,26 +505,170 @@ int test_cell(int x, int y, int z, world* game) {
   }
 
   return -1;
-
 }
 
 
-void test_tree(node *root, world *actual_world){
+int test_cell_recurs(int x, int y, int z, world* game, world* next_world) {
+
+  int live = 0;
+  cell *new_cell;
+
+  if(x+1 == game->size) {
+    if(check_alive(0,y, z, game->cells)){
+      live++;
+    }else{
+      if(test_cell(0,y,z,game)){
+        new_cell = create_cell(0,y, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x+1,y, z, game->cells)) {
+      live++;
+    }else{
+      if(test_cell(x+1,y,z,game)){
+        new_cell = create_cell(x+1,y, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+
+  if(x-1 == -1) {
+    if(check_alive(game->size-1,y, z, game->cells)){
+      live++;
+    }else{
+      if(test_cell(game->size-1,y,z,game)){
+        new_cell = create_cell(game->size-1,y, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x-1,y, z, game->cells)) {
+      live++;
+    }else{
+      if(test_cell(x-1,y,z,game)){
+        new_cell = create_cell(x-1,y, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+  if(y+1 == game->size) {
+    if(check_alive(x,0, z, game->cells)) {
+      live++;
+    }else{
+      if(test_cell(x,0, z,game)){
+        new_cell = create_cell(x,0, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x,y+1, z, game->cells)) {
+      live++;
+    }else{
+      if(test_cell(x,y+1,z,game)){
+        new_cell = create_cell(x,y+1, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+
+  if(y-1 == -1) {
+    if(check_alive(x,game->size-1, z, game->cells)){
+      live++;
+    }else{
+      if(test_cell(x,game->size-1,z,game)){
+        new_cell = create_cell(x,game->size-1, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x,y-1,z, game->cells)) {
+      live++;
+    }else{
+      if(test_cell(x,y-1,z,game)){
+        new_cell = create_cell(x,y-1, z);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+  if(z+1 == game->size) {
+    if(check_alive(x,y,0, game->cells)){
+      live++;
+    }else{
+      if(test_cell(x,y,0,game)){
+        new_cell = create_cell(x,y,0);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x,y,z+1, game->cells)){
+      live++;
+    }else{
+      if(test_cell(x,y,z+1,game)){
+        new_cell = create_cell(x,y,z+1);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+
+  if(z-1 == -1) {
+    if(check_alive(x,y,game->size-1, game->cells)){
+      live++;
+    }else{
+      if(test_cell(x,y,game->size-1,game)){
+        new_cell = create_cell(x,y,game->size-1);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  } else {
+    if(check_alive(x,y,z-1, game->cells)){
+      live++;
+    }else{
+      if(test_cell(x,y,z-1,game)){
+        new_cell = create_cell(x,y,z-1);
+        insert_cell(next_world, new_cell);
+      }
+    }
+  }
+
+
+  if(live < 2) // a live cell with fewer than two live nieghbors dies
+    return 0;
+  if(live > 2 && live < 5) // a live cell with two to four live nieghbors lives on to the next generation
+    return 1;
+  if(live > 4) // a live cell with more than four live nieghbors dies
+    return 0;
+
+  return -1;
+}
+
+
+world* handle_subtree(node *root, world *actual_world,world *next_world){
+  world *next;
 
   if(root->left != NULL){
-    print_bintree(root->left);
+    next=handle_subtree(root->left, actual_world,next_world);
   }
+
+  int ret = test_cell_recurs(root->this->x, root->this->y, root->this->z, actual_world, next_world);
+
+  if(ret==1){
+    cell *new_cell = create_cell(root->this->x, root->this->y, root->this->z);
+    insert_cell(next_world, new_cell);
+  }
+
   #ifdef DEBUG
-    printf("\t  Height: %d", root->height);
-  #endif
-
-  int ret = test_cell(root->this->x, root->this->y, root->this->z, actual_world);
   printf("\t  Testing: %d %d %d | Result = %d\n",root->this->x, root->this->y, root->this->z, ret);
-
+  #endif
   if(root->right != NULL){
-    print_bintree(root->right);
+    next=handle_subtree(root->right,actual_world,next_world);
   }
+
+  return next;
 }
+
+
+
 
 world *get_next_world(world *actual_world){
 
@@ -532,8 +684,7 @@ world *get_next_world(world *actual_world){
   for(int x=0; x<actual_world->size; x++)
     for(int y=0; y<actual_world->size; y++)
       if(actual_world->cells[x][y]->root!=NULL)
-        test_tree(actual_world->cells[x][y]->root, actual_world);
-
+        handle_subtree(actual_world->cells[x][y]->root, actual_world,next_world);
 
   /*
   for(int x=0; x<next_world->size; x++)
