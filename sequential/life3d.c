@@ -286,7 +286,7 @@ node  *insert_bintree(node *root, cell *new_cell){
       #ifdef DEBUG
       printf("Cell already exists\n");
       #endif
-      
+
       return root;
 
     }else if(compare_cells(new_cell, root->this)==1){
@@ -643,28 +643,28 @@ int test_cell_recurs(int x, int y, int z, world* game, world* next_world) {
 }
 
 
-world* handle_subtree(node *root, world *actual_world,world *next_world){
-  world *next;
+void handle_subtree(node *root, world *actual_world,world *next_world){
+
+  cell *new_cell;
+
 
   if(root->left != NULL){
-    next=handle_subtree(root->left, actual_world,next_world);
+    handle_subtree(root->left, actual_world, next_world);
   }
 
-  int ret = test_cell_recurs(root->this->x, root->this->y, root->this->z, actual_world, next_world);
-
-  if(ret==1){
-    cell *new_cell = create_cell(root->this->x, root->this->y, root->this->z);
+  if(test_cell_recurs(root->this->x, root->this->y, root->this->z, actual_world, next_world)){
+    new_cell = create_cell(root->this->x, root->this->y, root->this->z);
     insert_cell(next_world, new_cell);
   }
 
   #ifdef DEBUG
   printf("\t  Testing: %d %d %d | Result = %d\n",root->this->x, root->this->y, root->this->z, ret);
   #endif
+
   if(root->right != NULL){
-    next=handle_subtree(root->right,actual_world,next_world);
+    handle_subtree(root->right, actual_world, next_world);
   }
 
-  return next;
 }
 
 
@@ -684,7 +684,7 @@ world *get_next_world(world *actual_world){
   for(int x=0; x<actual_world->size; x++)
     for(int y=0; y<actual_world->size; y++)
       if(actual_world->cells[x][y]->root!=NULL)
-        handle_subtree(actual_world->cells[x][y]->root, actual_world,next_world);
+        handle_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
   /*
   for(int x=0; x<next_world->size; x++)
