@@ -26,7 +26,7 @@ typedef struct _world{
 
   int alive_cells;
   int size;
-  bintree **cells;
+  bintree ***cells;
 
 } world;
 
@@ -68,12 +68,15 @@ bintree *create_bintree(){
 
 }
 
-bintree **create_bintree_hash(int size){
+bintree ***create_bintree_hash(int size){
 
-  bintree **new = (bintree**)malloc(size*sizeof(bintree*));
+  bintree ***new = (bintree***)malloc(size*sizeof(bintree**));
+  for(int i=0; i<size; i++)
+    new[i] = (bintree**)malloc(size*sizeof(bintree*));
 
   for(int i=0; i<size; i++)
-      new[i] = create_bintree();
+    for(int j=0; j<size; j++)
+      new[i][j] = create_bintree();
 
   return new;
 
@@ -112,11 +115,14 @@ void destroy_bintree_nodes(node *root){
 }
 
 // function to free the cell structures
-void destroy_bintree(bintree **tree, int size){
+void destroy_bintree(bintree ***tree, int size){
 
   for(int i=0; i<size; i++){
-    if(tree[i]->root!=NULL)
-      destroy_bintree_nodes(tree[i]->root);
+    for(int j=0; j<size; j++){
+      if(tree[i][j]->root!=NULL)
+        destroy_bintree_nodes(tree[i][j]->root);
+      free(tree[i][j]);
+    }
     free(tree[i]);
   }
   free(tree);
@@ -163,11 +169,12 @@ void print_bintree(node *root){
 
 }
 
-void print_bintree_hash(bintree **tree, int size){
+void print_bintree_hash(bintree ***tree, int size){
 
   for(int i=0; i<size; i++)
-    if(tree[i]->root!=NULL)
-      print_bintree(tree[i]->root);
+    for(int j=0; j<size; j++)
+      if(tree[i][j]->root!=NULL)
+        print_bintree(tree[i][j]->root);
 
 }
 
@@ -190,16 +197,12 @@ void print_world(world *game){
 // function to compare two cell positions in the tree
 int most_priority_index(int x1, int y1, int z1, int x2, int y2, int z2){
 
-  if(y1 > y2)
-    return(1);
-  else if(y1 == y2){
-    if(z1 > z2)
-      return(1);
-    else if(z1 == z2)
-      return(0);
-  }
+  if(z1 > z2)
+    return 1;
+  else if(z1 == z2)
+    return 0;
 
-  return(-1);
+  return -1;
 }
 
 
@@ -337,7 +340,7 @@ void insert_data(bintree *tree, cell *new_cell){
 
 void insert_cell(world *game, cell *new_cell){
 
-  insert_data(game->cells[new_cell->x], new_cell);
+  insert_data(game->cells[new_cell->x][new_cell->y], new_cell);
 
   #ifdef DEBUG
     printf("      Inserted in tree\n");
@@ -418,9 +421,9 @@ void usage(){
   printf("usage:\t life3d <input.in> <number of iterations>\n\n\n");
 }
 
-int check_alive(int x, int y, int z, bintree **tree){
+int check_alive(int x, int y, int z, bintree ***tree){
 
-  node *aux = tree[x]->root;
+  node *aux = tree[x][y]->root;
   int ret;
 
   while(aux!=NULL){
