@@ -501,6 +501,23 @@ int test_cell(int x, int y, int z, world* game) {
 }
 
 
+void test_tree(node *root, world *actual_world){
+
+  if(root->left != NULL){
+    print_bintree(root->left);
+  }
+  #ifdef DEBUG
+    printf("\t  Height: %d", root->height);
+  #endif
+
+  int ret = test_cell(root->this->x, root->this->y, root->this->z, actual_world);
+  printf("\t  Testing: %d %d %d | Result = %d\n",root->this->x, root->this->y, root->this->z, ret);
+
+  if(root->right != NULL){
+    print_bintree(root->right);
+  }
+}
+
 world *get_next_world(world *actual_world){
 
   #ifdef DEBUG
@@ -511,10 +528,17 @@ world *get_next_world(world *actual_world){
   #ifdef DEBUG
     printf("    Testing cells\n");
   #endif
+
+  for(int x=0; x<actual_world->size; x++)
+    for(int y=0; y<actual_world->size; y++)
+      if(actual_world->cells[x][y]->root!=NULL)
+        test_tree(actual_world->cells[x][y]->root, actual_world);
+
+
+  /*
   for(int x=0; x<next_world->size; x++)
     for(int y=0; y<next_world->size; y++)
       for(int z=0; z<next_world->size; z++){
-
         if(test_cell(x, y, z, actual_world)){
           #ifdef DEBUG
             printf("      %d %d %d will be alive\n",x, y, z);
@@ -532,6 +556,7 @@ world *get_next_world(world *actual_world){
   #ifdef DEBUG
     printf("    Finished testing cells\n");
   #endif
+  */
   return next_world;
 
 }
