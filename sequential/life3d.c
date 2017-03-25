@@ -275,11 +275,12 @@ int get_balance(node *N)
 
 
 
-node  *insert_bintree(node *root, cell *new_cell){
+node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 
     if(root == NULL){
 
       root = create_bintree_node(new_cell);
+      (*n_cells)++;
 
     }else if(compare_cells(new_cell, root->this)==0){
       #ifdef DEBUG
@@ -289,11 +290,11 @@ node  *insert_bintree(node *root, cell *new_cell){
       return root;
     }else if(compare_cells(new_cell, root->this)==1){
 
-      root->right = insert_bintree(root->right, new_cell);
+      root->right = insert_bintree(root->right, new_cell, n_cells);
 
     }else{
 
-      root->left = insert_bintree(root->left, new_cell);
+      root->left = insert_bintree(root->left, new_cell, n_cells);
 
     }
 
@@ -336,23 +337,22 @@ node  *insert_bintree(node *root, cell *new_cell){
 
 
 
-void insert_data(bintree *tree, cell *new_cell){
+void insert_data(bintree *tree, cell *new_cell, int *n_cells){
 
 
-  tree->root = insert_bintree(tree->root, new_cell);
+  tree->root = insert_bintree(tree->root, new_cell, n_cells);
 
 }
 
 
 void insert_cell(world *game, cell *new_cell){
 
-  insert_data(game->cells[new_cell->x][new_cell->y], new_cell);
+  insert_data(game->cells[new_cell->x][new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
     printf("      Inserted in tree\n");
   #endif
 
-  game->alive_cells++;
 
   return;
 
@@ -493,7 +493,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   if(status){
     if(live < 2) // a live cell with fewer than two live nieghbors dies
       return 0;
-    if(live > 2 && live < 5) // a live cell with two to four live nieghbors lives on to the next generation
+    if(live >= 2 && live < 5) // a live cell with two to four live nieghbors lives on to the next generation
       return 1;
     if(live > 4) // a live cell with more than four live nieghbors dies
       return 0;
@@ -706,7 +706,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
     }
   }
 
-  if(live > 2 && live < 5){ // a live cell with two to four live nieghbors lives on to the next generation
+  if(live >= 2 && live < 5){ // a live cell with two to four live nieghbors lives on to the next generation
     new_cell = create_cell(x, y, z);
     insert_cell(next_world, new_cell);
 
@@ -745,41 +745,47 @@ world *get_next_world(world *actual_world){
     printf("    Testing cells\n");
   #endif
 
-  for(int x=0; x<actual_world->size; x++)
-    for(int y=0; y<actual_world->size; y++)
-      if(actual_world->cells[x][y]->root != NULL){
-        #ifdef DEBUG
-        printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
-        #endif
-        //this function will analyzer every node of the subtree, and add to the new world the cells
-        solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
-      }
-  #ifdef DEBUG
-  printf("\t\t\tFINISHED SUBTREE TESTS\n");
-  #endif
-
-
-
-  /*
-  for(int x=0; x<next_world->size; x++)
-    for(int y=0; y<next_world->size; y++)
-      for(int z=0; z<next_world->size; z++){
-
-        if(test_cell(x, y, z, actual_world, -1)){
+  if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
+    #ifdef ITERATION
+    printf("    Choose live cells\n");
+    #endif
+    for(int x=0; x<actual_world->size; x++)
+      for(int y=0; y<actual_world->size; y++)
+        if(actual_world->cells[x][y]->root != NULL){
           #ifdef DEBUG
-            printf("      %d %d %d will be alive\n",x, y, z);
+          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
           #endif
-          cell *new_cell = create_cell(x, y, z);
-          insert_cell(next_world, new_cell);
+          //this function will analyzer every node of the subtree, and add to the new world the cells
+          solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
+
         }
-        else{
-          #ifdef DEBUG
-            printf("      %d %d %d will be dead\n",x, y, z);
-          #endif
+    #ifdef DEBUG
+    printf("\t\t\tFINISHED SUBTREE TESTS\n");
+    #endif
+
+  }else{
+    #ifdef ITERATION
+    printf("    Choose N^3\n");
+    #endif
+    for(int x=0; x<next_world->size; x++)
+      for(int y=0; y<next_world->size; y++)
+        for(int z=0; z<next_world->size; z++){
+
+          if(test_cell(x, y, z, actual_world, -1)){
+            #ifdef DEBUG
+              printf("      %d %d %d will be alive\n",x, y, z);
+            #endif
+            cell *new_cell = create_cell(x, y, z);
+            insert_cell(next_world, new_cell);
+          }
+          else{
+            #ifdef DEBUG
+              printf("      %d %d %d will be dead\n",x, y, z);
+            #endif
+          }
         }
-      }
-  */
+  }
 
 
 
