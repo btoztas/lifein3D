@@ -506,7 +506,8 @@ int test_cell(int x, int y, int z, world* game, int status) {
   return -1;
 }
 
-
+// this function checks for a given node if it will by alive on the next world
+// it also checks, for the dead neighbors of the given node, if they will be alive on the next world, adding them if so.
 void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
   cell *new_cell;
@@ -716,7 +717,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
 }
 
-
+// it works by going to all nodes of the tree, and executing handle_node
 void solve_subtree(node *root, world* actual_world, world* next_world){
 
   if(root->left != NULL){
@@ -750,6 +751,7 @@ world *get_next_world(world *actual_world){
         #ifdef DEBUG
         printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
         #endif
+        //this function will analyzer every node of the subtree, and add to the new world the cells
         solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
       }
