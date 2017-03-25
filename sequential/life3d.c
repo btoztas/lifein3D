@@ -511,6 +511,15 @@ world *get_next_world(world *actual_world){
   #ifdef DEBUG
     printf("    Testing cells\n");
   #endif
+
+
+
+
+
+
+
+
+  /*
   for(int x=0; x<next_world->size; x++)
     for(int y=0; y<next_world->size; y++)
       for(int z=0; z<next_world->size; z++){
@@ -528,7 +537,10 @@ world *get_next_world(world *actual_world){
           #endif
         }
       }
+  */
 
+
+  
   #ifdef DEBUG
     printf("    Finished testing cells\n");
   #endif
