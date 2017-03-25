@@ -285,6 +285,7 @@ node  *insert_bintree(node *root, cell *new_cell){
       #ifdef DEBUG
       printf("\t\t\t\t\t\t\t\t\tCELL ALREADY EXISTS\n");
       #endif
+      destroy_cell(new_cell);
       return root;
     }else if(compare_cells(new_cell, root->this)==1){
 
@@ -755,10 +756,6 @@ world *get_next_world(world *actual_world){
   #ifdef DEBUG
   printf("\t\t\tFINISHED SUBTREE TESTS\n");
   #endif
-
-
-
-
 
 
 
