@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 typedef struct _cell{
 
   int x, y, z;
@@ -745,13 +746,18 @@ world *get_next_world(world *actual_world){
     printf("    Testing cells\n");
   #endif
 
+  int x, y, z;
 
   if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
     #ifdef ITERATION
     printf("   Choose live cells\n");
     #endif
-    for(int x=0; x<actual_world->size; x++)
-      for(int y=0; y<actual_world->size; y++)
+
+    #pragma omp parallel private(y)
+    {
+    #pragma omp for schedule(dynamic,10)
+    for(x=0; x<actual_world->size; x++)
+      for(y=0; y<actual_world->size; y++)
         if(actual_world->cells[x][y]->root != NULL){
           #ifdef DEBUG
           printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
@@ -760,6 +766,7 @@ world *get_next_world(world *actual_world){
           solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
         }
+    }
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n");
     #endif
@@ -768,23 +775,30 @@ world *get_next_world(world *actual_world){
     #ifdef ITERATION
     printf("    Choose N^3\n");
     #endif
-    for(int x=0; x<next_world->size; x++)
-      for(int y=0; y<next_world->size; y++)
-        for(int z=0; z<next_world->size; z++){
 
-          if(test_cell(x, y, z, actual_world, -1)){
-            #ifdef DEBUG
-              printf("      %d %d %d will be alive\n",x, y, z);
-            #endif
-            cell *new_cell = create_cell(x, y, z);
-            insert_cell(next_world, new_cell);
+
+
+    #pragma omp parallel private(y,z)
+    {
+      #pragma omp for schedule(dynamic,10)
+      for(x=0; x<next_world->size; x++)
+        for(y=0; y<next_world->size; y++)
+          for(z=0; z<next_world->size; z++){
+
+            if(test_cell(x, y, z, actual_world, -1)){
+              #ifdef DEBUG
+                printf("      %d %d %d will be alive\n",x, y, z);
+              #endif
+              cell *new_cell = create_cell(x, y, z);
+              insert_cell(next_world, new_cell);
+            }
+            else{
+              #ifdef DEBUG
+                printf("      %d %d %d will be dead\n",x, y, z);
+              #endif
+            }
           }
-          else{
-            #ifdef DEBUG
-              printf("      %d %d %d will be dead\n",x, y, z);
-            #endif
-          }
-        }
+    }
   }
 
 
@@ -864,7 +878,7 @@ int main(int argc, char* argv[]){
   for(int i=0; i<num_iterations; i++){
 
     #if defined(DEBUG) || defined(ITERATION)
-      printf("  Iteration number %d\n", i+1);
+      printf("  Iteration number %d\n", i+1); fflush(stdout);
     #endif
 
     next_world = get_next_world(actual_world);
