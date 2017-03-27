@@ -748,7 +748,7 @@ world *get_next_world(world *actual_world){
 
   if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
     #ifdef ITERATION
-    printf("    Choose live cells\n");
+    printf("   Choose live cells\n");
     #endif
     for(int x=0; x<actual_world->size; x++)
       for(int y=0; y<actual_world->size; y++)
