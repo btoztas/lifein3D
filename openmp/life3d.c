@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 
 
 typedef struct _cell{
@@ -71,12 +72,14 @@ bintree *create_bintree(){
 
 bintree ***create_bintree_hash(int size){
 
+  int i,j;
+
   bintree ***new = (bintree***)malloc(size*sizeof(bintree**));
-  for(int i=0; i<size; i++)
+  for(i=0; i<size; i++)
     new[i] = (bintree**)malloc(size*sizeof(bintree*));
 
-  for(int i=0; i<size; i++)
-    for(int j=0; j<size; j++)
+  for(j=0; j<size; j++)
+    for(i=0; i<size; i++)
       new[i][j] = create_bintree();
 
   return new;
@@ -104,12 +107,17 @@ void destroy_cell(cell *this){
 
 void destroy_bintree_nodes(node *root){
 
-  if(root->left != NULL)
-    destroy_bintree_nodes(root->left);
+  if(root->left != NULL){
 
-  if(root->right != NULL)
-    destroy_bintree_nodes(root->right);
+      destroy_bintree_nodes(root->left);
 
+  }
+  if(root->right != NULL){
+
+      destroy_bintree_nodes(root->right);
+
+  }
+  #pragma omp taskwait
   destroy_cell(root->this);
   free(root);
 
@@ -118,14 +126,20 @@ void destroy_bintree_nodes(node *root){
 // function to free the cell structures
 void destroy_bintree(bintree ***tree, int size){
 
-  for(int i=0; i<size; i++){
-    for(int j=0; j<size; j++){
+  int i, j;
+
+  for(i=0; i<size; i++){
+    for(j=0; j<size; j++){
       if(tree[i][j]->root!=NULL)
+
+
         destroy_bintree_nodes(tree[i][j]->root);
+
       free(tree[i][j]);
     }
     free(tree[i]);
   }
+
   free(tree);
 
 
@@ -753,9 +767,7 @@ world *get_next_world(world *actual_world){
     printf("   Choose live cells\n");
     #endif
 
-    #pragma omp parallel private(y)
-    {
-    #pragma omp for schedule(dynamic,10)
+    #pragma omp parallel for private(y) schedule(dynamic, 10)
     for(x=0; x<actual_world->size; x++)
       for(y=0; y<actual_world->size; y++)
         if(actual_world->cells[x][y]->root != NULL){
@@ -766,7 +778,7 @@ world *get_next_world(world *actual_world){
           solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
         }
-    }
+
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n");
     #endif
@@ -777,28 +789,24 @@ world *get_next_world(world *actual_world){
     #endif
 
 
-
-    #pragma omp parallel private(y,z)
-    {
-      #pragma omp for schedule(dynamic,10)
-      for(x=0; x<next_world->size; x++)
-        for(y=0; y<next_world->size; y++)
-          for(z=0; z<next_world->size; z++){
-
-            if(test_cell(x, y, z, actual_world, -1)){
-              #ifdef DEBUG
-                printf("      %d %d %d will be alive\n",x, y, z);
-              #endif
-              cell *new_cell = create_cell(x, y, z);
-              insert_cell(next_world, new_cell);
-            }
-            else{
-              #ifdef DEBUG
-                printf("      %d %d %d will be dead\n",x, y, z);
-              #endif
-            }
+    #pragma omp parallel for private(y,z) schedule(dynamic, 10)
+    for(x=0; x<next_world->size; x++)
+      for(y=0; y<next_world->size; y++)
+        for(z=0; z<next_world->size; z++){
+          if(test_cell(x, y, z, actual_world, -1)){
+            #ifdef DEBUG
+              printf("      %d %d %d will be alive\n",x, y, z);
+            #endif
+            cell *new_cell = create_cell(x, y, z);
+            insert_cell(next_world, new_cell);
           }
-    }
+          else{
+            #ifdef DEBUG
+              printf("      %d %d %d will be dead\n",x, y, z);
+            #endif
+          }
+        }
+
   }
 
 
@@ -835,6 +843,10 @@ void print_tree_padding ( node *root, int level ){
 
 
 int main(int argc, char* argv[]){
+
+  #ifdef TIME
+    double begin = omp_get_wtime();
+  #endif
 
   world *next_world;
 
@@ -911,6 +923,9 @@ int main(int argc, char* argv[]){
 
   fclose(file);
   free(file_name);
+  #ifdef TIME
+    printf("###Elapsed time: %lf seconds###\n", omp_get_wtime()-begin);
+  #endif
   exit(EXIT_SUCCESS);
 
 }

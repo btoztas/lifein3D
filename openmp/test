@@ -1,0 +1,53 @@
+#!/bin/bash
+
+rm our.*
+
+case $1 in
+	5)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s5e50.in 10 > /dev/null;
+		fi
+		time ./life3d tests/s5e50.in 10 > our.s5e50.10.out;
+		diff our.s5e50.10.out tests/s5e50.10.out;
+		;;
+
+	20)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s20e400.in 500 > /dev/null;
+		fi
+		time ./life3d tests/s20e400.in 500 > our.s20e400.500.out;
+		diff our.s20e400.500.out tests/s20e400.500.out;
+		;;
+
+	50)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s50e5k.in 300 > /dev/null;
+		fi
+		time ./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
+		diff our.s50e5k.300.out tests/s50e5k.300.out;
+		;;
+
+	150)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s150e10k.in 1000 > /dev/null;
+		fi
+		time ./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
+		diff our.s150e10k.1000.out tests/s150e10k.1000.out;
+		;;
+
+	200)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s200e50k.in 1000 > /dev/null;
+		fi
+		time ./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
+		diff our.s200e50k.1000.out tests/s200e50k.1000.out;
+		;;
+
+	500)
+		if [ "$2" = "-s" ]; then
+			time ./../sequential/life3d tests/s500e300k.in 2000 > /dev/null;
+		fi
+		time ./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
+		diff our.s500e300k.2000.out tests/s500e300k.2000.out;
+
+esac
