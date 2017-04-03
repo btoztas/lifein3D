@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <omp.h>
-
 
 typedef struct _cell{
 
@@ -11,6 +9,7 @@ typedef struct _cell{
 } cell;
 
 typedef struct _node{
+
   cell *this;
   int height;
   struct _node *left;
@@ -72,14 +71,12 @@ bintree *create_bintree(){
 
 bintree ***create_bintree_hash(int size){
 
-  int i,j;
-
   bintree ***new = (bintree***)malloc(size*sizeof(bintree**));
-  for(i=0; i<size; i++)
+  for(int i=0; i<size; i++)
     new[i] = (bintree**)malloc(size*sizeof(bintree*));
 
-  for(j=0; j<size; j++)
-    for(i=0; i<size; i++)
+  for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
       new[i][j] = create_bintree();
 
   return new;
@@ -107,17 +104,12 @@ void destroy_cell(cell *this){
 
 void destroy_bintree_nodes(node *root){
 
-  if(root->left != NULL){
+  if(root->left != NULL)
+    destroy_bintree_nodes(root->left);
 
-      destroy_bintree_nodes(root->left);
+  if(root->right != NULL)
+    destroy_bintree_nodes(root->right);
 
-  }
-  if(root->right != NULL){
-
-      destroy_bintree_nodes(root->right);
-
-  }
-  #pragma omp taskwait
   destroy_cell(root->this);
   free(root);
 
@@ -126,20 +118,14 @@ void destroy_bintree_nodes(node *root){
 // function to free the cell structures
 void destroy_bintree(bintree ***tree, int size){
 
-  int i, j;
-
-  for(i=0; i<size; i++){
-    for(j=0; j<size; j++){
+  for(int i=0; i<size; i++){
+    for(int j=0; j<size; j++){
       if(tree[i][j]->root!=NULL)
-
-
         destroy_bintree_nodes(tree[i][j]->root);
-
       free(tree[i][j]);
     }
     free(tree[i]);
   }
-
   free(tree);
 
 
@@ -449,6 +435,7 @@ int check_alive(int x, int y, int z, bintree ***tree){
 
   while(aux!=NULL){
     ret = most_priority_index((aux->this)->x, (aux->this)->y, (aux->this)->z, x, y, z);
+
     if(ret==-1)
       aux=aux->right;
     else if(ret==1)
@@ -467,41 +454,54 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
   int live = 0;
 
-  if(x+1 == game->size) {
-    if(check_alive(0,y, z, game->cells)) live++;
-  } else {
-    if(check_alive(x+1,y, z, game->cells)) live++;
-  }
 
-  if(x-1 == -1) {
-    if(check_alive(game->size-1,y, z, game->cells)) live++;
-  } else {
-    if(check_alive(x-1,y, z, game->cells)) live++;
-  }
+      if(x+1 == game->size) {
+        if(check_alive(0,y, z, game->cells)) live++;
+      } else {
+        if(check_alive(x+1,y, z, game->cells)) live++;
+      }
 
-  if(y+1 == game->size) {
-    if(check_alive(x,0, z, game->cells)) live++;
-  } else {
-    if(check_alive(x,y+1, z, game->cells)) live++;
-  }
 
-  if(y-1 == -1) {
-    if(check_alive(x,game->size-1, z, game->cells)) live++;
-  } else {
-    if(check_alive(x,y-1, z, game->cells)) live++;
-  }
 
-  if(z+1 == game->size) {
-    if(check_alive(x,y,0, game->cells)) live++;
-  } else {
-    if(check_alive(x,y,z+1, game->cells)) live++;
-  }
+      if(x-1 == -1) {
+        if(check_alive(game->size-1,y, z, game->cells)) live++;
+      } else {
+        if(check_alive(x-1,y, z, game->cells)) live++;
+      }
 
-  if(z-1 == -1) {
-    if(check_alive(x,y,game->size-1, game->cells)) live++;
-  } else {
-    if(check_alive(x,y,z-1, game->cells)) live++;
-  }
+
+
+      if(y+1 == game->size) {
+        if(check_alive(x,0, z, game->cells)) live++;
+      } else {
+        if(check_alive(x,y+1, z, game->cells)) live++;
+      }
+
+
+
+      if(y-1 == -1) {
+        if(check_alive(x,game->size-1, z, game->cells)) live++;
+      } else {
+        if(check_alive(x,y-1, z, game->cells)) live++;
+      }
+
+
+
+      if(z+1 == game->size) {
+        if(check_alive(x,y,0, game->cells)) live++;
+      } else {
+        if(check_alive(x,y,z+1, game->cells)) live++;
+      }
+
+
+
+      if(z-1 == -1) {
+        if(check_alive(x,y,game->size-1, game->cells)) live++;
+      } else {
+        if(check_alive(x,y,z-1, game->cells)) live++;
+      }
+
+
 
   if(status == -1)
     status = check_alive(x,y,z, game->cells);
@@ -529,194 +529,215 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
   int live = 0;
 
-  if(x+1 == actual_world->size) {
-    if(check_alive(0,y, z, actual_world->cells)) {
+  #pragma omp parallel sections reduction(+:live)
+  {
+    #pragma omp section
+    {
+      if(x+1 == actual_world->size) {
+        if(check_alive(0,y, z, actual_world->cells)) {
 
-      live++;
+          live++;
 
-    }else{
-      if(test_cell(0,y, z, actual_world, 0)){
-        new_cell = create_cell(0,y, z);
-        insert_cell(next_world, new_cell);
+        }else{
+          if(test_cell(0,y, z, actual_world, 0)){
+            new_cell = create_cell(0,y, z);
+            insert_cell(next_world, new_cell);
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", 0,y, z);
-        #endif
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", 0,y, z);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x+1,y, z, actual_world->cells)) {
+
+          live++;
+
+        }else{
+          if(test_cell(x+1,y, z, actual_world, 0)){
+            new_cell = create_cell(x+1,y, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x+1,y, z);
+            #endif
+          }
+        }
       }
     }
-  } else {
-    if(check_alive(x+1,y, z, actual_world->cells)) {
 
-      live++;
+    #pragma omp section
+    {
+      if(x-1 == -1) {
+        if(check_alive(actual_world->size-1,y, z, actual_world->cells)) {
 
-    }else{
-      if(test_cell(x+1,y, z, actual_world, 0)){
-        new_cell = create_cell(x+1,y, z);
-        insert_cell(next_world, new_cell);
+          live++;
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x+1,y, z);
-        #endif
+        }else{
+          if(test_cell(actual_world->size-1,y, z, actual_world, 0)){
+            new_cell = create_cell(actual_world->size-1,y, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", actual_world->size-1,y, z);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x-1,y, z, actual_world->cells)) {
+
+          live++;
+
+        }else{
+          if(test_cell(x-1,y, z, actual_world, 0)){
+            new_cell = create_cell(x-1,y, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x-1,y, z);
+            #endif
+          }
+        }
       }
     }
-  }
 
-  if(x-1 == -1) {
-    if(check_alive(actual_world->size-1,y, z, actual_world->cells)) {
+    #pragma omp section
+    {
+      if(y+1 == actual_world->size) {
+        if(check_alive(x,0, z, actual_world->cells)) {
 
-      live++;
+          live++;
 
-    }else{
-      if(test_cell(actual_world->size-1,y, z, actual_world, 0)){
-        new_cell = create_cell(actual_world->size-1,y, z);
-        insert_cell(next_world, new_cell);
+        }else{
+          if(test_cell(x,0, z, actual_world, 0)){
+            new_cell = create_cell(x,0, z);
+            insert_cell(next_world, new_cell);
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", actual_world->size-1,y, z);
-        #endif
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,0, z);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x,y+1, z, actual_world->cells)) {
+
+          live++;
+
+        }else{
+          if(test_cell(x,y+1, z, actual_world, 0)){
+            new_cell = create_cell(x,y+1, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y+1, z);
+            #endif
+          }
+        }
       }
     }
-  } else {
-    if(check_alive(x-1,y, z, actual_world->cells)) {
 
-      live++;
+    #pragma omp section
+    {
+      if(y-1 == -1) {
+        if(check_alive(x,actual_world->size-1, z, actual_world->cells)) {
 
-    }else{
-      if(test_cell(x-1,y, z, actual_world, 0)){
-        new_cell = create_cell(x-1,y, z);
-        insert_cell(next_world, new_cell);
+          live++;
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x-1,y, z);
-        #endif
+        }else{
+          if(test_cell(x,actual_world->size-1, z, actual_world, 0)){
+            new_cell = create_cell(x,actual_world->size-1, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,actual_world->size-1, z);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x,y-1, z, actual_world->cells)) {
+
+          live++;
+
+        }else{
+          if(test_cell(x,y-1, z, actual_world, 0)){
+            new_cell = create_cell(x,y-1, z);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y-1, z);
+            #endif
+          }
+        }
       }
     }
-  }
 
-  if(y+1 == actual_world->size) {
-    if(check_alive(x,0, z, actual_world->cells)) {
+    #pragma omp section
+    {
+      if(z+1 == actual_world->size) {
+        if(check_alive(x,y,0, actual_world->cells)) {
 
-      live++;
+          live++;
 
-    }else{
-      if(test_cell(x,0, z, actual_world, 0)){
-        new_cell = create_cell(x,0, z);
-        insert_cell(next_world, new_cell);
+        }else{
+          if(test_cell(x,y,0, actual_world, 0)){
+            new_cell = create_cell(x,y,0);
+            insert_cell(next_world, new_cell);
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,0, z);
-        #endif
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,0);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x,y,z+1, actual_world->cells)) {
+
+          live++;
+
+        }else{
+          if(test_cell(x,y,z+1, actual_world, 0)){
+            new_cell = create_cell(x,y,z+1);
+            insert_cell(next_world, new_cell);
+
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z+1);
+            #endif
+          }
+        }
       }
     }
-  } else {
-    if(check_alive(x,y+1, z, actual_world->cells)) {
 
-      live++;
+    #pragma omp section
+    {
+      if(z-1 == -1) {
+        if(check_alive(x,y,actual_world->size-1, actual_world->cells)) {
 
-    }else{
-      if(test_cell(x,y+1, z, actual_world, 0)){
-        new_cell = create_cell(x,y+1, z);
-        insert_cell(next_world, new_cell);
+          live++;
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y+1, z);
-        #endif
-      }
-    }
-  }
+        }else{
+          if(test_cell(x,y,actual_world->size-1, actual_world, 0)){
+            new_cell = create_cell(x,y,actual_world->size-1);
+            insert_cell(next_world, new_cell);
 
-  if(y-1 == -1) {
-    if(check_alive(x,actual_world->size-1, z, actual_world->cells)) {
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,actual_world->size-1);
+            #endif
+          }
+        }
+      } else {
+        if(check_alive(x,y,z-1, actual_world->cells)) {
 
-      live++;
+          live++;
 
-    }else{
-      if(test_cell(x,actual_world->size-1, z, actual_world, 0)){
-        new_cell = create_cell(x,actual_world->size-1, z);
-        insert_cell(next_world, new_cell);
+        }else{
+          if(test_cell(x,y,z-1, actual_world, 0)){
+            new_cell = create_cell(x,y,z-1);
+            insert_cell(next_world, new_cell);
 
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,actual_world->size-1, z);
-        #endif
-      }
-    }
-  } else {
-    if(check_alive(x,y-1, z, actual_world->cells)) {
-
-      live++;
-
-    }else{
-      if(test_cell(x,y-1, z, actual_world, 0)){
-        new_cell = create_cell(x,y-1, z);
-        insert_cell(next_world, new_cell);
-
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y-1, z);
-        #endif
-      }
-    }
-  }
-
-  if(z+1 == actual_world->size) {
-    if(check_alive(x,y,0, actual_world->cells)) {
-
-      live++;
-
-    }else{
-      if(test_cell(x,y,0, actual_world, 0)){
-        new_cell = create_cell(x,y,0);
-        insert_cell(next_world, new_cell);
-
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,0);
-        #endif
-      }
-    }
-  } else {
-    if(check_alive(x,y,z+1, actual_world->cells)) {
-
-      live++;
-
-    }else{
-      if(test_cell(x,y,z+1, actual_world, 0)){
-        new_cell = create_cell(x,y,z+1);
-        insert_cell(next_world, new_cell);
-
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z+1);
-        #endif
-      }
-    }
-  }
-
-  if(z-1 == -1) {
-    if(check_alive(x,y,actual_world->size-1, actual_world->cells)) {
-
-      live++;
-
-    }else{
-      if(test_cell(x,y,actual_world->size-1, actual_world, 0)){
-        new_cell = create_cell(x,y,actual_world->size-1);
-        insert_cell(next_world, new_cell);
-
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,actual_world->size-1);
-        #endif
-      }
-    }
-  } else {
-    if(check_alive(x,y,z-1, actual_world->cells)) {
-
-      live++;
-
-    }else{
-      if(test_cell(x,y,z-1, actual_world, 0)){
-        new_cell = create_cell(x,y,z-1);
-        insert_cell(next_world, new_cell);
-
-        #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z-1);
-        #endif
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z-1);
+            #endif
+          }
+        }
       }
     }
   }
@@ -767,7 +788,9 @@ world *get_next_world(world *actual_world){
     printf("   Choose live cells\n");
     #endif
 
-    #pragma omp parallel for private(y) schedule(dynamic, 10)
+    #pragma omp parallel private(y)
+    {
+    #pragma omp for schedule(dynamic,10)
     for(x=0; x<actual_world->size; x++)
       for(y=0; y<actual_world->size; y++)
         if(actual_world->cells[x][y]->root != NULL){
@@ -778,7 +801,7 @@ world *get_next_world(world *actual_world){
           solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
 
         }
-
+    }
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n");
     #endif
@@ -789,25 +812,29 @@ world *get_next_world(world *actual_world){
     #endif
 
 
-    #pragma omp parallel for private(y,z) schedule(dynamic, 10)
-    for(x=0; x<next_world->size; x++)
-      for(y=0; y<next_world->size; y++)
-        for(z=0; z<next_world->size; z++){
-          if(test_cell(x, y, z, actual_world, -1)){
-            #ifdef DEBUG
-              printf("      %d %d %d will be alive\n",x, y, z);
-            #endif
-            cell *new_cell = create_cell(x, y, z);
-            insert_cell(next_world, new_cell);
-          }
-          else{
-            #ifdef DEBUG
-              printf("      %d %d %d will be dead\n",x, y, z);
-            #endif
-          }
-        }
+    #pragma omp parallel private(y,z)
+    {
+      #pragma omp for schedule(dynamic,10)
+      for(x=0; x<next_world->size; x++)
+        for(y=0; y<next_world->size; y++)
+          for(z=0; z<next_world->size; z++){
 
+            if(test_cell(x, y, z, actual_world, -1)){
+              #ifdef DEBUG
+                printf("      %d %d %d will be alive\n",x, y, z);
+              #endif
+              cell *new_cell = create_cell(x, y, z);
+              insert_cell(next_world, new_cell);
+            }
+            else{
+              #ifdef DEBUG
+                printf("      %d %d %d will be dead\n",x, y, z);
+              #endif
+            }
+          }
+    }
   }
+
 
 
 
@@ -843,10 +870,6 @@ void print_tree_padding ( node *root, int level ){
 
 
 int main(int argc, char* argv[]){
-
-  #ifdef TIME
-    double begin = omp_get_wtime();
-  #endif
 
   world *next_world;
 
@@ -923,9 +946,6 @@ int main(int argc, char* argv[]){
 
   fclose(file);
   free(file_name);
-  #ifdef TIME
-    printf("###Elapsed time: %lf seconds###\n", omp_get_wtime()-begin);
-  #endif
   exit(EXIT_SUCCESS);
 
 }
