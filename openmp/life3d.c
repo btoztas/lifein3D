@@ -3,6 +3,8 @@
 #include <string.h>
 #include <omp.h>
 
+
+
 typedef struct _cell{
 
   int x, y, z;
@@ -905,18 +907,20 @@ world *get_next_world(world *actual_world){
     printf("   Choose live cells\n"); fflush(stdout);
     #endif
 
-
-    for(x=0; x<actual_world->size; x++)
-      for(y=0; y<actual_world->size; y++)
-        if(actual_world->cells[x][y]->root != NULL){
-          #ifdef DEBUG
-          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y); fflush(stdout);
-          #endif
-          //this function will analyzer every node of the subtree, and add to the new world the cells
-          solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
-
-        }
-
+    #pragma omp parallel private(y)
+    {
+      int num_threads = omp_get_num_threads();
+      #pragma omp for
+      for(x=0; x<actual_world->size; x++)
+        for(y=0; y<actual_world->size; y++)
+          if(actual_world->cells[x][y]->root != NULL){
+            #ifdef ITERATION
+            printf("\t\t\t\tTHREAD NUM %d   TESTING SUBTREE %d %d\n", omp_get_thread_num(), x, y); fflush(stdout);
+            #endif
+            //this function will analyzer every node of the subtree, and add to the new world the cells
+            solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
+          }
+    }
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n"); fflush(stdout);
     #endif
@@ -930,7 +934,8 @@ world *get_next_world(world *actual_world){
 
     #pragma omp parallel private(y,z)
     {
-      #pragma omp for schedule(guided, (next_world->size)/(5*omp_get_num_threads)
+      int num_threads = omp_get_num_threads();
+      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
       for(x=0; x<next_world->size; x++)
         for(y=0; y<next_world->size; y++)
           for(z=0; z<next_world->size; z++){
