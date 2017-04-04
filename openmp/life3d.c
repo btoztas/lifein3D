@@ -36,8 +36,8 @@ typedef struct _world{
 cell *create_cell(int x, int y, int z){
 
   cell *new = (cell*)malloc(sizeof(cell));
-  if(new == NULL)
-    printf("Error allocating memory for a new cell.\n"); fflush(stdout);
+  if(new == NULL){
+    printf("Error allocating memory for a new cell.\n"); fflush(stdout);}
   new->x    = x;
   new->y    = y;
   new->z    = z;
@@ -48,8 +48,8 @@ cell *create_cell(int x, int y, int z){
 node *create_bintree_node(cell *this){
 
   node *new   = (node*)malloc(sizeof(node));
-  if(new == NULL)
-    printf("Error allocating memory for a new node.\n"); fflush(stdout);
+  if(new == NULL){
+    printf("Error allocating memory for a new node.\n"); fflush(stdout);}
   new->this   = this;
   new->left   = NULL;
   new->right  = NULL;
@@ -62,8 +62,8 @@ node *create_bintree_node(cell *this){
 bintree *create_bintree(){
 
   bintree *tree = (bintree*)malloc(sizeof(bintree));
-  if(tree == NULL)
-    printf("Error allocating memory for a new tree.\n"); fflush(stdout);
+  if(tree == NULL){
+    printf("Error allocating memory for a new tree.\n"); fflush(stdout);}
   tree->root    = NULL;
 
   return tree;
@@ -87,8 +87,8 @@ bintree ***create_bintree_hash(int size){
 world *create_world(int size){
 
   world *new       = (world*)malloc(sizeof(world));
-  if(new == NULL)
-    printf("Error allocating memory for a new world.\n"); fflush(stdout);
+  if(new == NULL){
+    printf("Error allocating memory for a new world.\n"); fflush(stdout);}
   new->alive_cells = 0;
   new->size        = size;
   new->cells       = create_bintree_hash(size);
@@ -98,21 +98,31 @@ world *create_world(int size){
 }
 
 void destroy_cell(cell *this){
-
-  free(this);
+  if(this!=NULL)
+    free(this);
 
 }
 
 void destroy_bintree_nodes(node *root){
 
+
   if(root->left != NULL)
+    //#pragma omp task
     destroy_bintree_nodes(root->left);
 
   if(root->right != NULL)
+    //#pragma omp task
     destroy_bintree_nodes(root->right);
 
+
+
   destroy_cell(root->this);
-  free(root);
+  //#pragma omp taskwait
+  //{
+  if(root!=NULL)
+    free(root);
+
+//  }
 
 }
 
@@ -122,7 +132,13 @@ void destroy_bintree(bintree ***tree, int size){
   for(int i=0; i<size; i++){
     for(int j=0; j<size; j++){
       if(tree[i][j]->root!=NULL)
-        destroy_bintree_nodes(tree[i][j]->root);
+        //#pragma omp parallel
+        //{
+        //  #pragma omp single
+        //  {
+            destroy_bintree_nodes(tree[i][j]->root);
+          //}
+        //}
       free(tree[i][j]);
     }
     free(tree[i]);
@@ -285,12 +301,18 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
       (*n_cells)++;
 
     }else if(compare_cells(new_cell, root->this)==0){
+
       #ifdef DEBUG
       printf("\t\t\t\t\t\t\t\t\tCELL %d %d %d ALREADY EXISTS   FROM THREAD %d\n", new_cell->x, new_cell->y, new_cell->z, omp_get_thread_num()); fflush(stdout);
       printf("\t\t\t\t\t\t\t\t\tFREEING CELL %d %d %d FROM THREAD %d\n",new_cell->x, new_cell->y, new_cell->z, omp_get_thread_num()); fflush(stdout);
       #endif
+
       destroy_cell(new_cell);
+
+      #ifdef DEBUG
       printf("\t\t\t\t\t\t\t\t\tDONE FREEING CELL   FROM THREAD %d\n", omp_get_thread_num()); fflush(stdout);
+      #endif
+
       return root;
     }else if(compare_cells(new_cell, root->this)==1){
 
@@ -457,20 +479,33 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
   int live = 0;
 
+//  #pragma omp parallel
+//{
+
+//  #pragma omp sections nowait reduction(+:live)
+//  {
+
+//    #pragma omp section
+//    {
+
 
       if(x+1 == game->size) {
         if(check_alive(0,y, z, game->cells)) live++;
       } else {
         if(check_alive(x+1,y, z, game->cells)) live++;
       }
-
-
+    //}
+//    #pragma omp section
+//    {
 
       if(x-1 == -1) {
         if(check_alive(game->size-1,y, z, game->cells)) live++;
       } else {
         if(check_alive(x-1,y, z, game->cells)) live++;
       }
+    //}
+//    #pragma omp section
+//    {
 
 
 
@@ -479,6 +514,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
       } else {
         if(check_alive(x,y+1, z, game->cells)) live++;
       }
+    //}
+//    #pragma omp section
+//    {
 
 
 
@@ -487,6 +525,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
       } else {
         if(check_alive(x,y-1, z, game->cells)) live++;
       }
+    //}
+//    #pragma omp section
+//    {
 
 
 
@@ -495,6 +536,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
       } else {
         if(check_alive(x,y,z+1, game->cells)) live++;
       }
+    //}
+//    #pragma omp section
+//    {
 
 
 
@@ -503,8 +547,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
       } else {
         if(check_alive(x,y,z-1, game->cells)) live++;
       }
-
-
+  //  }
+//}
+//}
 
   if(status == -1)
     status = check_alive(x,y,z, game->cells);
@@ -530,17 +575,17 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
   cell *new_cell;
 
-  omp_lock_t lck_insertcell;
+//  omp_lock_t lck_insertcell;
   int live = 0;
-  #pragma omp parallel
-{
+//  #pragma omp parallel private(new_cell)
+//{
 
-      omp_init_lock(&lck_insertcell);
-  #pragma omp sections reduction(+:live)
-  {
+//      omp_init_lock(&lck_insertcell);
+//  #pragma omp sections reduction(+:live)
+//  {
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(x+1 == actual_world->size) {
         if(check_alive(0,y, z, actual_world->cells)) {
 
@@ -548,10 +593,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(0,y, z, actual_world, 0)){
+
             new_cell = create_cell(0,y, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", 0,y, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", 0,y, z, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -564,20 +613,24 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x+1,y, z, actual_world, 0)){
+
             new_cell = create_cell(x+1,y, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x+1,y, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x+1,y, z, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(x-1 == -1) {
         if(check_alive(actual_world->size-1,y, z, actual_world->cells)) {
 
@@ -585,10 +638,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(actual_world->size-1,y, z, actual_world, 0)){
+
             new_cell = create_cell(actual_world->size-1,y, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", actual_world->size-1,y, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", actual_world->size-1,y, z, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -601,20 +658,24 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x-1,y, z, actual_world, 0)){
+
             new_cell = create_cell(x-1,y, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x-1,y, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x-1,y, z, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(y+1 == actual_world->size) {
         if(check_alive(x,0, z, actual_world->cells)) {
 
@@ -622,10 +683,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,0, z, actual_world, 0)){
+
             new_cell = create_cell(x,0, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,0, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,0, z, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -638,20 +703,24 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y+1, z, actual_world, 0)){
+
             new_cell = create_cell(x,y+1, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y+1, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y+1, z, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(y-1 == -1) {
         if(check_alive(x,actual_world->size-1, z, actual_world->cells)) {
 
@@ -659,10 +728,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,actual_world->size-1, z, actual_world, 0)){
+
             new_cell = create_cell(x,actual_world->size-1, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,actual_world->size-1, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,actual_world->size-1, z, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -675,20 +748,24 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y-1, z, actual_world, 0)){
+
             new_cell = create_cell(x,y-1, z);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y-1, z, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y-1, z, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(z+1 == actual_world->size) {
         if(check_alive(x,y,0, actual_world->cells)) {
 
@@ -696,10 +773,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y,0, actual_world, 0)){
+
             new_cell = create_cell(x,y,0);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,0, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,0, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -712,20 +793,24 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y,z+1, actual_world, 0)){
+
             new_cell = create_cell(x,y,z+1);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,z+1, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,z+1, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-    #pragma omp section
-    {
+//    #pragma omp section
+//    {
       if(z-1 == -1) {
         if(check_alive(x,y,actual_world->size-1, actual_world->cells)) {
 
@@ -733,10 +818,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y,actual_world->size-1, actual_world, 0)){
+
             new_cell = create_cell(x,y,actual_world->size-1);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,actual_world->size-1, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,actual_world->size-1, omp_get_thread_num()); fflush(stdout);
             #endif
@@ -749,21 +838,25 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
         }else{
           if(test_cell(x,y,z-1, actual_world, 0)){
+
             new_cell = create_cell(x,y,z-1);
-            omp_set_lock(&lck_insertcell);
+            #ifdef DEBUG
+            printf("\t\t\t\t\t\t HANDLE NODE    GOING TO INSERT DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,z-1, omp_get_thread_num()); fflush(stdout);
+            #endif
+            //omp_set_lock(&lck_insertcell);
             insert_cell(next_world, new_cell);
-            omp_unset_lock(&lck_insertcell);
+            //omp_unset_lock(&lck_insertcell);
             #ifdef DEBUG
             printf("\t\t\t\t\t\t HANDLE NODE    INSERTED DEAD CELL %d %d %d    FROM THREAD: %d\n", x,y,z-1, omp_get_thread_num()); fflush(stdout);
             #endif
           }
         }
       }
-    }
+//    }
 
-}
-omp_destroy_lock(&lck_insertcell);
-}
+//}
+//omp_destroy_lock(&lck_insertcell);
+//}
 
   if(live >= 2 && live < 5){ // a live cell with two to four live nieghbors lives on to the next generation
     new_cell = create_cell(x, y, z);
@@ -837,7 +930,7 @@ world *get_next_world(world *actual_world){
 
     #pragma omp parallel private(y,z)
     {
-      #pragma omp for schedule(auto)
+      #pragma omp for schedule(guided, (next_world->size)/(5*omp_get_num_threads)
       for(x=0; x<next_world->size; x++)
         for(y=0; y<next_world->size; y++)
           for(z=0; z<next_world->size; z++){
@@ -904,8 +997,8 @@ int main(int argc, char* argv[]){
 
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
-  if(file_name == NULL)
-    printf("Error allocating memory for filename.\n"); fflush(stdout);
+  if(file_name == NULL){
+    printf("Error allocating memory for filename.\n"); fflush(stdout);}
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
   #ifdef DEBUG
