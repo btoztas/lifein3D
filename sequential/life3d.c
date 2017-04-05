@@ -16,17 +16,11 @@ typedef struct _node{
 
 } node;
 
-typedef struct _bintree{
-
-  node *root;
-
-} bintree;
-
 typedef struct _world{
 
   int alive_cells;
   int size;
-  bintree **cells;
+  node **cells;
 
 } world;
 
@@ -57,23 +51,10 @@ node *create_bintree_node(cell *this){
 
 }
 
-bintree *create_bintree(){
 
-  bintree *tree = (bintree*)malloc(sizeof(bintree));
-  if(tree == NULL)
-    printf("Error allocating memory for a new tree.\n");
-  tree->root    = NULL;
+node **create_bintree_hash(int size){
 
-  return tree;
-
-}
-
-bintree **create_bintree_hash(int size){
-
-  bintree **new = (bintree**)malloc(size*size*sizeof(bintree*));
-
-  for(int i=0; i < (size*size); i++)
-      new[i] = create_bintree();
+  node **new = (node**)calloc(size*size,sizeof(node*));
 
   return new;
 
@@ -112,13 +93,12 @@ void destroy_bintree_nodes(node *root){
 }
 
 // function to free the cell structures
-void destroy_bintree(bintree **tree, int size){
+void destroy_bintree(node **tree, int size){
 
-  for(int i=0; i<size*size; i++){
-    if(tree[i]->root!=NULL)
-      destroy_bintree_nodes(tree[i]->root);
-    free(tree[i]);
-  }
+  for(int i=0; i<size*size; i++)
+    if(tree[i]!=NULL)
+      destroy_bintree_nodes(tree[i]);
+
   free(tree);
 }
 
@@ -161,11 +141,11 @@ void print_bintree(node *root){
 
 }
 
-void print_bintree_hash(bintree **tree, int size){
+void print_bintree_hash(node **tree, int size){
 
   for(int i=0; i<size*size; i++)
-    if(tree[i]->root!=NULL)
-      print_bintree(tree[i]->root);
+    if(tree[i]!=NULL)
+      print_bintree(tree[i]);
 
 }
 
@@ -327,18 +307,9 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 }
 
 
-
-void insert_data(bintree *tree, cell *new_cell, int *n_cells){
-
-
-  tree->root = insert_bintree(tree->root, new_cell, n_cells);
-
-}
-
-
 void insert_cell(world *game, cell *new_cell){
 
-  insert_data(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
+  game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
     printf("      Inserted in tree\n"); fflush(stdout);
@@ -348,9 +319,6 @@ void insert_cell(world *game, cell *new_cell){
   return;
 
 }
-
-
-
 
 // create initial world from input file
 world *file_to_world(FILE *file){
@@ -419,9 +387,9 @@ void usage(){
 }
 
 
-int check_alive(int size, int x, int y, int z, bintree **tree ){
+int check_alive(int size, int x, int y, int z, node **tree ){
 
-  node *aux = tree[x * size + y]->root;
+  node *aux = tree[x * size + y];
   int ret;
 
   while(aux!=NULL){
@@ -746,12 +714,12 @@ world *get_next_world(world *actual_world){
     #endif
     for(int x=0; x<actual_world->size; x++)
       for(int y=0; y<actual_world->size; y++)
-        if(actual_world->cells[x * actual_world->size + y]->root != NULL){
+        if(actual_world->cells[x * actual_world->size + y] != NULL){
           #ifdef DEBUG
           printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
           #endif
           //this function will analyzer every node of the subtree, and add to the new world the cells
-          solve_subtree(actual_world->cells[x * actual_world->size + y]->root, actual_world, next_world);
+          solve_subtree(actual_world->cells[x * actual_world->size + y], actual_world, next_world);
 
         }
     #ifdef DEBUG

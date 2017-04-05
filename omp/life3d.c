@@ -741,16 +741,11 @@ world *get_next_world(world *actual_world){
     printf("    Testing cells\n");
   #endif
 
- //AQUI!!
   if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
     #ifdef ITERATION
     printf("   Choose live cells\n");
     #endif
 
-    #pragma omp parallel
-    {
-      int num_threads = omp_get_num_threads();
-      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
       for(int i=0; i<actual_world->size*actual_world->size; i++)
           if(actual_world->cells[i]->root != NULL){
 
@@ -761,7 +756,7 @@ world *get_next_world(world *actual_world){
             solve_subtree(actual_world->cells[i]->root, actual_world, next_world);
 
         }
-    }
+
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n");
     #endif
