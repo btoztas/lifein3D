@@ -164,7 +164,8 @@ void print_bintree(node *root){
 void print_bintree_hash(bintree **tree, int size){
 
   for(int i=0; i<size*size; i++)
-    print_bintree(tree[i]->root);
+    if(tree[i]->root!=NULL)
+      print_bintree(tree[i]->root);
 
 }
 
