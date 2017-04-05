@@ -3,8 +3,6 @@
 #include <string.h>
 #include <omp.h>
 
-
-
 typedef struct _cell{
 
   int x, y, z;
@@ -30,7 +28,7 @@ typedef struct _world{
 
   int alive_cells;
   int size;
-  bintree ***cells;
+  bintree **cells;
 
 } world;
 
@@ -72,15 +70,13 @@ bintree *create_bintree(){
 
 }
 
-bintree ***create_bintree_hash(int size){
+bintree **create_bintree_hash(int size){
 
-  bintree ***new = (bintree***)malloc(size*sizeof(bintree**));
-  for(int i=0; i<size; i++)
-    new[i] = (bintree**)malloc(size*sizeof(bintree*));
+  bintree **new = (bintree**)malloc(size*size*sizeof(bintree*));
 
   for(int i=0; i<size; i++)
     for(int j=0; j<size; j++)
-      new[i][j] = create_bintree();
+      new[i * size + j] = create_bintree();
 
   return new;
 
@@ -129,21 +125,20 @@ void destroy_bintree_nodes(node *root){
 }
 
 // function to free the cell structures
-void destroy_bintree(bintree ***tree, int size){
-
-  for(int i=0; i<size; i++){
-    for(int j=0; j<size; j++){
-      if(tree[i][j]->root!=NULL)
+void destroy_bintree(bintree **tree, int size){
+  int i,j;
+  for(i=0; i<size; i++){
+    for(j=0; j<size; j++){
+      if(tree[i * size + j]->root!=NULL)
         //#pragma omp parallel
         //{
         //  #pragma omp single
         //  {
-            destroy_bintree_nodes(tree[i][j]->root);
+            destroy_bintree_nodes(tree[i * size + j]->root);
           //}
         //}
-      free(tree[i][j]);
     }
-    free(tree[i]);
+    free(tree[i * size + j]);
   }
   free(tree);
 
@@ -189,12 +184,12 @@ void print_bintree(node *root){
 
 }
 
-void print_bintree_hash(bintree ***tree, int size){
+void print_bintree_hash(bintree **tree, int size){
 
   for(int i=0; i<size; i++)
     for(int j=0; j<size; j++)
-      if(tree[i][j]->root!=NULL)
-        print_bintree(tree[i][j]->root);
+      if(tree[i * size + j]->root!=NULL)
+        print_bintree(tree[i * size + j]->root);
 
 }
 
@@ -375,7 +370,7 @@ void insert_data(bintree *tree, cell *new_cell, int *n_cells){
 
 void insert_cell(world *game, cell *new_cell){
 
-  insert_data(game->cells[new_cell->x][new_cell->y], new_cell, &(game->alive_cells));
+  insert_data(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
     printf("      Inserted in tree\n"); fflush(stdout);
@@ -455,9 +450,9 @@ void usage(){
   printf("usage:\t life3d <input.in> <number of iterations>\n\n\n"); fflush(stdout);
 }
 
-int check_alive(int x, int y, int z, bintree ***tree){
+int check_alive(int size, int x, int y, int z, bintree **tree ){
 
-  node *aux = tree[x][y]->root;
+  node *aux = tree[x * size + y]->root;
   int ret;
 
   while(aux!=NULL){
@@ -492,18 +487,18 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
 
       if(x+1 == game->size) {
-        if(check_alive(0,y, z, game->cells)) live++;
+        if(check_alive(game->size, 0,y, z, game->cells)) live++;
       } else {
-        if(check_alive(x+1,y, z, game->cells)) live++;
+        if(check_alive(game->size, x+1,y, z, game->cells)) live++;
       }
     //}
 //    #pragma omp section
 //    {
 
       if(x-1 == -1) {
-        if(check_alive(game->size-1,y, z, game->cells)) live++;
+        if(check_alive(game->size, game->size-1,y, z, game->cells)) live++;
       } else {
-        if(check_alive(x-1,y, z, game->cells)) live++;
+        if(check_alive(game->size, x-1,y, z, game->cells)) live++;
       }
     //}
 //    #pragma omp section
@@ -512,9 +507,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
 
       if(y+1 == game->size) {
-        if(check_alive(x,0, z, game->cells)) live++;
+        if(check_alive(game->size, x,0, z, game->cells)) live++;
       } else {
-        if(check_alive(x,y+1, z, game->cells)) live++;
+        if(check_alive(game->size, x,y+1, z, game->cells)) live++;
       }
     //}
 //    #pragma omp section
@@ -523,9 +518,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
 
       if(y-1 == -1) {
-        if(check_alive(x,game->size-1, z, game->cells)) live++;
+        if(check_alive(game->size, x,game->size-1, z, game->cells)) live++;
       } else {
-        if(check_alive(x,y-1, z, game->cells)) live++;
+        if(check_alive(game->size, x,y-1, z, game->cells)) live++;
       }
     //}
 //    #pragma omp section
@@ -534,9 +529,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
 
       if(z+1 == game->size) {
-        if(check_alive(x,y,0, game->cells)) live++;
+        if(check_alive(game->size, x,y,0, game->cells)) live++;
       } else {
-        if(check_alive(x,y,z+1, game->cells)) live++;
+        if(check_alive(game->size, x,y,z+1, game->cells)) live++;
       }
     //}
 //    #pragma omp section
@@ -545,16 +540,16 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
 
       if(z-1 == -1) {
-        if(check_alive(x,y,game->size-1, game->cells)) live++;
+        if(check_alive(game->size, x,y,game->size-1, game->cells)) live++;
       } else {
-        if(check_alive(x,y,z-1, game->cells)) live++;
+        if(check_alive(game->size, x,y,z-1, game->cells)) live++;
       }
   //  }
 //}
 //}
 
   if(status == -1)
-    status = check_alive(x,y,z, game->cells);
+    status = check_alive(game->size, x,y,z, game->cells);
   if(status){
     if(live < 2) // a live cell with fewer than two live nieghbors dies
       return 0;
@@ -589,7 +584,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(x+1 == actual_world->size) {
-        if(check_alive(0,y, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, 0,y, z, actual_world->cells)) {
 
           live++;
 
@@ -609,7 +604,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x+1,y, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x+1,y, z, actual_world->cells)) {
 
           live++;
 
@@ -634,7 +629,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(x-1 == -1) {
-        if(check_alive(actual_world->size-1,y, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, actual_world->size-1,y, z, actual_world->cells)) {
 
           live++;
 
@@ -654,7 +649,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x-1,y, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x-1,y, z, actual_world->cells)) {
 
           live++;
 
@@ -679,7 +674,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(y+1 == actual_world->size) {
-        if(check_alive(x,0, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,0, z, actual_world->cells)) {
 
           live++;
 
@@ -699,7 +694,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x,y+1, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y+1, z, actual_world->cells)) {
 
           live++;
 
@@ -724,7 +719,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(y-1 == -1) {
-        if(check_alive(x,actual_world->size-1, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,actual_world->size-1, z, actual_world->cells)) {
 
           live++;
 
@@ -744,7 +739,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x,y-1, z, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y-1, z, actual_world->cells)) {
 
           live++;
 
@@ -769,7 +764,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(z+1 == actual_world->size) {
-        if(check_alive(x,y,0, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y,0, actual_world->cells)) {
 
           live++;
 
@@ -789,7 +784,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x,y,z+1, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y,z+1, actual_world->cells)) {
 
           live++;
 
@@ -814,7 +809,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 //    #pragma omp section
 //    {
       if(z-1 == -1) {
-        if(check_alive(x,y,actual_world->size-1, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y,actual_world->size-1, actual_world->cells)) {
 
           live++;
 
@@ -834,7 +829,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
           }
         }
       } else {
-        if(check_alive(x,y,z-1, actual_world->cells)) {
+        if(check_alive(actual_world->size, x,y,z-1, actual_world->cells)) {
 
           live++;
 
@@ -902,25 +897,31 @@ world *get_next_world(world *actual_world){
 
   int x, y, z;
 
-  if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
+  if(actual_world->alive_cells * 6 * 6 < 6*actual_world->size*actual_world->size*actual_world->size){
     #ifdef ITERATION
     printf("   Choose live cells\n"); fflush(stdout);
     #endif
 
+
+
     #pragma omp parallel private(y)
     {
       int num_threads = omp_get_num_threads();
-      #pragma omp for
+      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
       for(x=0; x<actual_world->size; x++)
         for(y=0; y<actual_world->size; y++)
-          if(actual_world->cells[x][y]->root != NULL){
+          if(actual_world->cells[x * actual_world->size + y]->root != NULL){
+
             #ifdef ITERATION
             printf("\t\t\t\tTHREAD NUM %d   TESTING SUBTREE %d %d\n", omp_get_thread_num(), x, y); fflush(stdout);
             #endif
+
             //this function will analyzer every node of the subtree, and add to the new world the cells
-            solve_subtree(actual_world->cells[x][y]->root, actual_world, next_world);
+            solve_subtree(actual_world->cells[x * actual_world->size + y ]->root, actual_world, next_world);
           }
+
     }
+
     #ifdef DEBUG
     printf("\t\t\tFINISHED SUBTREE TESTS\n"); fflush(stdout);
     #endif
@@ -994,6 +995,7 @@ int main(int argc, char* argv[]){
 
   world *next_world;
 
+  double start = omp_get_wtime();
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
@@ -1030,7 +1032,7 @@ int main(int argc, char* argv[]){
     print_world(actual_world);
     printf("\nStarting to iterate\n"); fflush(stdout);
   #endif
-
+  double parallel_start = omp_get_wtime();
   for(int i=0; i<num_iterations; i++){
 
     #if defined(DEBUG) || defined(ITERATION)
@@ -1051,6 +1053,7 @@ int main(int argc, char* argv[]){
 
   }
 
+  double parallel_end= omp_get_wtime();
 
   #ifdef DEBUG
     printf("\nDestroying World\n"); fflush(stdout);
@@ -1065,6 +1068,8 @@ int main(int argc, char* argv[]){
     printf("Freeing other variables\n"); fflush(stdout);
   #endif
 
+  double end= omp_get_wtime();
+  printf("TOTAL TIME = %lf\n", end-start);
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
