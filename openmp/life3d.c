@@ -129,7 +129,9 @@ void destroy_bintree(bintree **tree, int size){
   int i,j;
   for(i=0; i<size; i++){
     for(j=0; j<size; j++){
-      if(tree[i * size + j]->root!=NULL)
+      if(tree[i * size + j]->root!=NULL){
+
+        printf("Destroying %d %d, index: %d\n", i, j, i * size + j);
         //#pragma omp parallel
         //{
         //  #pragma omp single
@@ -137,8 +139,10 @@ void destroy_bintree(bintree **tree, int size){
             destroy_bintree_nodes(tree[i * size + j]->root);
           //}
         //}
+      }
+      printf("free(tree[%d * size + %d]) index: %d\n", i, j, i * size + j);
+      free(tree[i * size + j]);
     }
-    free(tree[i * size + j]);
   }
   free(tree);
 
