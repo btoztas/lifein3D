@@ -74,9 +74,8 @@ bintree **create_bintree_hash(int size){
 
   bintree **new = (bintree**)malloc(size*size*sizeof(bintree*));
 
-  for(int i=0; i<size; i++)
-    for(int j=0; j<size; j++)
-      new[i * size + j] = create_bintree();
+  for(int i=0; i < (size*size); i++)
+      new[i] = create_bintree();
 
   return new;
 
@@ -105,17 +104,17 @@ void destroy_bintree_nodes(node *root){
 
 
   if(root->left != NULL)
-    //#pragma omp task
+    //
     destroy_bintree_nodes(root->left);
 
   if(root->right != NULL)
-    //#pragma omp task
+    //
     destroy_bintree_nodes(root->right);
 
 
 
   destroy_cell(root->this);
-  //#pragma omp taskwait
+  //
   //{
   if(root!=NULL)
     free(root);
@@ -126,23 +125,22 @@ void destroy_bintree_nodes(node *root){
 
 // function to free the cell structures
 void destroy_bintree(bintree **tree, int size){
-  int i,j;
-  for(i=0; i<size; i++){
-    for(j=0; j<size; j++){
-      if(tree[i * size + j]->root!=NULL){
 
-        printf("Destroying %d %d, index: %d\n", i, j, i * size + j);
-        //#pragma omp parallel
-        //{
-        //  #pragma omp single
-        //  {
-            destroy_bintree_nodes(tree[i * size + j]->root);
-          //}
+  for(int i=0; i<size*size; i++){
+    if(tree[i]->root!=NULL){
+
+      //printf("Destroying %d\n", i);
+      //
+      //{
+      //  
+      //  {
+        destroy_bintree_nodes(tree[i]->root);
         //}
-      }
-      printf("free(tree[%d * size + %d]) index: %d\n", i, j, i * size + j);
-      free(tree[i * size + j]);
+      //}
+
     }
+    //printf("free(tree[%d])\n", i);
+    free(tree[i]);
   }
   free(tree);
 
@@ -480,13 +478,13 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
   int live = 0;
 
-//  #pragma omp parallel
+//  
 //{
 
-//  #pragma omp sections nowait reduction(+:live)
+//  
 //  {
 
-//    #pragma omp section
+//    
 //    {
 
 
@@ -496,7 +494,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
         if(check_alive(game->size, x+1,y, z, game->cells)) live++;
       }
     //}
-//    #pragma omp section
+//    
 //    {
 
       if(x-1 == -1) {
@@ -505,7 +503,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
         if(check_alive(game->size, x-1,y, z, game->cells)) live++;
       }
     //}
-//    #pragma omp section
+//    
 //    {
 
 
@@ -516,7 +514,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
         if(check_alive(game->size, x,y+1, z, game->cells)) live++;
       }
     //}
-//    #pragma omp section
+//    
 //    {
 
 
@@ -527,7 +525,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
         if(check_alive(game->size, x,y-1, z, game->cells)) live++;
       }
     //}
-//    #pragma omp section
+//    
 //    {
 
 
@@ -538,7 +536,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
         if(check_alive(game->size, x,y,z+1, game->cells)) live++;
       }
     //}
-//    #pragma omp section
+//    
 //    {
 
 
@@ -578,14 +576,14 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
 
 //  omp_lock_t lck_insertcell;
   int live = 0;
-//  #pragma omp parallel private(new_cell)
+//  
 //{
 
 //      omp_init_lock(&lck_insertcell);
-//  #pragma omp sections reduction(+:live)
+//  
 //  {
 
-//    #pragma omp section
+//    
 //    {
       if(x+1 == actual_world->size) {
         if(check_alive(actual_world->size, 0,y, z, actual_world->cells)) {
@@ -630,7 +628,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       }
 //    }
 
-//    #pragma omp section
+//    
 //    {
       if(x-1 == -1) {
         if(check_alive(actual_world->size, actual_world->size-1,y, z, actual_world->cells)) {
@@ -675,7 +673,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       }
 //    }
 
-//    #pragma omp section
+//    
 //    {
       if(y+1 == actual_world->size) {
         if(check_alive(actual_world->size, x,0, z, actual_world->cells)) {
@@ -720,7 +718,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       }
 //    }
 
-//    #pragma omp section
+//    
 //    {
       if(y-1 == -1) {
         if(check_alive(actual_world->size, x,actual_world->size-1, z, actual_world->cells)) {
@@ -765,7 +763,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       }
 //    }
 
-//    #pragma omp section
+//    
 //    {
       if(z+1 == actual_world->size) {
         if(check_alive(actual_world->size, x,y,0, actual_world->cells)) {
@@ -810,7 +808,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       }
 //    }
 
-//    #pragma omp section
+//    
 //    {
       if(z-1 == -1) {
         if(check_alive(actual_world->size, x,y,actual_world->size-1, actual_world->cells)) {
@@ -908,10 +906,10 @@ world *get_next_world(world *actual_world){
 
 
 
-    #pragma omp parallel private(y)
+    
     {
       int num_threads = omp_get_num_threads();
-      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
+      
       for(x=0; x<actual_world->size; x++)
         for(y=0; y<actual_world->size; y++)
           if(actual_world->cells[x * actual_world->size + y]->root != NULL){
@@ -937,10 +935,10 @@ world *get_next_world(world *actual_world){
 
     //Com o schedule(auto) dá melhor, tentar perceber porquê
 
-    #pragma omp parallel private(y,z)
+    
     {
       int num_threads = omp_get_num_threads();
-      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
+      
       for(x=0; x<next_world->size; x++)
         for(y=0; y<next_world->size; y++)
           for(z=0; z<next_world->size; z++){
