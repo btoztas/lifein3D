@@ -309,6 +309,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 
 void insert_cell(world *game, cell *new_cell){
 
+  
   game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
@@ -708,7 +709,7 @@ world *get_next_world(world *actual_world){
   #endif
 
  //AQUI!!
-  if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
+  if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size)*(actual_world->size)*(actual_world->size)){
     #ifdef ITERATION
     printf("   Choose live cells\n");
     #endif

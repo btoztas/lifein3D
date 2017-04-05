@@ -17,17 +17,11 @@ typedef struct _node{
 
 } node;
 
-typedef struct _bintree{
-
-  node *root;
-
-} bintree;
-
 typedef struct _world{
 
   int alive_cells;
   int size;
-  bintree **cells;
+  node **cells;
 
 } world;
 
@@ -58,23 +52,10 @@ node *create_bintree_node(cell *this){
 
 }
 
-bintree *create_bintree(){
 
-  bintree *tree = (bintree*)malloc(sizeof(bintree));
-  if(tree == NULL)
-    printf("Error allocating memory for a new tree.\n");
-  tree->root    = NULL;
+node **create_bintree_hash(int size){
 
-  return tree;
-
-}
-
-bintree **create_bintree_hash(int size){
-
-  bintree **new = (bintree**)malloc(size*size*sizeof(bintree*));
-
-  for(int i=0; i < (size*size); i++)
-      new[i] = create_bintree();
+  node **new = (node**)calloc(size*size,sizeof(node*));
 
   return new;
 
@@ -113,13 +94,12 @@ void destroy_bintree_nodes(node *root){
 }
 
 // function to free the cell structures
-void destroy_bintree(bintree **tree, int size){
+void destroy_bintree(node **tree, int size){
 
-  for(int i=0; i<size*size; i++){
-    if(tree[i]->root!=NULL)
-      destroy_bintree_nodes(tree[i]->root);
-    free(tree[i]);
-  }
+  for(int i=0; i<size*size; i++)
+    if(tree[i]!=NULL)
+      destroy_bintree_nodes(tree[i]);
+
   free(tree);
 }
 
@@ -162,11 +142,11 @@ void print_bintree(node *root){
 
 }
 
-void print_bintree_hash(bintree **tree, int size){
+void print_bintree_hash(node **tree, int size){
 
   for(int i=0; i<size*size; i++)
-    if(tree[i]->root!=NULL)
-      print_bintree(tree[i]->root);
+    if(tree[i]!=NULL)
+      print_bintree(tree[i]);
 
 }
 
@@ -328,18 +308,9 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 }
 
 
-
-void insert_data(bintree *tree, cell *new_cell, int *n_cells){
-
-  #pragma omp critical (insert)
-  tree->root = insert_bintree(tree->root, new_cell, n_cells);
-
-}
-
-
 void insert_cell(world *game, cell *new_cell){
 
-  insert_data(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
+  game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
     printf("      Inserted in tree\n"); fflush(stdout);
@@ -349,9 +320,6 @@ void insert_cell(world *game, cell *new_cell){
   return;
 
 }
-
-
-
 
 // create initial world from input file
 world *file_to_world(FILE *file){
@@ -420,9 +388,9 @@ void usage(){
 }
 
 
-int check_alive(int size, int x, int y, int z, bintree **tree ){
+int check_alive(int size, int x, int y, int z, node **tree ){
 
-  node *aux = tree[x * size + y]->root;
+  node *aux = tree[x * size + y];
   int ret;
 
   while(aux!=NULL){
@@ -517,7 +485,6 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
     }else{
       if(test_cell(0,y, z, actual_world, 0)){
         new_cell = create_cell(0,y, z);
-        #pragma omp critical (insert)
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
@@ -731,7 +698,7 @@ void solve_subtree(node *root, world* actual_world, world* next_world){
 
 
 world *get_next_world(world *actual_world){
-  int x,y,z;
+
   #ifdef DEBUG
     printf("    Creating next world\n");
   #endif
@@ -741,37 +708,32 @@ world *get_next_world(world *actual_world){
     printf("    Testing cells\n");
   #endif
 
-  if(actual_world->alive_cells * 6 * 6 < actual_world->size*actual_world->size*actual_world->size){
+  if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size)*(actual_world->size)*(actual_world->size)){
     #ifdef ITERATION
-    printf("   Choose live cells\n");
+    printf("    Choose living cells\n");
     #endif
-
     #pragma omp parallel
     {
-      int num_threads = omp_get_num_threads();
-      #pragma omp for schedule(guided, (next_world->size)/(5*num_threads))
+      #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
       for(int i=0; i<actual_world->size*actual_world->size; i++)
-          if(actual_world->cells[i]->root != NULL){
+          if(actual_world->cells[i] != NULL){
 
             #ifdef DEBUG
-            printf("\t\t\t\tTESTING SUBTREE %d %d\n", x/actual_world->size, y%actual_world->size);
+            printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
             #endif
-            //this function will analyze every node of the subtree, and add to the new world the cells who respect the rules
-            solve_subtree(actual_world->cells[i]->root, actual_world, next_world);
+            //this function will analyzer every node of the subtree, and add to the new world the cells
+            solve_subtree(actual_world->cells[i], actual_world, next_world);
 
-        }
+          }
+      #ifdef DEBUG
+      printf("\t\t\tFINISHED SUBTREE TESTS\n");
+      #endif
     }
-    #ifdef DEBUG
-    printf("\t\t\tFINISHED SUBTREE TESTS\n");
-    #endif
-
   }else{
     #ifdef ITERATION
     printf("    Choose N^3\n");
     #endif
-
-
-
+    int x,y,z;
     #pragma omp parallel private(y,z)
     {
       int num_threads = omp_get_num_threads();
@@ -780,19 +742,19 @@ world *get_next_world(world *actual_world){
         for(y=0; y<next_world->size; y++)
           for(z=0; z<next_world->size; z++){
 
-            if(test_cell(x, y, z, actual_world, -1)){
-              #ifdef DEBUG
-                printf("      %d %d %d will be alive\n",x, y, z);
-              #endif
-              cell *new_cell = create_cell(x, y, z);
-              insert_cell(next_world, new_cell);
-            }
-            else{
-              #ifdef DEBUG
-                printf("      %d %d %d will be dead\n",x, y, z);
-              #endif
-            }
+          if(test_cell(x, y, z, actual_world, -1)){
+            #ifdef DEBUG
+              printf("      %d %d %d will be alive\n",x, y, z);
+            #endif
+            cell *new_cell = create_cell(x, y, z);
+            insert_cell(next_world, new_cell);
           }
+          else{
+            #ifdef DEBUG
+              printf("      %d %d %d will be dead\n",x, y, z);
+            #endif
+          }
+        }
     }
   }
 
