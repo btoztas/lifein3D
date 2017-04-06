@@ -712,22 +712,84 @@ world *get_next_world(world *actual_world){
     #ifdef ITERATION
     printf("    Choose living cells\n");
     #endif
-    #pragma omp parallel
+    int i,j;
+    int size = actual_world->size;
+
+    #pragma omp parallel private(j)
     {
-      #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
-      for(int i=0; i<actual_world->size*actual_world->size; i++)
-          if(actual_world->cells[i] != NULL){
-
-            #ifdef DEBUG
-            printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
-            #endif
-            //this function will analyzer every node of the subtree, and add to the new world the cells
-            solve_subtree(actual_world->cells[i], actual_world, next_world);
-
+      int num_threads = omp_get_num_threads();
+      #pragma omp for schedule(dynamic, 20/num_threads)
+        for(i=1; i<size; i+=5){
+          if(i!=1){
+            for(j=0;j<3*size;j++){
+              if(actual_world->cells[i*size+j] != NULL){
+                #ifdef DEBUG
+                printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                #endif
+                //this function will analyze every node of the subtree, and add to the new world the cells
+                solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+              }
+              #ifdef DEBUG
+              printf("\t\t\tFINISHED SUBTREE TESTS\n");
+              #endif
+            }
+          }else{
+            for(j=0;j<size*(3+size%5);j++){
+              if(actual_world->cells[i*size+j] != NULL){
+                #ifdef DEBUG
+                printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                #endif
+                //this function will analyze every node of the subtree, and add to the new world the cells
+                solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+              }
+              #ifdef DEBUG
+              printf("\t\t\tFINISHED SUBTREE TESTS\n");
+              #endif
+            }
+            i+=size%5;
           }
-      #ifdef DEBUG
-      printf("\t\t\tFINISHED SUBTREE TESTS\n");
-      #endif
+        }
+        #pragma omp for schedule(dynamic, 20/num_threads)
+          for(i=4+size%5; i<size; i+=5){
+            if(i!=size-1){
+              for(j=0;j<2*size;j++){
+                if(actual_world->cells[i*size+j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
+              }
+            }else{
+              for(j=0;j<size;j++){
+                if(actual_world->cells[(size-1)*size+j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[(size-1)*size+j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
+
+                if(actual_world->cells[j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", 0, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
+              }
+            }
+          }
     }
   }else{
     #ifdef ITERATION
@@ -794,7 +856,7 @@ void print_tree_padding ( node *root, int level ){
 int main(int argc, char* argv[]){
 
   world *next_world;
-
+  double start = omp_get_wtime();
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
