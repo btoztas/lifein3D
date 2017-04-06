@@ -712,37 +712,82 @@ world *get_next_world(world *actual_world){
     #ifdef ITERATION
     printf("    Choose living cells\n");
     #endif
-    int i;
-    #pragma omp parallel
+    int i,j;
+    int size = actual_world->size;
+    #pragma omp parallel private(j)
     {
-      int num_threads = omp_get_num_threads();
-      #pragma omp for schedule(guided, 2)
-      for(i=0; i<actual_world->size; i+=2)
-        for(int j=0; j<2*actual_world->size; j++)
-          if(actual_world->cells[i*actual_world->size+j] != NULL){
-
-            #ifdef DEBUG
-            printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
-            #endif
-            //this function will analyzer every node of the subtree, and add to the new world the cells
-            solve_subtree(actual_world->cells[i*actual_world->size+j], actual_world, next_world);
-
+      #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
+        for(i=1; i<size; i+=5){
+          if(i!=1){
+            for(j=0;j<3*size;j++){
+              if(actual_world->cells[i*size+j] != NULL){
+                #ifdef DEBUG
+                printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                #endif
+                //this function will analyze every node of the subtree, and add to the new world the cells
+                solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+              }
+              #ifdef DEBUG
+              printf("\t\t\tFINISHED SUBTREE TESTS\n");
+              #endif
+            }
+          }else{
+            for(j=0;j<size*(3+size%5);j++){
+              if(actual_world->cells[i*size+j] != NULL){
+                #ifdef DEBUG
+                printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                #endif
+                //this function will analyze every node of the subtree, and add to the new world the cells
+                solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+              }
+              #ifdef DEBUG
+              printf("\t\t\tFINISHED SUBTREE TESTS\n");
+              #endif
+            }
+            i+=size%5;
           }
-      #pragma omp for schedule(dynamic, 2)
-      for(i=1; i<actual_world->size; i+=2)
-        for(int j=0; j<actual_world->size; j++)
-          if(actual_world->cells[i*actual_world->size+j] != NULL){
+        }
+        #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
+          for(i=4+size%5; i<size; i+=5){
+            if(i!=size-1){
+              for(j=0;j<2*size;j++){
+                if(actual_world->cells[i*size+j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[i*size+j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
+              }
+            }else{
+              for(j=0;j<size;j++){
+                if(actual_world->cells[(size-1)*size+j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", i, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[(size-1)*size+j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
 
-            #ifdef DEBUG
-            printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
-            #endif
-            //this function will analyzer every node of the subtree, and add to the new world the cells
-            solve_subtree(actual_world->cells[i*actual_world->size+j], actual_world, next_world);
-
+                if(actual_world->cells[j] != NULL){
+                  #ifdef DEBUG
+                  printf("\t\t\t\tTESTING SUBTREE %d %d\n", 0, j);
+                  #endif
+                  //this function will analyze every node of the subtree, and add to the new world the cells
+                  solve_subtree(actual_world->cells[j], actual_world, next_world);
+                }
+                #ifdef DEBUG
+                printf("\t\t\tFINISHED SUBTREE TESTS\n");
+                #endif
+              }
+            }
           }
-      #ifdef DEBUG
-      printf("\t\t\tFINISHED SUBTREE TESTS\n");
-      #endif
     }
   }else{
     #ifdef ITERATION
