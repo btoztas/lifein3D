@@ -716,7 +716,7 @@ world *get_next_world(world *actual_world){
     int size = actual_world->size;
     #pragma omp parallel private(j)
     {
-      #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
+      #pragma omp for schedule(guided, 10)
         for(i=1; i<size; i+=5){
           if(i!=1){
             for(j=0;j<3*size;j++){
@@ -747,7 +747,7 @@ world *get_next_world(world *actual_world){
             i+=size%5;
           }
         }
-        #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
+        #pragma omp for schedule(guided, 10)
           for(i=4+size%5; i<size; i+=5){
             if(i!=size-1){
               for(j=0;j<2*size;j++){
