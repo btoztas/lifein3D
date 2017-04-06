@@ -712,17 +712,32 @@ world *get_next_world(world *actual_world){
     #ifdef ITERATION
     printf("    Choose living cells\n");
     #endif
+    int i;
     #pragma omp parallel
     {
-      #pragma omp for schedule(dynamic, (actual_world->size)*(actual_world->size)/10)
-      for(int i=0; i<actual_world->size*actual_world->size; i++)
-          if(actual_world->cells[i] != NULL){
+      int num_threads = omp_get_num_threads();
+      #pragma omp for schedule(guided, 2)
+      for(i=0; i<actual_world->size; i+=2)
+        for(int j=0; j<2*actual_world->size; j++)
+          if(actual_world->cells[i*actual_world->size+j] != NULL){
 
             #ifdef DEBUG
             printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
             #endif
             //this function will analyzer every node of the subtree, and add to the new world the cells
-            solve_subtree(actual_world->cells[i], actual_world, next_world);
+            solve_subtree(actual_world->cells[i*actual_world->size+j], actual_world, next_world);
+
+          }
+      #pragma omp for schedule(dynamic, 2)
+      for(i=1; i<actual_world->size; i+=2)
+        for(int j=0; j<actual_world->size; j++)
+          if(actual_world->cells[i*actual_world->size+j] != NULL){
+
+            #ifdef DEBUG
+            printf("\t\t\t\tTESTING SUBTREE %d %d\n", i/actual_world->size, i%actual_world->size);
+            #endif
+            //this function will analyzer every node of the subtree, and add to the new world the cells
+            solve_subtree(actual_world->cells[i*actual_world->size+j], actual_world, next_world);
 
           }
       #ifdef DEBUG
