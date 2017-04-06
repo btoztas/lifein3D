@@ -309,7 +309,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 
 void insert_cell(world *game, cell *new_cell){
 
-  
+
   game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
 
   #ifdef DEBUG
