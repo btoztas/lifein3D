@@ -10,3 +10,6 @@ optiter:
 	gcc -fopenmp -std=c99 -Wall -DITERATION -o life3d life3d.c
 optdebug:
 	gcc -fopenmp -std=c99 -Wall -DDEGUG -o life3d life3d.c
+opttimer:
+	gcc -Wall -std=c99 -DTIMER -fopenmp -o life3d life3d.c
+

@@ -854,7 +854,11 @@ void print_tree_padding ( node *root, int level ){
 int main(int argc, char* argv[]){
 
   world *next_world;
+
+  #ifdef TIMER
   double start = omp_get_wtime();
+  #endif
+
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
@@ -926,8 +930,11 @@ int main(int argc, char* argv[]){
     printf("Freeing other variables\n");
   #endif
 
+  #ifdef TIMER
   double end = omp_get_wtime();
   printf("Total time = %lf\n", end-start);
+  #endif
+
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);

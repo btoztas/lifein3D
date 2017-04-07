@@ -4,6 +4,11 @@ rm -rf results;
 rm our.*;
 mkdir results;
 
+make omptimer;
+cd ../sequential
+make opttimer
+cd ../omp
+
 echo "";
 echo "Final test";
 echo "";

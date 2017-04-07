@@ -20,3 +20,6 @@ ompiter:
 	gcc -Wall -std=c99 -DITERATION -fopenmp -o life3d life3d.c
 ompdebug:
 	gcc -Wall -std=c99 -DDEBUG -fopenmp -o life3d life3d.c
+omptimer:
+	gcc -Wall -std=c99 -DTIMER -fopenmp -o life3d life3d.c
+
