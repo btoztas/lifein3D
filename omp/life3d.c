@@ -134,8 +134,6 @@ void print_bintree(node *root){
   #endif
   print_cell(root->this);
 
-
-
   if(root->right != NULL){
     print_bintree(root->right);
   }

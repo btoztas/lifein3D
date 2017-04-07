@@ -1,0 +1,7 @@
+sequential/life3d
+sequential/our.*
+sequential/life3d.dSYM
+omp/life3d
+omp/our.*
+omp/life3d.dSY
+omp/results
