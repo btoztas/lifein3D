@@ -22,4 +22,7 @@ ompdebug:
 	gcc -Wall -std=c99 -DDEBUG -fopenmp -o life3d life3d.c
 omptimer:
 	gcc -Wall -std=c99 -DTIMER -fopenmp -o life3d life3d.c
+ompk:
+	kinst-ompp gcc -Wall -std=c99 -DTIMER -fopenmp -o life3d life3d.c
+
 
