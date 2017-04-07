@@ -95,7 +95,7 @@ void destroy_bintree_nodes(node *root){
 
 // function to free the cell structures
 void destroy_bintree(node **tree, int size){
-
+  #pragma omp parallel for schedule(guided, size)
   for(int i=0; i<size*size; i++)
     if(tree[i]!=NULL)
       destroy_bintree_nodes(tree[i]);
@@ -928,6 +928,8 @@ int main(int argc, char* argv[]){
     printf("Freeing other variables\n");
   #endif
 
+  double end = omp_get_wtime();
+  printf("Total time = %lf\n", end-start);
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);

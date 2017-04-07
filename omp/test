@@ -8,10 +8,11 @@ case "$1" in
 		echo "Running: s5e50 10 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s5e50.in 10 > /dev/null;
+			./../sequential/life3d tests/s5e50.in 10 > ../sequential/our.s5e50.10.out;
+			diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s5e50.in 10 > our.s5e50.10.out;
+		./life3d tests/s5e50.in 10 > our.s5e50.10.out;
 		diff our.s5e50.10.out tests/s5e50.10.out;
 		;;
 
@@ -20,10 +21,11 @@ case "$1" in
 		echo "Running: s20e400 500 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s20e400.in 500 > /dev/null;
+			./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
+			diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s20e400.in 500 > our.s20e400.500.out;
+		./life3d tests/s20e400.in 500 > our.s20e400.500.out;
 		diff our.s20e400.500.out tests/s20e400.500.out;
 		;;
 
@@ -32,10 +34,11 @@ case "$1" in
 		echo "Running: s50e5k 300 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s50e5k.in 300 > /dev/null;
+			./../sequential/life3d tests/s50e5k.in 300 > ../sequential/our.s50e5k.300.out;
+			diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
+		./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
 		diff our.s50e5k.300.out tests/s50e5k.300.out;
 		;;
 
@@ -44,10 +47,11 @@ case "$1" in
 		echo "Running: s150e10k 1000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s150e10k.in 1000 > /dev/null;
+			./../sequential/life3d tests/s150e10k.in 1000 > ../sequential/our.s150e10k.1000.out;
+			diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
+		./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
 		diff our.s150e10k.1000.out tests/s150e10k.1000.out;
 		;;
 
@@ -56,10 +60,11 @@ case "$1" in
 		echo "Running: s200e50k 1000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s200e50k.in 1000 > /dev/null;
+			./../sequential/life3d tests/s200e50k.in 1000 > ../sequential/our.s200e50k.1000.out;
+			diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
+		./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
 		diff our.s200e50k.1000.out tests/s200e50k.1000.out;
 		;;
 
@@ -68,10 +73,11 @@ case "$1" in
 		echo "Running: s500e300k 2000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s500e300k.in 2000 > /dev/null;
+			./../sequential/life3d tests/s500e300k.in 2000 > ../sequential/our.s500e300k.2000.out;
+			diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
+		./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
 		diff our.s500e300k.2000.out tests/s500e300k.2000.out;
 		;;
 
@@ -83,60 +89,66 @@ case "$1" in
 		echo "Running: s5e50 10 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s5e50.in 10 > /dev/null;
+			./../sequential/life3d tests/s5e50.in 10 > ../sequential/our.s5e50.10.out;
+			diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s5e50.in 10 > our.s5e50.10.out;
+		./life3d tests/s5e50.in 10 > our.s5e50.10.out;
 		diff our.s5e50.10.out tests/s5e50.10.out;
 		echo "";
 		echo "";
 		echo "Running: s20e400 500 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s20e400.in 500 > /dev/null;
+			./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
+			diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s20e400.in 500 > our.s20e400.500.out;
+		./life3d tests/s20e400.in 500 > our.s20e400.500.out;
 		diff our.s20e400.500.out tests/s20e400.500.out;
 		echo "";
 		echo "";
 		echo "Running: s50e5k 300 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s50e5k.in 300 > /dev/null;
+			./../sequential/life3d tests/s50e5k.in 300 > ../sequential/our.s50e5k.300.out;
+			diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
+		./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
 		diff our.s50e5k.300.out tests/s50e5k.300.out;
 		echo "";
 		echo "";
 		echo "Running: s150e10k 1000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s150e10k.in 1000 > /dev/null;
+			./../sequential/life3d tests/s150e10k.in 1000 > ../sequential/our.s150e10k.1000.out;
+			diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
+		./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
 		diff our.s150e10k.1000.out tests/s150e10k.1000.out;
 		echo "";
 		echo "";
 		echo "Running: s200e50k 1000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s200e50k.in 1000 > /dev/null;
+			./../sequential/life3d tests/s200e50k.in 1000 > ../sequential/our.s200e50k.1000.out;
+			diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
+		./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
 		diff our.s200e50k.1000.out tests/s200e50k.1000.out;
 		echo "";
 		echo "";
 		echo "Running: s500e300k 2000 iter";
 		if [ "$2" = "-s" ]; then
 			echo "Sequential:";
-			time ./../sequential/life3d tests/s500e300k.in 2000 > /dev/null;
+			./../sequential/life3d tests/s500e300k.in 2000 > ../sequential/our.s500e300k.2000.out;
+			diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out;
 		fi
 		echo "Parallel:";
-		time ./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
+		./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
 		diff our.s500e300k.2000.out tests/s500e300k.2000.out;
 
 esac
