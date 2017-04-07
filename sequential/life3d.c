@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
+
 
 typedef struct _cell{
 
@@ -786,7 +788,7 @@ void print_tree_padding ( node *root, int level ){
 int main(int argc, char* argv[]){
 
   world *next_world;
-
+  double start = omp_get_wtime();
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
@@ -858,6 +860,8 @@ int main(int argc, char* argv[]){
     printf("Freeing other variables\n");
   #endif
 
+  double end = omp_get_wtime();
+  printf("Total time = %lf\n", end-start);
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
