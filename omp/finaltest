@@ -21,6 +21,7 @@ case "$1" in
 		echo "Sequential:" >> results/s5e50.10.results;
 		./../sequential/life3d tests/s5e50.in 10 > ../sequential/our.s5e50.10.out;
 		diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out >> results/s5e50.10.results;
+		diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out;
 		echo "" >> results/s5e50.10.results;
 		echo "" >> results/s5e50.10.results;
 
@@ -33,6 +34,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s5e50.10.results
 			./life3d tests/s5e50.in 10 > our.s5e50.10.out;
 			diff our.s5e50.10.out tests/s5e50.10.out >> results/s5e50.10.results;
+			diff our.s5e50.10.out tests/s5e50.10.out;
 			echo "" >> results/s5e50.10.results;
 		done
 		;;
@@ -44,6 +46,7 @@ case "$1" in
 		echo "Sequential:" >> results/s20e400.500.results;
 		./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
 		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out >> results/s20e400.500.results;
+		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
 		echo "" >> results/s20e400.500.results;
 		echo "" >> results/s20e400.500.results;
 
@@ -56,6 +59,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s20e400.500.results
 			./life3d tests/s20e400.in 500 > our.s20e400.500.out;
 			diff our.s20e400.500.out tests/s20e400.500.out >> results/s20e400.500.results;
+			diff our.s20e400.500.out tests/s20e400.500.out;
 			echo "" >> results/s20e400.500.results;
 		done
 		;;
@@ -67,6 +71,7 @@ case "$1" in
 		echo "Sequential:" >> results/s50e5k.300.results;
 		./../sequential/life3d tests/s50e5k.in 300 > ../sequential/our.s50e5k.300.out;
 		diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out >> results/s50e5k.300.results;
+		diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out;
 		echo "" >> results/s50e5k.300.results;
 		echo "" >> results/s50e5k.300.results;
 
@@ -79,6 +84,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s50e5k.300.results
 			./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
 			diff our.s50e5k.300.out tests/s50e5k.300.out >> results/s50e5k.300.results;
+			diff our.s50e5k.300.out tests/s50e5k.300.out;
 			echo "" >> results/s50e5k.300.results;
 		done
 		;;
@@ -90,28 +96,31 @@ case "$1" in
 		echo "Sequential:" >> results/s150e10k.1000.results;
 		./../sequential/life3d tests/s150e10k.in 1000 > ../sequential/our.s150e10k.1000.out;
 		diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out >> results/s150e10k.1000.results;
+		diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out;
 		echo "" >> results/s150e10k.1000.results;
 		echo "" >> results/s150e10k.1000.results;
 
 		echo "Parallel:";
-		echo "Parallelresults/:" >> s150e10k.1000results;
+		echo "Parallel:" >> results/s150e10k.1000.results;
 		for i in {2..8}
 		do
 			export OMP_NUM_THREADS=$i;
 			echo "NUM THREADS = $i"
-			echo "NUM THREADS = $iresults/" >> s150e10k.1000results
-			./life3d tests/s150e10k.in 1000 > our.s150e10k.1000out;
-			diff our.s150e10k.1000out tests/s150e10k.results/1000out >> s150e10k.1000results;
+			echo "NUM THREADS = $iresults/" >> results/s150e10k.1000.results
+			./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
+			diff our.s150e10k.1000.out tests/s150e10k.1000.out >> results/s150e10k.1000.results;
+			diff our.s150e10k.1000.out tests/s150e10k.1000.out;
 			echo "" >> results/s150e10k.1000.results;
 		done
 		;;
-
+		
 	"200")
 		echo "Running: s200e50k 1000 iter";
 		echo "Sequential:";
 		echo "Sequential:" >> results/s200e50k.1000.results;
 		./../sequential/life3d tests/s200e50k.in 1000 > ../sequential/our.s200e50k.1000.out;
 		diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out >> results/s200e50k.1000.results;
+		diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out;
 		echo "" >> results/s200e50k.1000.results;
 		echo "" >> results/s200e50k.1000.results;
 
@@ -124,6 +133,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s200e50k.1000.results
 			./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
 			diff our.s200e50k.1000.out tests/s200e50k.1000.out >> results/s200e50k.1000.results;
+			diff our.s200e50k.1000.out tests/s200e50k.1000.out;
 			echo "" >> results/s200e50k.1000.results;
 		done
 		;;
@@ -134,6 +144,7 @@ case "$1" in
 		echo "Sequential:" >> results/s500e300k.2000.results;
 		./../sequential/life3d tests/s500e300k.in 2000 > ../sequential/our.s500e300k.2000.out;
 		diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out >> results/s500e300k.2000.results;
+		diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out;
 		echo "" >> results/s500e300k.2000.results;
 		echo "" >> results/s500e300k.2000.results;
 
@@ -146,6 +157,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s500e300k.2000.results
 			./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
 			diff our.s500e300k.2000.out tests/s500e300k.2000.out >> results/s500e300k.2000.results;
+			diff our.s500e300k.2000.out tests/s500e300k.2000.out;
 			echo "" >> results/s500e300k.2000.results;
 		done
 		;;
@@ -156,6 +168,7 @@ case "$1" in
 		echo "Sequential:" >> results/s5e50.10.results;
 		./../sequential/life3d tests/s5e50.in 10 > ../sequential/our.s5e50.10.out;
 		diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out >> results/s5e50.10.results;
+		diff ../sequential/our.s5e50.10.out ../sequential/tests/s5e50.10.out;
 		echo "" >> results/s5e50.10.results;
 		echo "" >> results/s5e50.10.results;
 
@@ -168,6 +181,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s5e50.10.results
 			./life3d tests/s5e50.in 10 > our.s5e50.10.out;
 			diff our.s5e50.10.out tests/s5e50.10.out >> results/s5e50.10.results;
+			diff our.s5e50.10.out tests/s5e50.10.out;
 			echo "" >> results/s5e50.10.results;
 		done
 		echo "Running: s20e400 500 iter";
@@ -175,6 +189,7 @@ case "$1" in
 		echo "Sequential:" >> results/s20e400.500.results;
 		./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
 		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out >> results/s20e400.500.results;
+		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
 		echo "" >> results/s20e400.500.results;
 		echo "" >> results/s20e400.500.results;
 
@@ -187,6 +202,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s20e400.500.results
 			./life3d tests/s20e400.in 500 > our.s20e400.500.out;
 			diff our.s20e400.500.out tests/s20e400.500.out >> results/s20e400.500.results;
+			diff our.s20e400.500.out tests/s20e400.500.out;
 			echo "" >> results/s20e400.500.results;
 		done
 		echo "Running: s50e5k 300 iter";
@@ -194,6 +210,7 @@ case "$1" in
 		echo "Sequential:" >> results/s50e5k.300.results;
 		./../sequential/life3d tests/s50e5k.in 300 > ../sequential/our.s50e5k.300.out;
 		diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out >> results/s50e5k.300.results;
+		diff ../sequential/our.s50e5k.300.out ../sequential/tests/s50e5k.300.out;
 		echo "" >> results/s50e5k.300.results;
 		echo "" >> results/s50e5k.300.results;
 
@@ -206,32 +223,38 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s50e5k.300.results
 			./life3d tests/s50e5k.in 300 > our.s50e5k.300.out;
 			diff our.s50e5k.300.out tests/s50e5k.300.out >> results/s50e5k.300.results;
+			diff our.s50e5k.300.out tests/s50e5k.300.out;
 			echo "" >> results/s50e5k.300.results;
 		done
+
 		echo "Running: s150e10k 1000 iter";
 		echo "Sequential:";
 		echo "Sequential:" >> results/s150e10k.1000.results;
 		./../sequential/life3d tests/s150e10k.in 1000 > ../sequential/our.s150e10k.1000.out;
 		diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out >> results/s150e10k.1000.results;
+		diff ../sequential/our.s150e10k.1000.out ../sequential/tests/s150e10k.1000.out;
 		echo "" >> results/s150e10k.1000.results;
 		echo "" >> results/s150e10k.1000.results;
 
 		echo "Parallel:";
-		echo "Parallelresults/:" >> s150e10k.1000results;
+		echo "Parallel:" >> results/s150e10k.1000.results;
 		for i in {2..8}
 		do
 			export OMP_NUM_THREADS=$i;
 			echo "NUM THREADS = $i"
-			echo "NUM THREADS = $iresults/" >> s150e10k.1000results
-			./life3d tests/s150e10k.in 1000 > our.s150e10k.1000out;
-			diff our.s150e10k.1000out tests/s150e10k.results/1000out >> s150e10k.1000results;
+			echo "NUM THREADS = $iresults/" >> results/s150e10k.1000.results
+			./life3d tests/s150e10k.in 1000 > our.s150e10k.1000.out;
+			diff our.s150e10k.1000.out tests/s150e10k.1000.out >> results/s150e10k.1000.results;
+			diff our.s150e10k.1000.out tests/s150e10k.1000.out;
 			echo "" >> results/s150e10k.1000.results;
 		done
+
 		echo "Running: s200e50k 1000 iter";
 		echo "Sequential:";
 		echo "Sequential:" >> results/s200e50k.1000.results;
 		./../sequential/life3d tests/s200e50k.in 1000 > ../sequential/our.s200e50k.1000.out;
 		diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out >> results/s200e50k.1000.results;
+		diff ../sequential/our.s200e50k.1000.out ../sequential/tests/s200e50k.1000.out;
 		echo "" >> results/s200e50k.1000.results;
 		echo "" >> results/s200e50k.1000.results;
 
@@ -244,6 +267,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s200e50k.1000.results
 			./life3d tests/s200e50k.in 1000 > our.s200e50k.1000.out;
 			diff our.s200e50k.1000.out tests/s200e50k.1000.out >> results/s200e50k.1000.results;
+			diff our.s200e50k.1000.out tests/s200e50k.1000.out;
 			echo "" >> results/s200e50k.1000.results;
 		done
 		echo "Running: s500e300k 2000 iter";
@@ -251,6 +275,7 @@ case "$1" in
 		echo "Sequential:" >> results/s500e300k.2000.results;
 		./../sequential/life3d tests/s500e300k.in 2000 > ../sequential/our.s500e300k.2000.out;
 		diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out >> results/s500e300k.2000.results;
+		diff ../sequential/our.s500e300k.2000.out ../sequential/tests/s500e300k.2000.out;
 		echo "" >> results/s500e300k.2000.results;
 		echo "" >> results/s500e300k.2000.results;
 
@@ -263,6 +288,7 @@ case "$1" in
 			echo "NUM THREADS = $i" >> results/s500e300k.2000.results
 			./life3d tests/s500e300k.in 2000 > our.s500e300k.2000.out;
 			diff our.s500e300k.2000.out tests/s500e300k.2000.out >> results/s500e300k.2000.results;
+			diff our.s500e300k.2000.out tests/s500e300k.2000.out;
 			echo "" >> results/s500e300k.2000.results;
 		done
 
