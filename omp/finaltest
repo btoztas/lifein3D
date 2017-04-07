@@ -113,7 +113,7 @@ case "$1" in
 			echo "" >> results/s150e10k.1000.results;
 		done
 		;;
-		
+
 	"200")
 		echo "Running: s200e50k 1000 iter";
 		echo "Sequential:";
