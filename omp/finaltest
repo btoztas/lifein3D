@@ -41,26 +41,30 @@ case "$1" in
 
 
 	"20")
-		echo "Running: s20e400 500 iter";
-		echo "Sequential:";
-		echo "Sequential:" >> results/s20e400.500.results;
-		./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
-		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out >> results/s20e400.500.results;
-		diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
-		echo "" >> results/s20e400.500.results;
-		echo "" >> results/s20e400.500.results;
-
-		echo "Parallel:";
-		echo "Parallel:" >> results/s20e400.500.results;
-		for i in {2..8}
+		for j in 500 5000 20000
 		do
-			export OMP_NUM_THREADS=$i;
-			echo "NUM THREADS = $i"
-			echo "NUM THREADS = $i" >> results/s20e400.500.results
-			./life3d tests/s20e400.in 500 > our.s20e400.500.out;
-			diff our.s20e400.500.out tests/s20e400.500.out >> results/s20e400.500.results;
-			diff our.s20e400.500.out tests/s20e400.500.out;
+			echo "Running: s20e400 $j iter";
+			echo "Running: s20e400 $j iter" >> results/s20e400.500.results;
+			echo "Sequential:";
+			echo "Sequential:" >> results/s20e400.500.results;
+			./../sequential/life3d tests/s20e400.in 500 > ../sequential/our.s20e400.500.out;
+			diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out >> results/s20e400.500.results;
+			diff ../sequential/our.s20e400.500.out ../sequential/tests/s20e400.500.out;
 			echo "" >> results/s20e400.500.results;
+			echo "" >> results/s20e400.500.results;
+
+			echo "Parallel:";
+			echo "Parallel:" >> results/s20e400.500.results;
+			for i in {2..8}
+			do
+				export OMP_NUM_THREADS=$i;
+				echo "NUM THREADS = $i"
+				echo "NUM THREADS = $i" >> results/s20e400.500.results
+				./life3d tests/s20e400.in 500 > our.s20e400.500.out;
+				diff our.s20e400.500.out tests/s20e400.500.out >> results/s20e400.500.results;
+				diff our.s20e400.500.out tests/s20e400.500.out;
+				echo "" >> results/s20e400.500.results;
+			done
 		done
 		;;
 

@@ -1,0 +1,126 @@
+#!/bin/bash
+
+rm our.*
+
+case "$1" in
+
+	"20")
+		for i in 500 5000; do
+			echo "";
+			echo "Running: s20e400 $i iter";
+			echo "Sequential:";
+			time ./../sequential/life3d tests/s20e400.in $i > /dev/null
+			echo "Parallel:";
+			for j in 2 4 8; do
+				export OMP_NUM_THREADS=$j;
+				echo "NUM THREADS = $j"
+				time ./life3d tests/s20e400.in $i > /dev/null
+			done
+		done
+		;;
+
+	"50")
+		for i in 300 1000; do
+			echo "";
+			echo "Running: s50e5k $i iter";
+			echo "Sequential:";
+			time ./../sequential/life3d tests/s50e5k.in $i > /dev/null
+			echo "Parallel:";
+			for j in 2 4 8; do
+				export OMP_NUM_THREADS=$j;
+				echo "NUM THREADS = $j"
+				time ./life3d tests/s50e5k.in $i > /dev/null
+			done
+		done
+		;;
+
+	"200")
+
+		for i in 1000 5000; do
+			echo "";
+			echo "Running: s200e50k  $i iter";
+			echo "Sequential:";
+			time ./../sequential/life3d tests/s200e50k.in  $i > /dev/null
+			echo "Parallel:";
+			for j in 2 4 8; do
+				export OMP_NUM_THREADS=$j;
+				echo "NUM THREADS = $j"
+				time ./life3d tests/s200e50k.in $i > /dev/null
+			done
+		done
+		;;
+
+	"500")
+		for i in 2000 6000; do
+			echo "";
+			echo "Running: s500e300k $i iter";
+			echo "Sequential:";
+			time ./../sequential/life3d tests/s500e300k.in  $i > /dev/null
+			echo "Parallel:";
+			for j in 2 4 8; do
+				export OMP_NUM_THREADS=$j;
+				echo "NUM THREADS = $j"
+				time ./life3d tests/s500e300k.in $i > /dev/null
+			done
+		done
+		;;
+
+
+	"all")
+	for i in 500 5000; do
+		echo "";
+		echo "Running: s20e400 $i iter";
+		echo "Sequential:";
+		time ./../sequential/life3d tests/s20e400.in $i > /dev/null
+		echo "Parallel:";
+		for j in 2 4 8; do
+			export OMP_NUM_THREADS=$j;
+			echo "NUM THREADS = $j"
+			time ./life3d tests/s20e400.in $i > /dev/null
+		done
+	done
+
+
+for i in 300 1000; do
+		echo "";
+		echo "Running: s50e5k $i iter";
+		echo "Sequential:";
+		time ./../sequential/life3d tests/s50e5k.in $i > /dev/null
+		echo "Parallel:";
+		for j in 2 4 8; do
+			export OMP_NUM_THREADS=$j;
+			echo "NUM THREADS = $j"
+			time ./life3d tests/s50e5k.in $i > /dev/null
+		done
+	done
+
+
+
+	for i in 1000 5000; do
+		echo "";
+		echo "Running: s200e50k  $i iter";
+		echo "Sequential:";
+		time ./../sequential/life3d tests/s200e50k.in  $i > /dev/null
+		echo "Parallel:";
+		for j in 2 4 8; do
+			export OMP_NUM_THREADS=$j;
+			echo "NUM THREADS = $j"
+			time ./life3d tests/s200e50k.in $i > /dev/null
+		done
+	done
+
+for i in 2000 6000; do
+		echo "";
+		echo "Running: s500e300k $i iter";
+		echo "Sequential:";
+		time ./../sequential/life3d tests/s500e300k.in  $i > /dev/null
+		echo "Parallel:";
+		for j in 2 4 8; do
+			export OMP_NUM_THREADS=$j;
+			echo "NUM THREADS = $j"
+			time ./life3d tests/s500e300k.in $i > /dev/null
+		done
+	done
+	;;
+
+esac
