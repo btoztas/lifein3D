@@ -3,6 +3,7 @@
 #include <string.h>
 #include <omp.h>
 
+int aux=0;
 
 typedef struct _cell{
 
@@ -21,6 +22,7 @@ typedef struct _node{
 typedef struct _world{
 
   int alive_cells;
+  int **alive_cells_xy;
   int size;
   node **cells;
 
@@ -48,7 +50,6 @@ node *create_bintree_node(cell *this){
   new->left   = NULL;
   new->right  = NULL;
   new->height = 1;
-
   return new;
 
 }
@@ -57,7 +58,6 @@ node *create_bintree_node(cell *this){
 node **create_bintree_hash(int size){
 
   node **new = (node**)calloc(size*size,sizeof(node*));
-
   return new;
 
 }
@@ -70,7 +70,13 @@ world *create_world(int size){
   new->alive_cells = 0;
   new->size        = size;
   new->cells       = create_bintree_hash(size);
-
+  new->alive_cells_xy = (int**)malloc(size*sizeof(int*));
+  for(int x=0; x<size; x++){
+    new->alive_cells_xy[x] = (int*)malloc(size*sizeof(int));
+    for(int y=0; y<size; y++){
+      new->alive_cells_xy[x][y]=0;
+    }
+  }
   return new;
 
 }
@@ -114,6 +120,40 @@ void destroy_world(world *game){
 
 
 
+
+
+
+
+void no_struct_cell(cell *this, int *alive_xy){
+
+  alive_xy[aux]=this->x;
+  aux++;
+  alive_xy[aux]=this->y;
+  aux++;
+  alive_xy[aux]=this->z;
+  aux++;
+
+}
+
+void no_struct_bintree(node *root,int *alive_xy){
+
+  if(root->left != NULL){
+    no_struct_bintree(root->left, alive_xy);
+  }
+
+  no_struct_cell(root->this, alive_xy);
+
+  if(root->right != NULL){
+    no_struct_bintree(root->right, alive_xy);
+  }
+}
+
+void no_struct_game(world *game, int * alive_xy){
+  for(int i=0; i<game->size*game->size; i++)
+    if(game->cells[i]!=NULL)
+      no_struct_bintree(game->cells[i], alive_xy);
+}
+
 void print_cell(cell *this){
 
   #ifdef DEBUG
@@ -121,7 +161,6 @@ void print_cell(cell *this){
   #else
     printf("%d %d %d\n", this->x, this->y, this->z);
   #endif
-
 }
 
 
@@ -248,12 +287,14 @@ int get_balance(node *N)
 
 
 
-node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
+node  *insert_bintree(node *root, cell *new_cell, int* n_cells, int* n_cells_xy){
 
     if(root == NULL){
 
       root = create_bintree_node(new_cell);
+
       (*n_cells)++;
+      (*n_cells_xy)++;
 
     }else if(compare_cells(new_cell, root->this)==0){
       #ifdef DEBUG
@@ -263,11 +304,11 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
       return root;
     }else if(compare_cells(new_cell, root->this)==1){
 
-      root->right = insert_bintree(root->right, new_cell, n_cells);
+      root->right = insert_bintree(root->right, new_cell, n_cells, n_cells_xy);
 
     }else{
 
-      root->left = insert_bintree(root->left, new_cell, n_cells);
+      root->left = insert_bintree(root->left, new_cell, n_cells, n_cells_xy);
 
     }
 
@@ -312,7 +353,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 void insert_cell(world *game, cell *new_cell){
 
 
-  game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells));
+  game->cells[new_cell->x * game->size + new_cell->y] = insert_bintree(game->cells[new_cell->x * game->size + new_cell->y], new_cell, &(game->alive_cells), &(game->alive_cells_xy[new_cell->x][new_cell->y]));
 
   #ifdef DEBUG
     printf("      Inserted in tree\n"); fflush(stdout);
@@ -321,6 +362,23 @@ void insert_cell(world *game, cell *new_cell){
 
   return;
 
+}
+
+// create the world from the array of cells
+world * array_to_world(int * alive_xy, int size, int n_alive){
+  world *new_world;
+  cell *new_cell;
+  int counter=0;
+  new_world = create_world(size);
+  while(n_alive>0){
+    new_cell = create_cell(alive_xy[counter], alive_xy[counter+1], alive_xy[counter+2]);
+    //printf("(%d,%d,%d)\n",alive_xy[counter], alive_xy[counter+1], alive_xy[counter+2]);
+    insert_cell(new_world, new_cell);
+    n_alive--;
+    counter=counter+3;
+  }
+
+  return(new_world);
 }
 
 // create initial world from input file
@@ -788,6 +846,7 @@ void print_tree_padding ( node *root, int level ){
 int main(int argc, char* argv[]){
 
   world *next_world;
+  int * alive_xy;
   #ifdef TIMER
   double start = omp_get_wtime();
   #endif
@@ -820,7 +879,15 @@ int main(int argc, char* argv[]){
     printf("Reading file\n");
   #endif
 
-  world *actual_world = file_to_world(file);
+  world *old_but_gold = file_to_world(file);
+
+  alive_xy = (int *)malloc((old_but_gold->alive_cells)*3*sizeof(int));
+  no_struct_game(old_but_gold, alive_xy);
+  //for(int i=0; i<old_but_gold->alive_cells; i++){
+    //printf("(%d, %d, %d)\n",alive_xy[aux_cell], alive_xy[aux_cell+1],alive_xy[aux_cell+2] );
+  //  aux_cell=aux_cell+3;
+  //}
+  world *actual_world=array_to_world(alive_xy, old_but_gold->size,old_but_gold->alive_cells);
 
   #ifdef DEBUG
     printf("\nPrinting World\n");
@@ -866,7 +933,7 @@ int main(int argc, char* argv[]){
   double end = omp_get_wtime();
   printf("Total time = %lf\n", end-start);
   #endif
-  
+
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
