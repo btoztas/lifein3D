@@ -154,6 +154,66 @@ void no_struct_game(world *game, int * alive_xy){
       no_struct_bintree(game->cells[i], alive_xy);
 }
 
+
+void array_miniworl(int * alive_xy, int size, int n_alive, int threads){
+
+  int i,j;
+  int divisao=0;
+  int aux_step=0;
+  divisao=n_alive/threads;
+  printf("%d\n",n_alive );
+  for(i=0;i<threads;i++){
+
+
+    //resto=nums%threads;
+
+    printf("Thread %d - ", i);
+    if(i!=threads-1){
+      if(i==0)
+        aux_step=0;
+      else
+        aux_step=(i*divisao)-1;
+      for(j=i*divisao;j<(i+1)*divisao;j++){
+        if(j==i*divisao){
+          if(j==0)
+            printf("[(%d,%d,%d),(%d,%d,%d),",alive_xy[n_alive-6],alive_xy[n_alive-5],alive_xy[n_alive-4],alive_xy[n_alive-3],alive_xy[n_alive-2],alive_xy[n_alive-1]);
+          else
+            printf("[(%d,%d,%d),(%d,%d,%d),",alive_xy[aux_step-6],alive_xy[aux_step-5],alive_xy[aux_step-4],alive_xy[aux_step-3],alive_xy[aux_step-2],alive_xy[aux_step-1]);
+        }
+        printf("(%d,%d,%d),",alive_xy[aux_step],alive_xy[aux_step+1],alive_xy[aux_step+2]);
+        if(j==(i+1)*divisao-1){
+          if(j==n_alive-1)
+            printf("(%d,%d,%d),(%d,%d,%d)]",alive_xy[0],alive_xy[1],alive_xy[2],alive_xy[3],alive_xy[4],alive_xy[5]);
+          else
+            printf("(%d,%d,%d),(%d,%d,%d)]",alive_xy[aux_step+3],alive_xy[aux_step+4],alive_xy[aux_step+5],alive_xy[aux_step+6],alive_xy[aux_step+7],alive_xy[aux_step+8]);
+        }
+        aux_step=aux_step+3;
+      }
+    }else{
+      aux_step=i*divisao-1;
+
+      for(j=i*divisao;j<n_alive;j++){
+        printf("---%d---",aux_step );
+        if(j==i*divisao)
+            printf("[(%d,%d,%d),(%d,%d,%d),",alive_xy[aux_step-6],alive_xy[aux_step-5],alive_xy[aux_step-4],alive_xy[aux_step-3],alive_xy[aux_step-2],alive_xy[aux_step-1]);
+        printf("(%d,%d,%d),",alive_xy[aux_step],alive_xy[aux_step+1],alive_xy[aux_step+2]);
+        if(j==n_alive-1)
+          printf("(%d,%d,%d),(%d,%d,%d)]",alive_xy[0],alive_xy[1],alive_xy[2],alive_xy[3],alive_xy[4],alive_xy[5]);
+        aux_step=aux_step+3;
+      }
+
+    }
+
+    printf("\n");
+  }
+}
+
+
+
+
+
+
+
 void print_cell(cell *this){
 
   #ifdef DEBUG
@@ -883,6 +943,7 @@ int main(int argc, char* argv[]){
 
   alive_xy = (int *)malloc((old_but_gold->alive_cells)*3*sizeof(int));
   no_struct_game(old_but_gold, alive_xy);
+  array_miniworl(alive_xy, old_but_gold->size, (old_but_gold->alive_cells), 2);
   //for(int i=0; i<old_but_gold->alive_cells; i++){
     //printf("(%d, %d, %d)\n",alive_xy[aux_cell], alive_xy[aux_cell+1],alive_xy[aux_cell+2] );
   //  aux_cell=aux_cell+3;
