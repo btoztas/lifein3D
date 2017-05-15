@@ -21,10 +21,14 @@ int main (int argc, char *argv[]) {
   MPI_Init (&argc, &argv);
   MPI_Comm_rank (MPI_COMM_WORLD, &id);
   MPI_Comm_size (MPI_COMM_WORLD, &p);
+  int y=0;
+  for(y=0; y<argc; y++) {
+    printf("%s\t", argv[y]);
+  }
 
-  n_array1=atoi(argv[2]);
+  n_array1=atoi(argv[1]);
 
-  n_array2=atoi(argv[3]);
+  n_array2=atoi(argv[2]);
 
   MPI_Barrier (MPI_COMM_WORLD);
   secs = - MPI_Wtime();
