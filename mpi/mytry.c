@@ -30,7 +30,7 @@ int main (int argc, char *argv[]) {
   secs = - MPI_Wtime();
   int x;
   if(id ==0){
-    eu =(int *)malloc(sizeof(int)*n_array1);
+    eu =malloc(sizeof(int)*n_array1);
     for(x=0; x<n_array1; x++){
       eu[x]= x+1;
     }
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
 
   }
   if(id ==1){
-    eu =(int *)malloc(sizeof(int)*n_array2);
+    eu =malloc(sizeof(int)*n_array2);
     for(x=0; x<n_array2; x++){
       eu[x]= x+n_array1;
     }
@@ -57,7 +57,7 @@ int main (int argc, char *argv[]) {
     }
     printf("]\n");
   }else{
-    pprintf("id=1 -> [ ");
+    printf("id=1 -> [ ");
     for(x=0; x<n_array1; x++){
       printf("%d ");
     }
