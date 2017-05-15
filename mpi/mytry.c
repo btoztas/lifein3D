@@ -32,7 +32,7 @@ int main (int argc, char *argv[]) {
     MPI_Recv(&tu, 5, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
   }
   if(id ==1){
-
+    int eu={1,2,3,4,5};
     MPI_Send(&eu2, 5, MPI_INT, 0, 2, MPI_COMM_WORLD);
     MPI_Recv(&tu, 5, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
   }
