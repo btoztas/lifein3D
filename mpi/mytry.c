@@ -35,6 +35,7 @@ int main (int argc, char *argv[]) {
   int x;
   if(id ==0){
     eu =malloc(sizeof(int)*n_array1);
+    tu =malloc(sizeof(int)*n_array2);
     for(x=0; x<n_array1; x++){
       eu[x]= x+1;
     }
@@ -44,6 +45,7 @@ int main (int argc, char *argv[]) {
   }
   if(id ==1){
     eu =malloc(sizeof(int)*n_array2);
+    tu =malloc(sizeof(int)*n_array1);
     for(x=0; x<n_array2; x++){
       eu[x]= x+n_array1;
     }
