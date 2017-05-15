@@ -25,7 +25,7 @@ int main (int argc, char *argv[]) {
   if(argc != 2){
   	if (!id) printf ("Command line: %s <n-rounds>\n", argv[0]);
   	MPI_Finalize();
-  	exit (1);
+  	exit(1);
   }
   rounds = atoi(argv[1]);
 
