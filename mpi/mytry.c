@@ -21,7 +21,6 @@ int main (int argc, char *argv[]) {
   MPI_Comm_rank (MPI_COMM_WORLD, &id);
   MPI_Comm_size (MPI_COMM_WORLD, &p);
 
-  rounds = atoi(argv[1]);
 
   MPI_Barrier (MPI_COMM_WORLD);
   secs = - MPI_Wtime();
@@ -30,15 +29,23 @@ int main (int argc, char *argv[]) {
     for(x=0; x<5; x++){
       eu[x]= x+1;
     }
+    printf("id=0 sends\n");
     MPI_Send(&eu, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
+    printf("id=0 sends successfull\n");
+    printf("id=0 recieves\n");
     MPI_Recv(&tu, 5, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
+    printf("id=0 recieves successfull\n");
   }
   if(id ==1){
     for(x=0; x<5; x++){
       eu[x]= x+6;
     }
+    printf("id=1 sends\n");
     MPI_Send(&eu, 5, MPI_INT, 0, 2, MPI_COMM_WORLD);
+    printf("id=1 sends successfull\n");
+    printf("id=1 recieves\n");
     MPI_Recv(&tu, 5, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+    printf("id=1 recieves successfull\n");
   }
 
   MPI_Barrier (MPI_COMM_WORLD);
