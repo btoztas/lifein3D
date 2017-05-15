@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
   int eu[5];
   int *tu;
 
-  MPI_Init (&argc, &argv, &eu);
+  MPI_Init (&argc, &argv);
   MPI_Comm_rank (MPI_COMM_WORLD, &id);
   MPI_Comm_size (MPI_COMM_WORLD, &p);
 
