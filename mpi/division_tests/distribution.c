@@ -929,7 +929,7 @@ world *get_next_miniworld(world *actual_world){
     #ifdef ITERATION
     printf("   Choose live cells\n");
     #endif
-    for(int x=1; x<actual_world->size_x-1; x++)
+    for(int x=0; x<actual_world->size_x; x++)
       for(int y=0; y<actual_world->size_y; y++)
         if(actual_world->cells[MATRIX_INDEX(x, y, actual_world->size_y)] != NULL){
           #ifdef DEBUG
@@ -947,7 +947,7 @@ world *get_next_miniworld(world *actual_world){
     #ifdef ITERATION
     printf("    Choose N^3\n");
     #endif
-    for(int x=1; x<next_world->size_x-1; x++)
+    for(int x=0; x<next_world->size_x; x++)
       for(int y=0; y<next_world->size_y; y++)
         for(int z=0; z<next_world->size_y; z++){
 
@@ -1289,24 +1289,31 @@ int main(int argc, char* argv[]){
 
   for(int i=0; i<num_iterations; i++){
 
-    for(int i=0; i<p; i++){
+    #if defined(DEBUG) || defined(ITERATION)
+      printf("  Iteration number %d\n", i+1);
+    #endif
 
-      #if defined(DEBUG) || defined(ITERATION)
-        printf("  Iteration number %d\n", i+1);
-      #endif
+    for(int j=0; j<p; j++){
 
-      next_miniworlds[i] = get_next_miniworld(miniworlds[i]);
+      next_miniworlds[j] = get_next_miniworld(miniworlds[j]);
 
       #ifdef DEBUG
         printf("    Printing new world\n");
-        print_world(next_world);
+        print_world(next_miniworlds[j]);
         printf("    Destroying previous world\n");
       #endif
 
-      destroy_world(old_but_gold);
-      old_but_gold = next_world;
+      destroy_world(miniworlds[j]);
+      miniworlds[j] = next_miniworlds[j];
+        printf("MINI WORLD %d\n", j);
+        print_world(miniworlds[j]);
     }
 
+  }
+
+  for(int i=0; i<p; i++){
+    printf("\nPC %d:\n", i);
+    print_world(miniworlds[i]);
   }
 
 
@@ -1354,7 +1361,7 @@ int main(int argc, char* argv[]){
     printf("\nStarting to iterate\n");
   #endif
 
-  for(int i=0; i<num_iterations; i++){
+  for(int i=0; i<terations; i++){
 
     #if defined(DEBUG) || defined(ITERATION)
       printf("  Iteration number %d\n", i+1);
