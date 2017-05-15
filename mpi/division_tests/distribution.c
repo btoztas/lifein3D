@@ -1214,7 +1214,7 @@ int main(int argc, char* argv[]){
   int id, p;
 
   // if argc not expected, print program usage
-  if(argc!=3){
+  if(argc!=4){
     usage();
     exit(EXIT_FAILURE);
   }
@@ -1245,7 +1245,7 @@ int main(int argc, char* argv[]){
     for(int j=0; j< size_y; j++)
       printf("(%d, %d) = %d\n", i, j, MATRIX_INDEX(i, j, size_y));
 */
- p = atoi(argv[2]);
+ p = atoi(argv[3]);
 
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
@@ -1278,6 +1278,7 @@ int main(int argc, char* argv[]){
 */
 
   world ** miniworlds = (world**)malloc(sizeof(world*)*p);
+  world ** next_miniworlds = (world**)malloc(sizeof(world*)*p);
 
   for(int i=0; i<p; i++){
     rewind(file);
@@ -1285,23 +1286,16 @@ int main(int argc, char* argv[]){
     print_world(miniworlds[i]);
   }
 
-  next_world = get_next_miniworld(miniworlds[i]);
 
-  for(int i=0; i<p; i++){
+  for(int i=0; i<num_iterations; i++){
 
-    #ifdef DEBUG
-      printf("\nPrinting World\n");
-      print_world(old_but_gold);
-      printf("\nStarting to iterate\n");
-    #endif
-
-    for(int i=0; i<num_iterations; i++){
+    for(int i=0; i<p; i++){
 
       #if defined(DEBUG) || defined(ITERATION)
         printf("  Iteration number %d\n", i+1);
       #endif
 
-      next_world = get_next_world(miniworlds[i]);
+      next_miniworlds[i] = get_next_miniworld(miniworlds[i]);
 
       #ifdef DEBUG
         printf("    Printing new world\n");
