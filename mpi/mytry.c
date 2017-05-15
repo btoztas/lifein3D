@@ -15,7 +15,7 @@ int main (int argc, char *argv[]) {
   int id, p, i, rounds;
   double secs;
   int eu[5];
-  int *tu;
+  int tu[5];
 
   MPI_Init (&argc, &argv);
   MPI_Comm_rank (MPI_COMM_WORLD, &id);
