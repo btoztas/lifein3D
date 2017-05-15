@@ -25,16 +25,16 @@ int main (int argc, char *argv[]) {
 
   MPI_Barrier (MPI_COMM_WORLD);
   secs = - MPI_Wtime();
-
+  int x;
   if(id ==0){
-    for(int x=0; x<5; x++){
+    for(x=0; x<5; x++){
       eu[x]= x+1;
     }
     MPI_Send(&eu, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
     MPI_Recv(&tu, 5, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
   }
   if(id ==1){
-    for(int x=0; x<5; x++){
+    for(x=0; x<5; x++){
       eu[x]= x+6;
     }
     MPI_Send(&eu, 5, MPI_INT, 0, 2, MPI_COMM_WORLD);
