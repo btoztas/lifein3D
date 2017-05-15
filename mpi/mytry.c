@@ -27,8 +27,8 @@ int main (int argc, char *argv[]) {
     printf("%s\t", argv[y]);
   }
 
-  n_array1=atoi(argv[4]);
-  n_array2=atoi(argv[5]);
+  n_array1=10;
+  n_array2=10;
 
   MPI_Barrier (MPI_COMM_WORLD);
   secs = - MPI_Wtime();
