@@ -50,11 +50,11 @@ int main (int argc, char *argv[]) {
 
   MPI_Barrier (MPI_COMM_WORLD);
   //secs += MPI_Wtime();
-/*  if(id ==0){
+  if(id ==0){
     printf("Acabei esta merda!! Recebi [%d,%d,%d,%d,%d] do filho da mãe 1\n", tu[0], tu[1], tu[2], tu[3], tu[4] );
   }else{
     printf("Acabei esta merda!! Recebi [%d,%d,%d,%d,%d] do filho da mãe 0\n", tu[0], tu[1], tu[2], tu[3], tu[4] );
-  }*/
+  }
   MPI_Finalize();
   return 0;
   }
