@@ -1217,27 +1217,22 @@ world * file_to_miniworld(FILE *file, int p, int id){
 
 void free_bounds(world *miniworld){
 
-  printf("starting free bounds 0 \n");
+  printf("starting free bounds \n");
   for(int i=0; i<miniworld->size_y; i++){
 
     printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) \n", miniworld->size_x, miniworld->size_y, i);
-    if(miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ]!=NULL){
+    if(miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ] != NULL){
       destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ] );
       miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y)] = NULL;
     }
 
-  }
-
-  printf("starting free bounds size_x-1\n");
-  for(int i=0; i<miniworld->size_y; i++){
-
     printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-1, i);
-    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]!=NULL){
+    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] != NULL){
       destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
       miniworld->cells[MATRIX_INDEX(miniworld->size_x-1,i,miniworld->size_y)] = NULL;
     }
-  }
 
+  }
 
   printf("finish free bounds\n");
 
