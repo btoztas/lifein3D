@@ -30,6 +30,7 @@ typedef struct _node{
 typedef struct _world{
 
   int alive_cells;
+  int *n_alive_cells;
   int size_x;
   int size_y;
   node **cells;
@@ -75,11 +76,11 @@ world *create_world(int size_x, int size_y){
   world *new       = (world*)malloc(sizeof(world));
   if(new == NULL)
     printf("Error allocating memory for a new world.\n");
-  new->alive_cells = 0;
-  new->size_x      = size_x;
-  new->size_y      = size_y;
-  new->cells       = create_bintree_hash(size_x, size_y);
-
+  new->alive_cells   = 0;
+  new->size_x        = size_x;
+  new->size_y        = size_y;
+  new->cells         = create_bintree_hash(size_x, size_y);
+  new->n_alive_cells = (int*)calloc(size_x,sizeof(int));
   return new;
 }
 
@@ -116,6 +117,7 @@ void destroy_bintree(node **tree, int size_x, int size_y){
 void destroy_world(world *game){
 
   destroy_bintree(game->cells, game->size_x, game->size_y);
+  free(game->n_alive_cells);
   free(game);
 
 }
@@ -286,7 +288,12 @@ void print_world(world *game){
 
   #ifdef DEBUG
     printf("################################\n\tWorld Size: x=%d y=%d\n\tAlive Cells: %d\n\tPrinting Cells\n", game->size_x, game->size_y, game->alive_cells);
+
+
   #endif
+
+  for (int i = 0; i < game->size_x; i++)
+    printf("x = %d - %d cells\n", i, game->n_alive_cells[i]);
 
   print_bintree_hash(game->cells, game->size_x, game->size_y);
 
@@ -379,13 +386,14 @@ int get_balance(node *N)
 
 
 
-node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
+node  *insert_bintree(node *root, cell *new_cell, int* n_cells, int* n_alive_cells, int size_y){
     if(root == NULL){
 
       root = create_bintree_node(new_cell);
 
 
       (*n_cells)++;
+      n_alive_cells[new_cell->x]++;
 
     }else if(compare_cells(new_cell, root->this)==0){
       #ifdef DEBUG
@@ -395,11 +403,11 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
       return root;
     }else if(compare_cells(new_cell, root->this)==1){
 
-      root->right = insert_bintree(root->right, new_cell, n_cells);
+      root->right = insert_bintree(root->right, new_cell, n_cells, n_alive_cells, size_y);
 
     }else{
 
-      root->left = insert_bintree(root->left, new_cell, n_cells);
+      root->left = insert_bintree(root->left, new_cell, n_cells, n_alive_cells, size_y);
 
     }
 
@@ -444,7 +452,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells){
 void insert_cell(world *game, cell *new_cell){
 
 
-  game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)] = insert_bintree(game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)], new_cell, &(game->alive_cells));
+  game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)] = insert_bintree(game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)], new_cell, &(game->alive_cells), game->n_alive_cells, game->size_y);
 
 
   #ifdef DEBUG
@@ -1207,6 +1215,54 @@ world * file_to_miniworld(FILE *file, int p, int id){
 }
 
 
+void free_bounds(world *miniworld){
+
+  printf("starting free bounds 0 \n");
+  for(int i=0; i<miniworld->size_y; i++){
+
+    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) \n", miniworld->size_x, miniworld->size_y, i);
+    if(miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ]!=NULL){
+      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ] );
+      miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y)] = NULL;
+    }
+
+  }
+
+  printf("starting free bounds size_x-1\n");
+  for(int i=0; i<miniworld->size_y; i++){
+
+    printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-1, i);
+    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1,i,miniworld->size_y)]!=NULL){
+      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
+      miniworld->cells[MATRIX_INDEX(miniworld->size_x-1,i,miniworld->size_y)] = NULL;
+    }
+  }
+
+
+  printf("finish free bounds\n");
+
+
+}
+
+
+
+void sendbounds(world * miniworld, int i){
+  int aux=0;
+  int *upper_bound = (int*)malloc(sizeof(int)*miniworld->size_y*3);
+  int *lower_bound = (int*)malloc(sizeof(int)*miniworld->size_y*3);
+
+  for(int j=0; j<miniworld->size_y; j++)
+    if(miniworld->cells[MATRIX_INDEX(1,i,miniworld->size_y)]!=NULL)
+      no_struct_bintree(miniworld->cells[MATRIX_INDEX(1,i,miniworld->size_y)], lower_bound, &aux);
+
+  aux=0;
+
+  for(int j=0; j<miniworld->size_y; j++)
+    if(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,i,miniworld->size_y)]!=NULL)
+      no_struct_bintree(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,i,miniworld->size_y)], upper_bound, &aux);
+
+}
+
 int main(int argc, char* argv[]){
 
   world *next_world;
@@ -1286,7 +1342,6 @@ int main(int argc, char* argv[]){
     print_world(miniworlds[i]);
   }
 
-
   for(int i=0; i<num_iterations; i++){
 
     #if defined(DEBUG) || defined(ITERATION)
@@ -1305,9 +1360,24 @@ int main(int argc, char* argv[]){
 
       destroy_world(miniworlds[j]);
       miniworlds[j] = next_miniworlds[j];
-        printf("MINI WORLD %d\n", j);
-        print_world(miniworlds[j]);
+      printf("MINI WORLD %d\n", j);
+      print_world(miniworlds[j]);
     }
+
+    for(int i=0; i<p; i++){
+
+      free_bounds(miniworlds[i]);
+
+    }
+
+    for(int i=0; i<p; i++){
+
+      sendbounds(miniworlds[i], i);
+
+
+    }
+
+
 
   }
 
