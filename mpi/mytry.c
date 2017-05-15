@@ -27,12 +27,12 @@ int main (int argc, char *argv[]) {
   secs = - MPI_Wtime();
 
   if(id ==0){
-    eu={1,2,3,4,5};
+    eu={1;2;3;4;5};
     MPI_Send(&eu, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
     MPI_Recv(&tu, 5, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
   }
   if(id ==1){
-    eu={6,7,8,9,10};
+    eu={6;7;8;9;10};
     MPI_Send(&eu, 5, MPI_INT, 0, 2, MPI_COMM_WORLD);
     MPI_Recv(&tu, 5, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
   }
