@@ -39,8 +39,8 @@ int main (int argc, char *argv[]) {
     for(x=0; x<n_array1; x++){
       eu[x]= x+1;
     }
-    MPI_Send(&eu, 5, MPI_INT, 1, 1, MPI_COMM_WORLD);
-    MPI_Recv(&tu, 5, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
+    MPI_Send(&eu, n_array1, MPI_INT, 1, 1, MPI_COMM_WORLD);
+    MPI_Recv(&tu, n_array2, MPI_INT, 1, 2, MPI_COMM_WORLD, &status);
 
   }
   if(id ==1){
@@ -49,8 +49,8 @@ int main (int argc, char *argv[]) {
     for(x=0; x<n_array2; x++){
       eu[x]= x+n_array1;
     }
-    MPI_Send(&eu, 5, MPI_INT, 0, 2, MPI_COMM_WORLD);
-    MPI_Recv(&tu, 5, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+    MPI_Send(&eu, n_array2, MPI_INT, 0, 2, MPI_COMM_WORLD);
+    MPI_Recv(&tu, n_array1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
   }
 
   MPI_Barrier (MPI_COMM_WORLD);
