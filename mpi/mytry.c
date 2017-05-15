@@ -57,13 +57,13 @@ int main (int argc, char *argv[]) {
 
     printf("id=0 -> [ ");
     for(x=0; x<n_array2; x++){
-      printf("%d ");
+      printf("%d ",tu[x]);
     }
     printf("]\n");
   }else{
     printf("id=1 -> [ ");
     for(x=0; x<n_array1; x++){
-      printf("%d ");
+      printf("%d ",tu[x]);
     }
     printf("]\n");
   }
