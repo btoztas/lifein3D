@@ -15,7 +15,7 @@ int main (int argc, char *argv[]) {
   int id, p, i, rounds;
   double secs;
   int eu1[5]={1,2,3,4,5};
-  int eu2[]={6,7,8,9,10};
+  int eu2[5]={6,7,8,9,10};
   int *tu;
 
   MPI_Init (&argc, &argv);
