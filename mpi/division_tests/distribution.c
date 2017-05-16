@@ -1252,6 +1252,8 @@ void sendbounds(world * miniworld){
   int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
 
   for(int j=0; j<miniworld->size_y; j++){
+    if(miniworld->cells[j] != NULL)
+      print_bintree(miniworld->cells[j]);
     printf("going for tree (%d,%d)\n",1,j);
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       no_struct_bintree(miniworld->cells[miniworld->size_y+j], lower_bound, &aux);
