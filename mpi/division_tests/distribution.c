@@ -1220,16 +1220,21 @@ void free_bounds(world *miniworld){
   printf("starting free bounds \n");
   for(int i=0; i<miniworld->size_y; i++){
 
-    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) \n", miniworld->size_x, miniworld->size_y, i);
-    if(miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ] != NULL){
-      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y) ] );
-      miniworld->cells[MATRIX_INDEX(0,i,miniworld->size_y)] = NULL;
+    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, MATRIX_INDEX(0, i, miniworld->size_y));
+    if(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] != NULL)
+      print_bintree(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)]);
+    if(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] != NULL){
+      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] );
+      miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] = NULL;
     }
 
-    printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-1, i);
+    printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i);
+    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] != NULL)
+      print_bintree(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
+
     if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] != NULL){
       destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
-      miniworld->cells[MATRIX_INDEX(miniworld->size_x-1,i,miniworld->size_y)] = NULL;
+      miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] = NULL;
     }
 
   }
@@ -1340,41 +1345,15 @@ int main(int argc, char* argv[]){
     print_world(miniworlds[i]);
   }
 
-  for(int i=0; i<num_iterations; i++){
+  for(int w=0; w<p; w++){
 
-    #if defined(DEBUG) || defined(ITERATION)
-      printf("  Iteration number %d\n", i+1);
-    #endif
+    free_bounds(miniworlds[w]);
 
-    for(int j=0; j<p; j++){
+  }
 
-      next_miniworlds[j] = get_next_miniworld(miniworlds[j]);
+  for(int w=0; w<p; w++){
 
-      #ifdef DEBUG
-        printf("    Printing new world\n");
-        print_world(next_miniworlds[j]);
-        printf("    Destroying previous world\n");
-      #endif
-
-      destroy_world(miniworlds[j]);
-      miniworlds[j] = next_miniworlds[j];
-      printf("MINI WORLD %d\n", j);
-      print_world(miniworlds[j]);
-    }
-
-    for(int i=0; i<p; i++){
-
-      free_bounds(miniworlds[i]);
-
-    }
-
-    for(int i=0; i<p; i++){
-
-      sendbounds(miniworlds[i]);
-
-
-    }
-
+    sendbounds(miniworlds[w]);
 
 
   }
