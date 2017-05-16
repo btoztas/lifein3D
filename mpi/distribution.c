@@ -1358,8 +1358,8 @@ int main(int argc, char* argv[]){
 	MPI_Status statuses[2];
 	MPI_Request requests[2];
 
-	before=id-1;
-	after=id+1;
+	int before=id-1;
+	int after=id+1;
 	if(before==-1){
 		before=p-1;
 	}
@@ -1387,7 +1387,7 @@ int main(int argc, char* argv[]){
   #endif
 
   file = open_file(file_name);
-  miniworld = file_to_miniworld(file, p, i);
+  miniworld = file_to_miniworld(file, p, id);
 
   printf("[%d] FINISHED READING FILE\n", id);
 
@@ -1417,15 +1417,15 @@ int main(int argc, char* argv[]){
   	recv_lower_bound=(int*)malloc(recv_lower_bound_size*sizeof(int));
   	recv_upper_bound=(int*)malloc(recv_upper_bound_size*sizeof(int));
 
-  	MPI_Irecv(recv_lower_bound,s3,MPI_INT,before,2,MPI_COMM_WORLD,&requests[0]);
-  	MPI_Irecv(recv_upper_bound,s4,MPI_INT,after,2,MPI_COMM_WORLD,&requests[1]);
-  	MPI_Send(sent_lower_bound,s1,MPI_INT,before,2,MPI_COMM_WORLD);
-  	MPI_Send(sent_upper_bound,s2,MPI_INT,after,2,MPI_COMM_WORLD);
+  	MPI_Irecv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD,&requests[0]);
+  	MPI_Irecv(recv_upper_bound,recv_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD,&requests[1]);
+  	MPI_Send(sent_lower_bound,sent_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD);
+  	MPI_Send(sent_upper_bound,sent_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD);
 
 
   	MPI_Wait(requests,statuses);
 
-    print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id){
+    print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id);
 
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
 
