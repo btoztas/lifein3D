@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <omp.h>
+#include <mpi.h>
 
 #define MATRIX_INDEX(x, y, size_y)  (x*size_y+y)
 
@@ -1300,47 +1300,72 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
   }
 
 }
-
+void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, int s3,int s4, int after, int before,int rank){
+	int i;
+	printf("\nPC %d:\n\n",rank);
+	fflush(stdout);
+	printf("Mandei para o PC %d:[ ",before);
+	fflush(stdout);
+	for(i=0;i<s1;i++){
+		printf("%d ",bound1[i]);
+		fflush(stdout);
+	}
+	printf("]\n");
+	fflush(stdout);
+	printf("Mandei para o PC %d:[ ",after);
+	fflush(stdout);
+	for(i=0;i<s2;i++){
+		printf("%d ",bound2[i]);
+		fflush(stdout);
+	}
+	printf("]\n");
+	fflush(stdout);
+	printf("Recebi do PC %d:[ ",before);
+	fflush(stdout);
+	for(i=0;i<s3;i++){
+		printf("%d ",bound3[i]);
+		fflush(stdout);
+	}
+	printf("]\n");
+	fflush(stdout);
+	printf("Recebi do PC %d:[ ",after);
+	fflush(stdout);
+	for(i=0;i<s4;i++){
+		printf("%d ",bound4[i]);
+		fflush(stdout);
+	}
+	printf("]\n");
+	fflush(stdout);
+}
 
 int main(int argc, char* argv[]){
 
-  world *next_world;
-  int * array_world, *array_world_indexes;
+  world *next_miniworld, *miniworld;
   int id, p;
+  int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound;
+  int sent_lower_bound_size, sent_upper_bound_size, recv_lower_bound_size, recv_upper_bound_size;
 
   // if argc not expected, print program usage
-  if(argc!=4){
+  if(argc!=3){
     usage();
     exit(EXIT_FAILURE);
   }
 
-  /*MPI_Init (&argc, &argv);
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Comm_rank (MPI_COMM_WORLD, &id);
-  MPI_Comm_size (MPI_COMM_WORLD, &p);*/
-/*
-  int size_x = 5;
-  int size_y = 3;
-  printf("SIZE_X = %d, SIZE_Y = %d\n", size_x, size_y);
-  for(int i=0; i<size_x; i++)
-    for(int j=0; j< size_y; j++)
-      printf("(%d, %d) = %d\n", i, j, MATRIX_INDEX(i, j, size_y));
 
-  size_x = 3;
-  size_y = 5;
-  printf("SIZE_X = %d, SIZE_Y = %d\n", size_x, size_y);
-  for(int i=0; i<size_x; i++)
-    for(int j=0; j< size_y; j++)
-      printf("(%d, %d) = %d\n", i, j, MATRIX_INDEX(i, j, size_y));
+  MPI_Init(&argc,&argv);
+	MPI_Comm_rank(MPI_COMM_WORLD,&id);
+	MPI_Comm_size(MPI_COMM_WORLD,&p);
+	MPI_Status statuses[2];
+	MPI_Request requests[2];
 
-  size_x = 5;
-  size_y = 5;
-  printf("SIZE_X = %d, SIZE_Y = %d\n", size_x, size_y);
-  for(int i=0; i<size_x; i++)
-    for(int j=0; j< size_y; j++)
-      printf("(%d, %d) = %d\n", i, j, MATRIX_INDEX(i, j, size_y));
-*/
- p = atoi(argv[3]);
+	before=id-1;
+	after=id+1;
+	if(before==-1){
+		before=p-1;
+	}
+	if(after==p){
+		after=0;
+	}
 
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
@@ -1348,8 +1373,9 @@ int main(int argc, char* argv[]){
     printf("Error allocating memory for filename.\n");
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
+
   #ifdef DEBUG
-    printf("Iterations to do: %d\n\n", num_iterations);
+    printf("[%d] Iterations to do: %d\n\n", id, num_iterations);
   #endif
 
 
@@ -1357,171 +1383,85 @@ int main(int argc, char* argv[]){
   FILE *file;
 
   #ifdef DEBUG
-    printf("Opening file\n");
+    printf("[%d] Opening file\n", id);
   #endif
 
   file = open_file(file_name);
-/*
-  #ifdef DEBUG
-    printf("Reading file\n");
-  #endif
+  miniworld = file_to_miniworld(file, p, i);
 
-  world * old_but_gold = file_to_world(file);
-  printf("WHOLE WORLD:\n");
-  print_world(old_but_gold);
-  printf("\n\n");
-*/
+  printf("[%d] FINISHED READING FILE\n", id);
 
-  world ** miniworlds = (world**)malloc(sizeof(world*)*p);
-  world ** next_miniworlds = (world**)malloc(sizeof(world*)*p);
+  for(int i=0; i<num_iterations; i++){
 
+    next_miniworld = get_next_miniworld(miniworld);
 
-  printf("NORMAL WOOOOOOOOOORLDS\n");
-  for(int i=0; i<p; i++){
-    rewind(file);
-    miniworlds[i] = file_to_miniworld(file, p, i);
-    print_world(miniworlds[i]);
-  }
+    free_bounds(next_miniworld);
 
-  int **lower_bound     = (int**)malloc(sizeof(int*)*p);
-  int **upper_bound     = (int**)malloc(sizeof(int*)*p);
-  int *lower_bound_size = (int*)malloc(sizeof(int)*p);
-  int *upper_bound_size = (int*)malloc(sizeof(int)*p);
+    printf("[%d] ALLOCED LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3);
+    sent_lower_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[1]*3);
 
+    printf("[%d] ALLOCED UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
+    sent_upper_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
 
-  printf("NO BOUNDS WOOOOOOOOOORLDS\n");
-  for(int j=0; j<p; j++){
+    get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, &sent_lower_bound_size, &sent_upper_bound_size);
 
-    free_bounds(miniworlds[j]);
+    MPI_Barrier(MPI_COMM_WORLD);
 
-    printf("ALLOCED lower_bound WITH SIZE %d\n", miniworlds[j]->n_alive_cells[1]*3);
-    lower_bound[j] = (int*)malloc(sizeof(int)*miniworlds[j]->n_alive_cells[1]*3);
-    lower_bound_size[j] = miniworlds[j]->n_alive_cells[1]*3;
+    MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
+  	MPI_Irecv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD,&requests[1]);
+  	MPI_Send(&sent_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD);
+  	MPI_Send(&sent_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD);
 
-    printf("ALLOCED upper_bound WITH SIZE %d\n", miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3);
-    upper_bound[j] = (int*)malloc(sizeof(int)*miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3);
-    upper_bound_size[j] = miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3;
+  	MPI_Wait(requests,statuses);
+
+  	recv_lower_bound=(int*)malloc(recv_lower_bound_size*sizeof(int));
+  	recv_upper_bound=(int*)malloc(recv_upper_bound_size*sizeof(int));
+
+  	MPI_Irecv(recv_lower_bound,s3,MPI_INT,before,2,MPI_COMM_WORLD,&requests[0]);
+  	MPI_Irecv(recv_upper_bound,s4,MPI_INT,after,2,MPI_COMM_WORLD,&requests[1]);
+  	MPI_Send(sent_lower_bound,s1,MPI_INT,before,2,MPI_COMM_WORLD);
+  	MPI_Send(sent_upper_bound,s2,MPI_INT,after,2,MPI_COMM_WORLD);
 
 
-    get_bounds(miniworlds[j], lower_bound[j], upper_bound[j], &lower_bound_size[j], &upper_bound_size[j]);
-    print_world(miniworlds[j]);
-  }
+  	MPI_Wait(requests,statuses);
 
+    print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id){
 
-  printf("BOUNDS:\n");
-  for(int w=0; w<p; w++){
+    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
 
-    printf("PC %d lower_bound size = %d\n", w, lower_bound_size[w]);
-    for(int j = 0; j<lower_bound_size[w]; j++)
-      printf("%d", lower_bound[w][j]);
-    printf("\n");
+    free(sent_upper_bound);
+    free(sent_lower_bound);
+    free(recv_lower_bound);
+    free(recv_upper_bound);
 
-    printf("PC %d upper_bound size = %d\n", w, upper_bound_size[w]);
-    for(int j = 0; j<upper_bound_size[w]; j++)
-      printf("%d", upper_bound[w][j]);
-    printf("\n");
-  }
+    destroy_world(miniworld);
 
+    miniworld = next_miniworld;
 
-  printf("AFTER RECV BOUNDS WOOOOOOOOOORLDS\n");
-  for(int j=0; j<p; j++){
-    printf("GOING FOR PC %d\n", p);
-    collectbounds(miniworlds[j], lower_bound[j], upper_bound[j], lower_bound_size[j], upper_bound_size[j]);
-    printf("PC %d\n", p);
-    print_world(miniworlds[j]);
-  }
+  	MPI_Barrier(MPI_COMM_WORLD);
 
-
-
-
-/*
-  int **mini_array_worlds = (int **)malloc(sizeof(int *) * p);
-  int *size = (int *)malloc(sizeof(int) * p);
-
-
-
-  world *old_but_gold = file_to_world(file);
-
-
-  print_world(old_but_gold);
-
-
-  array_world = (int *)malloc((old_but_gold->alive_cells)*3*sizeof(int));
-  array_world_indexes = (int*)malloc(sizeof(int)*old_but_gold->size_x);
-
-
-  #ifdef DEBUG
-    printf("STARTING TO TRANSFORM WORLD INTO ARRAY\n");
-  #endif
-  no_struct_game(old_but_gold, array_world, array_world_indexes);
-  #ifdef DEBUG
-    printf("PRITING ARRAY WORLD NOW\n");
-  #endif
-
-  print_no_struct_game(array_world, array_world_indexes, old_but_gold->alive_cells, old_but_gold->size_x);
-  distribute_payload(p, old_but_gold->size_x, old_but_gold->alive_cells, array_world, array_world_indexes, mini_array_worlds, size);
-
-  world * miniworld = array_to_world(mini_array_worlds[0], old_but_gold->size_x,  NEEDED_BLOCK_SIZE(0,p,old_but_gold->size_x), size[0]/p);
-  print_world(miniworld);
-
-
-
-  // SEQUENTIAL
-
-
-  #ifdef DEBUG
-    printf("\nPrinting World\n");
-    print_world(old_but_gold);
-    printf("\nStarting to iterate\n");
-  #endif
-
-  for(int i=0; i<terations; i++){
-
-    #if defined(DEBUG) || defined(ITERATION)
-      printf("  Iteration number %d\n", i+1);
-    #endif
-
-    next_world = get_next_world(old_but_gold);
-
-    #ifdef DEBUG
-      printf("    Printing new world\n");
-      print_world(next_world);
-      printf("    Destroying previous world\n");
-    #endif
-
-    destroy_world(old_but_gold);
-    old_but_gold = next_world;
-
+    for(i = 0; i < p; i++) {
+  		MPI_Barrier(MPI_COMM_WORLD);
+  		if (i == id) {
+        print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id){
+		  }
+  	}
 
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
+  for(i = 0; i < p; i++) {
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (i == id) {
+      print_world(miniworld);
+    }
+  }
 
-  #ifdef DEBUG
-    printf("\nDestroying World\n");
-    //print_tree_padding(old_but_gold->cells->root, 0 );
-  #else
-    print_world(old_but_gold);
-  #endif
-
-  destroy_world(old_but_gold);
-
-  #ifdef DEBUG
-    printf("Freeing other variables\n");
-  #endif
-
-  #ifdef TIMER
-  double end = omp_get_wtime();
-  printf("Total time = %lf\n", end-start);
-  #endif
+  destroy_world(miniworld);
 
   fclose(file);
   free(file_name);
   exit(EXIT_SUCCESS);
-
-
-  */
-
-
 
 
 }

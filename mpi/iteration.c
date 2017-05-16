@@ -3,7 +3,7 @@
 #include <mpi.h>
 
 void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, int s3,int s4, int after, int before,int rank){
-	int i;	
+	int i;
 	printf("\nPC %d:\n\n",rank);
 	fflush(stdout);
 	printf("Mandei para o PC %d:[ ",before);
@@ -12,7 +12,7 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 		printf("%d ",bound1[i]);
 		fflush(stdout);
 	}
-	printf("]\n");	
+	printf("]\n");
 	fflush(stdout);
 	printf("Mandei para o PC %d:[ ",after);
 	fflush(stdout);
@@ -24,7 +24,7 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 	fflush(stdout);
 	printf("Recebi do PC %d:[ ",before);
 	fflush(stdout);
-	for(i=0;i<s3;i++){	
+	for(i=0;i<s3;i++){
 		printf("%d ",bound3[i]);
 		fflush(stdout);
 	}
@@ -36,7 +36,7 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 		printf("%d ",bound4[i]);
 		fflush(stdout);
 	}
-	printf("]\n");	
+	printf("]\n");
 	fflush(stdout);
 }
 
@@ -53,7 +53,7 @@ void print_mini_world(int ** mini_world, int world_size, int size_yz){
 }
 
 int main(int argc, char ** argv){
-		
+
 	int rank,pcs;
 	int s1,s2,s3,s4;
 	int *bound1,*bound2,*bound3,*bound4;
@@ -82,7 +82,7 @@ int main(int argc, char ** argv){
 	if(after==pcs){
 		after=0;
 	}
-	
+
 	mini_world=malloc(world_size*sizeof(int*));
 	for(i=0;i<world_size;i++){
 		mini_world[i]=malloc(size_yz*sizeof(int));
