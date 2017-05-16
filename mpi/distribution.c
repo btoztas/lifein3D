@@ -1438,7 +1438,7 @@ int main(int argc, char* argv[]){
 
   	MPI_Barrier(MPI_COMM_WORLD);
 
-    for(i = 0; i < p; i++) {
+    for(int i = 0; i < p; i++) {
   		MPI_Barrier(MPI_COMM_WORLD);
   		if (i == id) {
         print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id);
@@ -1448,7 +1448,7 @@ int main(int argc, char* argv[]){
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  for(i = 0; i < p; i++) {
+  for(int i = 0; i < p; i++) {
     MPI_Barrier(MPI_COMM_WORLD);
     if (i == id) {
       print_world(miniworld);
