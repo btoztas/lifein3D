@@ -1249,11 +1249,11 @@ void free_bounds(world *miniworld){
 void sendbounds(world * miniworld){
   int aux=0;
 
-  printf("ALLOCED upper_bound WITH SIZE %d\n", miniworld->n_alive_cells[1]*3);
-  int *upper_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[1]*3);
+  printf("ALLOCED lower_bound WITH SIZE %d\n", miniworld->n_alive_cells[1]*3);
+  int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[1]*3);
 
-  printf("ALLOCED lower_bound WITH SIZE %d\n", miniworld->n_alive_cells[miniworld->size_x-2]*3);
-  int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
+  printf("ALLOCED upper_bound WITH SIZE %d\n", miniworld->n_alive_cells[miniworld->size_x-2]*3);
+  int *upper_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
 
   for(int j=0; j<miniworld->size_y; j++){
     printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j);
