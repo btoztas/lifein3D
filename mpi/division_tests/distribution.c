@@ -466,22 +466,18 @@ void insert_cell(world *game, cell *new_cell){
 
 
 // create the world from the array of cells
-world * array_to_world(int * array_world, int size_x, int size_y, int n_alive){
+void array_to_world(int * array_world, int n_alive, world * new_world){
 
-  world *new_world;
   cell *new_cell;
   int counter=0;
 
-  new_world = create_world(size_x, size_y);
-
   for(int i = 0; i<n_alive;i++){
+    printf("ADDING %d %d %d\n", array_world[counter], array_world[counter+1], array_world[counter+2]);
     new_cell = create_cell(array_world[counter], array_world[counter+1], array_world[counter+2]);
     //printf("(%d,%d,%d)\n",array_world[counter], array_world[counter+1], array_world[counter+2]);
     insert_cell(new_world, new_cell);
     counter=counter+3;
   }
-
-  return(new_world);
 }
 
 // create initial world from input file
@@ -1226,6 +1222,7 @@ void free_bounds(world *miniworld){
     if(miniworld->cells[i] != NULL){
       destroy_bintree_nodes( miniworld->cells[i] );
       miniworld->cells[i] = NULL;
+      miniworld->n_alive_cells[0]=0;
     }
 
     printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i);
@@ -1235,6 +1232,7 @@ void free_bounds(world *miniworld){
     if(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] != NULL){
       destroy_bintree_nodes( miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i]);
       miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] = NULL;
+      miniworld->n_alive_cells[miniworld->size_x-1]=0;
     }
 
   }
@@ -1246,14 +1244,10 @@ void free_bounds(world *miniworld){
 
 
 
-void sendbounds(world * miniworld){
+void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lower_bound_size, int *upper_bound_size){
   int aux=0;
 
-  printf("ALLOCED lower_bound WITH SIZE %d\n", miniworld->n_alive_cells[1]*3);
-  int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[1]*3);
 
-  printf("ALLOCED upper_bound WITH SIZE %d\n", miniworld->n_alive_cells[miniworld->size_x-2]*3);
-  int *upper_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
 
   for(int j=0; j<miniworld->size_y; j++){
     printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j);
@@ -1266,6 +1260,7 @@ void sendbounds(world * miniworld){
 
   aux=0;
 
+
   for(int j=0; j<miniworld->size_y; j++){
 
     printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j);
@@ -1275,7 +1270,37 @@ void sendbounds(world * miniworld){
     if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
       no_struct_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j], upper_bound, &aux);
   }
+
+
 }
+void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size){
+
+  printf("GOING FOR upper_bound\n");
+
+  cell *new_cell;
+  int counter=0;
+
+  for(int i = 0; i<upper_bound_size/3;i++){
+    printf("ADDING %d %d %d\n",miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]);
+    new_cell = create_cell(miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]);
+    //printf("(%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]);
+    insert_cell(miniworld, new_cell);
+    counter=counter+3;
+  }
+
+  counter=0;
+
+  printf("GOING FOR lower_bound\n");
+  for(int i = 0; i<lower_bound_size/3;i++){
+    printf("ADDING %d %d %d\n", 0, lower_bound[counter+1], lower_bound[counter+2]);
+    new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
+    //printf("(%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]);
+    insert_cell(miniworld, new_cell);
+    counter=counter+3;
+  }
+
+}
+
 
 int main(int argc, char* argv[]){
 
@@ -1350,54 +1375,61 @@ int main(int argc, char* argv[]){
   world ** miniworlds = (world**)malloc(sizeof(world*)*p);
   world ** next_miniworlds = (world**)malloc(sizeof(world*)*p);
 
+
+  printf("NORMAL WOOOOOOOOOORLDS\n");
   for(int i=0; i<p; i++){
     rewind(file);
     miniworlds[i] = file_to_miniworld(file, p, i);
     print_world(miniworlds[i]);
   }
 
-  for(int i=0; i<num_iterations; i++){
-
-    #if defined(DEBUG) || defined(ITERATION)
-      printf("  Iteration number %d\n", i+1);
-    #endif
-
-    for(int j=0; j<p; j++){
-
-      next_miniworlds[j] = get_next_miniworld(miniworlds[j]);
-
-      #ifdef DEBUG
-        printf("    Printing new world\n");
-        print_world(next_miniworlds[j]);
-        printf("    Destroying previous world\n");
-      #endif
-
-      destroy_world(miniworlds[j]);
-      miniworlds[j] = next_miniworlds[j];
-      printf("MINI WORLD %d\n", j);
-      print_world(miniworlds[j]);
-    }
-
-    for(int j=0; j<p; j++){
-
-      free_bounds(miniworlds[j]);
-
-    }
+  int **lower_bound     = (int**)malloc(sizeof(int*)*p);
+  int **upper_bound     = (int**)malloc(sizeof(int*)*p);
+  int *lower_bound_size = (int*)malloc(sizeof(int)*p);
+  int *upper_bound_size = (int*)malloc(sizeof(int)*p);
 
 
+  printf("NO BOUNDS WOOOOOOOOOORLDS\n");
+  for(int j=0; j<p; j++){
+
+    free_bounds(miniworlds[j]);
+
+    printf("ALLOCED lower_bound WITH SIZE %d\n", miniworlds[j]->n_alive_cells[1]*3);
+    lower_bound[j] = (int*)malloc(sizeof(int)*miniworlds[j]->n_alive_cells[1]*3);
+    lower_bound_size[j] = miniworlds[j]->n_alive_cells[1]*3;
+
+    printf("ALLOCED upper_bound WITH SIZE %d\n", miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3);
+    upper_bound[j] = (int*)malloc(sizeof(int)*miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3);
+    upper_bound_size[j] = miniworlds[j]->n_alive_cells[miniworlds[j]->size_x-2]*3;
 
 
-    for(int j=0; j<p; j++){
-
-      sendbounds(miniworlds[j]);
-
-
-    }
-
-
-
+    get_bounds(miniworlds[j], lower_bound[j], upper_bound[j], &lower_bound_size[j], &upper_bound_size[j]);
+    print_world(miniworlds[j]);
   }
 
+
+  printf("BOUNDS:\n");
+  for(int w=0; w<p; w++){
+
+    printf("PC %d lower_bound size = %d\n", w, lower_bound_size[w]);
+    for(int j = 0; j<lower_bound_size[w]; j++)
+      printf("%d", lower_bound[w][j]);
+    printf("\n");
+
+    printf("PC %d upper_bound size = %d\n", w, upper_bound_size[w]);
+    for(int j = 0; j<upper_bound_size[w]; j++)
+      printf("%d", upper_bound[w][j]);
+    printf("\n");
+  }
+
+
+  printf("AFTER RECV BOUNDS WOOOOOOOOOORLDS\n");
+  for(int j=0; j<p; j++){
+    printf("GOING FOR PC %d\n", p);
+    collectbounds(miniworlds[j], lower_bound[j], upper_bound[j], lower_bound_size[j], upper_bound_size[j]);
+    printf("PC %d\n", p);
+    print_world(miniworlds[j]);
+  }
 
 
 
