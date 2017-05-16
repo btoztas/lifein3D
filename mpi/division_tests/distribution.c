@@ -1241,22 +1241,23 @@ void free_bounds(world *miniworld){
 
 
 
-void sendbounds(world * miniworld, int i){
+void sendbounds(world * miniworld){
   int aux=0;
   int *upper_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[1]*3);
   int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
 
   for(int j=0; j<miniworld->size_y; j++){
     printf("going for tree (%d,%d)\n",1,j);
-    if(miniworld->cells[MATRIX_INDEX(1,i,miniworld->size_y)]!=NULL)
-      no_struct_bintree(miniworld->cells[MATRIX_INDEX(1,i,miniworld->size_y)], lower_bound, &aux);
+    if(miniworld->cells[MATRIX_INDEX(1,j,miniworld->size_y)]!=NULL)
+      no_struct_bintree(miniworld->cells[MATRIX_INDEX(1,j,miniworld->size_y)], lower_bound, &aux);
   }
+
   aux=0;
 
   for(int j=0; j<miniworld->size_y; j++){
     printf("going for tree (%d,%d)\n",miniworld->size_y-2,j);
-    if(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,i,miniworld->size_y)]!=NULL)
-      no_struct_bintree(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,i,miniworld->size_y)], upper_bound, &aux);
+    if(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,j,miniworld->size_y)]!=NULL)
+      no_struct_bintree(miniworld->cells[MATRIX_INDEX(miniworld->size_y-2,j,miniworld->size_y)], upper_bound, &aux);
   }
 }
 
@@ -1369,7 +1370,7 @@ int main(int argc, char* argv[]){
 
     for(int i=0; i<p; i++){
 
-      sendbounds(miniworlds[i], i);
+      sendbounds(miniworlds[i]);
 
 
     }
