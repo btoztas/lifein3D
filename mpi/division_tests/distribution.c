@@ -452,7 +452,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells, int* n_alive_cel
 void insert_cell(world *game, cell *new_cell){
 
 
-  game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)] = insert_bintree(game->cells[MATRIX_INDEX(new_cell->x, new_cell->y, game->size_y)], new_cell, &(game->alive_cells), game->n_alive_cells, game->size_y);
+  game->cells[new_cell->x*game->size_y+new_cell->y] = insert_bintree(game->cells[new_cell->x*game->size_y + new_cell->y], new_cell, &(game->alive_cells), game->n_alive_cells, game->size_y);
 
 
   #ifdef DEBUG
@@ -878,12 +878,12 @@ world *get_next_world(world *actual_world){
     #endif
     for(int x=0; x<actual_world->size_x; x++)
       for(int y=0; y<actual_world->size_y; y++)
-        if(actual_world->cells[MATRIX_INDEX(x, y, actual_world->size_y)] != NULL){
+        if(actual_world->cells[x*actual_world->size_y+y] != NULL){
           #ifdef DEBUG
           printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
           #endif
           //this function will analyzer every node of the subtree, and add to the new world the cells
-          solve_subtree(actual_world->cells[MATRIX_INDEX(x, y, actual_world->size_y)], actual_world, next_world);
+          solve_subtree(actual_world->cells[x* actual_world->size_y+ y], actual_world, next_world);
 
         }
     #ifdef DEBUG
@@ -939,12 +939,12 @@ world *get_next_miniworld(world *actual_world){
     #endif
     for(int x=0; x<actual_world->size_x; x++)
       for(int y=0; y<actual_world->size_y; y++)
-        if(actual_world->cells[MATRIX_INDEX(x, y, actual_world->size_y)] != NULL){
+        if(actual_world->cells[x*actual_world->size_y+ y] != NULL){
           #ifdef DEBUG
           printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y);
           #endif
           //this function will analyzer every node of the subtree, and add to the new world the cells
-          solve_subtree(actual_world->cells[MATRIX_INDEX(x, y, actual_world->size_y)], actual_world, next_world);
+          solve_subtree(actual_world->cells[x*actual_world->size_y+ y], actual_world, next_world);
 
         }
     #ifdef DEBUG
