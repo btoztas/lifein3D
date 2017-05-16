@@ -1248,13 +1248,18 @@ void free_bounds(world *miniworld){
 
 void sendbounds(world * miniworld){
   int aux=0;
+
+  printf("ALLOCED upper_bound WITH SIZE %d\n", miniworld->n_alive_cells[1]*3);
   int *upper_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[1]*3);
+
+  printf("ALLOCED lower_bound WITH SIZE %d\n", miniworld->n_alive_cells[miniworld->size_x-2]*3);
   int *lower_bound = (int*)malloc(sizeof(int)*miniworld->n_alive_cells[miniworld->size_x-2]*3);
 
   for(int j=0; j<miniworld->size_y; j++){
-    if(miniworld->cells[j] != NULL)
-      print_bintree(miniworld->cells[j]);
-    printf("going for tree (%d,%d)\n",1,j);
+    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j);
+    if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
+      print_bintree(miniworld->cells[miniworld->size_y+j]);
+
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       no_struct_bintree(miniworld->cells[miniworld->size_y+j], lower_bound, &aux);
   }
@@ -1262,7 +1267,11 @@ void sendbounds(world * miniworld){
   aux=0;
 
   for(int j=0; j<miniworld->size_y; j++){
-    printf("going for tree (%d,%d)\n",miniworld->size_x-2,j);
+
+    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j);
+    if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
+      print_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]);
+
     if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
       no_struct_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j], upper_bound, &aux);
   }
