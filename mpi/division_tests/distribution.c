@@ -1220,21 +1220,21 @@ void free_bounds(world *miniworld){
   printf("starting free bounds \n");
   for(int i=0; i<miniworld->size_y; i++){
 
-    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, MATRIX_INDEX(0, i, miniworld->size_y));
-    if(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] != NULL)
-      print_bintree(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)]);
-    if(miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] != NULL){
-      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] );
-      miniworld->cells[MATRIX_INDEX(0, i, miniworld->size_y)] = NULL;
+    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, i);
+    if(miniworld->cells[i] != NULL)
+      print_bintree(miniworld->cells[i]);
+    if(miniworld->cells[i] != NULL){
+      destroy_bintree_nodes( miniworld->cells[i] );
+      miniworld->cells[i] = NULL;
     }
 
     printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i);
-    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] != NULL)
-      print_bintree(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
+    if(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] != NULL)
+      print_bintree(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i]);
 
-    if(miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] != NULL){
-      destroy_bintree_nodes( miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)]);
-      miniworld->cells[MATRIX_INDEX(miniworld->size_x-1, i, miniworld->size_y)] = NULL;
+    if(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] != NULL){
+      destroy_bintree_nodes( miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i]);
+      miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] = NULL;
     }
 
   }
