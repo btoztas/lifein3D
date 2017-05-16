@@ -1356,22 +1356,46 @@ int main(int argc, char* argv[]){
     print_world(miniworlds[i]);
   }
 
-  for(int w=0; w<p; w++){
+  for(int i=0; i<num_iterations; i++){
 
-    free_bounds(miniworlds[w]);
+    #if defined(DEBUG) || defined(ITERATION)
+      printf("  Iteration number %d\n", i+1);
+    #endif
 
-  }
+    for(int j=0; j<p; j++){
 
-  for(int w=0; w<p; w++){
+      next_miniworlds[j] = get_next_miniworld(miniworlds[j]);
 
-    sendbounds(miniworlds[w]);
+      #ifdef DEBUG
+        printf("    Printing new world\n");
+        print_world(next_miniworlds[j]);
+        printf("    Destroying previous world\n");
+      #endif
+
+      destroy_world(miniworlds[j]);
+      miniworlds[j] = next_miniworlds[j];
+      printf("MINI WORLD %d\n", j);
+      print_world(miniworlds[j]);
+    }
+
+    for(int j=0; j<p; j++){
+
+      free_bounds(miniworlds[j]);
+
+    }
 
 
-  }
 
-  for(int i=0; i<p; i++){
-    printf("\nPC %d:\n", i);
-    print_world(miniworlds[i]);
+
+    for(int j=0; j<p; j++){
+
+      sendbounds(miniworlds[j]);
+
+
+    }
+
+
+
   }
 
 
