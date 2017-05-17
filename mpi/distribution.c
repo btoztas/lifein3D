@@ -1395,14 +1395,14 @@ int main(int argc, char* argv[]){
   file = open_file(file_name);
   miniworld = file_to_miniworld(file, p, id);
 
-  printf("[%d] FINISHED READING FILE\n[%d]MY WORLD:\n", id, id); fflush(stdout);
+  printf("[%d] FINISHED READING FILE\n[%d] MY WORLD:\n", id, id); fflush(stdout);
   print_world(miniworld);
 
   for(int i=0; i<num_iterations; i++){
 
     next_miniworld = get_next_miniworld(miniworld);
 
-    printf("[%d] FINISHED NEXT WORLD\n[%d]NEXTWORLD WORLD:\n", id, id); fflush(stdout);
+    printf("[%d] FINISHED NEXT WORLD\n[%d] NEXTWORLD WORLD:\n", id, id); fflush(stdout);
     print_world(next_miniworld);
 
     printf("[%d] FREEING BOUNDS...\n", id); fflush(stdout);
@@ -1433,12 +1433,12 @@ int main(int argc, char* argv[]){
     printf("[%d] ALLOCED RECV_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
   	recv_upper_bound=(int*)malloc(recv_upper_bound_size*sizeof(int));
 
-    printf("ARRAY SENT_LOWER_BOUND: \n"); fflush(stdout);
+    printf("[%d] ARRAY SENT_LOWER_BOUND: \n", id); fflush(stdout);
     for(int c = 0; c<sent_lower_bound_size; c++)
       printf("%d", sent_lower_bound[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
 
-    printf("ARRAY SENT_UPPER_BOUND: \n"); fflush(stdout);
+    printf("[%d] ARRAY SENT_UPPER_BOUND: \n", id); fflush(stdout);
     for(int c = 0; c<sent_upper_bound_size; c++)
       printf("%d", sent_upper_bound[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
@@ -1451,6 +1451,17 @@ int main(int argc, char* argv[]){
 
   	MPI_Wait(requests,statuses);
     MPI_Barrier(MPI_COMM_WORLD);
+
+    printf("[%d] ARRAY RECV_LOWER_BOUND: \n", id); fflush(stdout);
+    for(int c = 0; c<recv_lower_bound_size; c++)
+      printf("%d", recv_lower_bound[c]); fflush(stdout);
+    printf("\n"); fflush(stdout);
+
+    printf("[%d] ARRAY RECV_UPPER_BOUND: \n", id); fflush(stdout);
+    for(int c = 0; c<recv_upper_bound_size; c++)
+      printf("%d", recv_upper_bound[c]); fflush(stdout);
+    printf("\n"); fflush(stdout);
+
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
 
