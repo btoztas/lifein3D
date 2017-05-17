@@ -266,7 +266,6 @@ void print_cell_mintree(cell *this, int first){
   #ifdef DEBUG
     printf("\t  %d %d %d\n", (this->x)+first-1, this->y, this->z); fflush(stdout);
   #else
-    printf("\tREAL CELL:  %d %d %d\n", this->x, this->y, this->z); fflush(stdout);
     printf("%d %d %d\n", (this->x)+first-1, this->y, this->z); fflush(stdout);
   #endif
 }
@@ -1380,7 +1379,7 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 void print_miniworld(world *miniworld, int p, int id){
   int size_y = miniworld->size_y;
 
-  int first_x = NEEDED_FIRST_X(id,p,size_y);
+  int first_x = TREATED_FIRST_X(id,p,size_y);
 
   for(int i=0; i < miniworld->size_x; i++)
     printf("x = %d - %d cells\n", i, miniworld->n_alive_cells[i]); fflush(stdout);
