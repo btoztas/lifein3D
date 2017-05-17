@@ -1497,6 +1497,8 @@ int main(int argc, char* argv[]){
 
   }
 
+  free_bounds(miniworld);
+
   printf("FINAL WORLD\n");
   MPI_Barrier(MPI_COMM_WORLD);
   for(int i = 0; i < p; i++) {
