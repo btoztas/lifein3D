@@ -1449,6 +1449,7 @@ int main(int argc, char* argv[]){
 
   for(int i=0; i<num_iterations; i++){
 
+    MPI_Barrier(MPI_COMM_WORLD);
     next_miniworld = get_next_miniworld(miniworld);
 
     printf("[%d] FINISHED NEXT WORLD\n[%d] NEXTWORLD WORLD:\n", id, id); fflush(stdout);
@@ -1528,7 +1529,7 @@ int main(int argc, char* argv[]){
 
     miniworld = next_miniworld;
 
-  	MPI_Barrier(MPI_COMM_WORLD);
+
 
     /*for(int i = 0; i < p; i++) {
   		MPI_Barrier(MPI_COMM_WORLD);
@@ -1542,6 +1543,7 @@ int main(int argc, char* argv[]){
 
   printf("FINAL WORLD\n");
   MPI_Barrier(MPI_COMM_WORLD);
+
   for(int i = 0; i < p; i++) {
     MPI_Barrier(MPI_COMM_WORLD);
     if (i == id) {
