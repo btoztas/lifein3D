@@ -271,18 +271,18 @@ void print_cell_mintree(cell *this, int first){
 }
 
 
-void print_bintree(node *root){
+void print_bintree(node *root, int first){
 
   if(root->left != NULL){
-    print_bintree(root->left);
+    print_bintree(root->left, int first);
   }
   #ifdef DEBUG
     printf("\t  Height: %d", root->height); fflush(stdout);
   #endif
-  print_cell(root->this);
+  print_cell(root->this, int first);
 
   if(root->right != NULL){
-    print_bintree(root->right);
+    print_bintree(root->right, int first);
   }
 
 }
@@ -1376,7 +1376,7 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 	fflush(stdout);
 }
 
-void print_miniworld(world *miniworld, p, id){
+void print_miniworld(world *miniworld, int p, int id){
   int size_y = miniworld->size_y;
 
   int first_x = NEEDED_FIRST_X(id,p,size_y);
