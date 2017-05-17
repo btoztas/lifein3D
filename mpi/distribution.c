@@ -271,18 +271,18 @@ void print_cell_mintree(cell *this, int first){
 }
 
 
-void print_bintree(node *root, int first){
+void print_bintree(node *root){
 
   if(root->left != NULL){
-    print_bintree(root->left, first);
+    print_bintree(root->left);
   }
   #ifdef DEBUG
     printf("\t  Height: %d", root->height); fflush(stdout);
   #endif
-  print_cell(root->this, first);
+  print_cell(root->this);
 
   if(root->right != NULL){
-    print_bintree(root->right, first);
+    print_bintree(root->right);
   }
 
 }
