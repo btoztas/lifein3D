@@ -1433,7 +1433,7 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
   #endif
   for(int i = 0; i<lower_bound_size/3;i++){
     #ifdef DEBUG
-    printf("[%d] READ %d %d %d\n ADDING %d %d %d\n",id, lower_bound[counter+1],lower_bound[counter+1], lower_bound[counter+2], 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
+    printf("[%d] READ %d %d %d\n ADDING %d %d %d\n",id, lower_bound[counter],lower_bound[counter+1], lower_bound[counter+2], 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     #endif
     new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
     //printf("[%d] (%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
