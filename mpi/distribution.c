@@ -1319,17 +1319,17 @@ world * file_to_miniworld(FILE *file, int p, int id){
 }
 
 
-void free_bounds(world *miniworld){
+void free_bounds(world *miniworld. int id){
 
 
   #ifdef DEBUG
-    printf("starting free bounds \n"); fflush(stdout);
+    printf("[%d] starting free bounds \n", id); fflush(stdout);
   #endif
 
   for(int i=0; i<miniworld->size_y; i++){
 
     #ifdef DEBUG
-      printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, i); fflush(stdout);
+      printf("[%d] freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n",id, miniworld->size_x, miniworld->size_y, i, i); fflush(stdout);
       if(miniworld->cells[i] != NULL)
         print_bintree(miniworld->cells[i]);
     #endif
@@ -1341,7 +1341,7 @@ void free_bounds(world *miniworld){
     }
 
     #ifdef DEBUG
-      printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i); fflush(stdout);
+      printf("[%d] freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n",id, miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i); fflush(stdout);
       if(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] != NULL)
         print_bintree(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i]);
     #endif
@@ -1355,14 +1355,14 @@ void free_bounds(world *miniworld){
   }
 
   #ifdef DEBUG
-    printf("finish free bounds\n"); fflush(stdout);
+    printf("[%d] finish free bounds\n", id); fflush(stdout);
   #endif
 
 }
 
 
 
-void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
+void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int id){
   int aux=0;
 
 
@@ -1370,7 +1370,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
   for(int j=0; j<miniworld->size_y; j++){
 
     #ifdef DEBUG
-    printf("LOWER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
+    printf("[%d] LOWER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", id, miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       print_bintree(miniworld->cells[miniworld->size_y+j]);
     #endif
@@ -1379,7 +1379,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
       no_struct_bintree(miniworld->cells[miniworld->size_y+j], lower_bound, &aux);
 
     #ifdef DEBUG
-    printf("LOWER BOUND: finished for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
+    printf("[%d] LOWER BOUND: finished for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", id, miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
     #endif
 
 
@@ -1391,7 +1391,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
   for(int j=0; j<miniworld->size_y; j++){
 
     #ifdef DEBUG
-    printf("UPPER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
+    printf("[%d] UPPER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n",id, miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
     if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
       print_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]);
     #endif
@@ -1400,16 +1400,16 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
       no_struct_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j], upper_bound, &aux);
 
     #ifdef DEBUG
-    printf("UPPER BOUND: finished tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
+    printf("[%d] UPPER BOUND: finished tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", id, miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
     #endif
   }
 
 
 }
-void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size){
+void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size, int id{
 
   #ifdef DEBUG
-  printf("GOING FOR upper_bound\n"); fflush(stdout);
+  printf("[%d] GOING FOR upper_bound\n", id); fflush(stdout);
   #endif
 
   cell *new_cell;
@@ -1417,11 +1417,11 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
 
   for(int i = 0; i<upper_bound_size/3;i++){
     #ifdef DEBUG
-    printf("ADDING %d %d %d\n",miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
+    printf("[%d] READ %d %d %d\n ADDING AS %d %d %d\n",id,upper_bound[counter],upper_bound[counter+1], upper_bound[counter+2], miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     #endif
 
     new_cell = create_cell(miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]);
-    //printf("(%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
+    //printf("[%d] (%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
@@ -1429,14 +1429,14 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
   counter=0;
 
   #ifdef DEBUG
-  printf("GOING FOR lower_bound\n"); fflush(stdout);
+  printf("[%d] GOING FOR lower_bound\n", id); fflush(stdout);
   #endif
   for(int i = 0; i<lower_bound_size/3;i++){
     #ifdef DEBUG
-    printf("ADDING %d %d %d\n", 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
+    printf("[%d] READ %d %d %d\n ADDING %d %d %d\n",id, lower_bound[counter+1],lower_bound[counter+1], lower_bound[counter+2], 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     #endif
     new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
-    //printf("(%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
+    //printf("[%d] (%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
@@ -1563,12 +1563,13 @@ int main(int argc, char* argv[]){
     next_miniworld = get_next_miniworld(miniworld);
 
     #if defined(DEBUG) || defined(BOUNDS)
+
     printf("[%d] FINISHED NEXT WORLD\n[%d] NEXTWORLD WORLD:\n", id, id); fflush(stdout);
     print_world(next_miniworld);
     printf("[%d] FREEING BOUNDS...\n", id); fflush(stdout);
     #endif
 
-    free_bounds(next_miniworld);
+    free_bounds(next_miniworld, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] ALLOCED SENT_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
@@ -1585,7 +1586,7 @@ int main(int argc, char* argv[]){
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     #endif
 
-    get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound);
+    get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
@@ -1642,7 +1643,7 @@ int main(int argc, char* argv[]){
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     #endif
 
-    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
+    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] FINISHED COLLECTION BOUNDS:\n", id); fflush(stdout);
