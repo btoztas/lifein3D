@@ -1252,7 +1252,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 
 
   for(int j=0; j<miniworld->size_y; j++){
-    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
+    printf("LOWER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
     //if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
     //  print_bintree(miniworld->cells[miniworld->size_y+j]);
 
@@ -1265,12 +1265,22 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 
   for(int j=0; j<miniworld->size_y; j++){
 
-    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
-    //if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
-    //  print_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]);
+    printf("UPPER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
+
+    if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
+      print_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]);
 
     if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
       no_struct_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j], upper_bound, &aux);
+
+
+    printf("UPPER BOUND: finished tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
+
+
+    printf("ARRAY: \n"); fflush(stdout);
+    for(int c = 0; c>j*3; c++)
+      printf("%s"); fflush(stdout);
+    printf("\n"); fflush(stdout);
   }
 
 
@@ -1404,10 +1414,10 @@ int main(int argc, char* argv[]){
     printf("[%d] FREEING BOUNDS...\n", id); fflush(stdout);
     free_bounds(next_miniworld);
 
-    printf("[%d] ALLOCED LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
+    printf("[%d] ALLOCED SENT_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
     sent_lower_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[1]*3);
 
-    printf("[%d] ALLOCED UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
+    printf("[%d] ALLOCED SENT_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
     sent_upper_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
 
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
@@ -1422,7 +1432,10 @@ int main(int argc, char* argv[]){
 
   	MPI_Wait(requests,statuses);
 
+    printf("[%d] ALLOCED RECV_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
   	recv_lower_bound=(int*)malloc(recv_lower_bound_size*sizeof(int));
+
+    printf("[%d] ALLOCED RECV_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
   	recv_upper_bound=(int*)malloc(recv_upper_bound_size*sizeof(int));
 
   	MPI_Irecv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD,&requests[0]);
