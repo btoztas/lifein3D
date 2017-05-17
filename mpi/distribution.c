@@ -1545,7 +1545,7 @@ int main(int argc, char* argv[]){
   for(int i = 0; i < p; i++) {
     MPI_Barrier(MPI_COMM_WORLD);
     if (i == id) {
-      print_miniworld(miniworld);
+      print_miniworld(miniworld, p, id);
     }
   }
 
