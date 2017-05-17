@@ -978,7 +978,7 @@ world *get_next_miniworld(world *actual_world){
     #ifdef ITERATION
     printf("    Choose N^3\n"); fflush(stdout);
     #endif
-    for(int x=0; x<next_world->size_x; x++)
+    for(int x=1; x<next_world->size_x-1; x++)
       for(int y=0; y<next_world->size_y; y++)
         for(int z=0; z<next_world->size_y; z++){
 
@@ -1450,7 +1450,7 @@ int main(int argc, char* argv[]){
   for(int i=0; i<num_iterations; i++){
 
     MPI_Barrier(MPI_COMM_WORLD);
-    next_miniworld = get_next_world(miniworld);
+    next_miniworld = get_next_miniworld(miniworld);
 
     printf("[%d] FINISHED NEXT WORLD\n[%d] NEXTWORLD WORLD:\n", id, id); fflush(stdout);
     print_world(next_miniworld);
