@@ -1278,7 +1278,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 
 
     printf("ARRAY: \n"); fflush(stdout);
-    for(int c = 0; c>j*3; c++)
+    for(int c = 0; c<j*3; c++)
       printf("%s"); fflush(stdout);
     printf("\n"); fflush(stdout);
   }
