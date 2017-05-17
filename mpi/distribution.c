@@ -1382,7 +1382,7 @@ void print_miniworld(world *miniworld, int p, int id){
   int first_x = NEEDED_FIRST_X(id,p,size_y);
 
   for(int i=0; i < miniworld->size_x; i++)
-    printf("x = %d - %d cells\n", i, game->n_alive_cells[i]); fflush(stdout);
+    printf("x = %d - %d cells\n", i, miniworld->n_alive_cells[i]); fflush(stdout);
 
   for(int i=size_y; i < (miniworld->size_x-2)*miniworld->size_y+miniworld->size_y; i++)
     if(miniworld->cells[i]!=NULL)
