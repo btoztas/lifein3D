@@ -1643,7 +1643,7 @@ int main(int argc, char* argv[]){
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     #endif
 
-    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
+    collectbounds(next_miniworld, recv_upper_bound, recv_lower_bound, recv_upper_bound_size, recv_lower_bound_size, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] FINISHED COLLECTION BOUNDS:\n", id); fflush(stdout);
