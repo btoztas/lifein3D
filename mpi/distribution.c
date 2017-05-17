@@ -264,9 +264,10 @@ void print_cell(cell *this){
 void print_cell_mintree(cell *this, int first){
 
   #ifdef DEBUG
-    printf("\t  %d %d %d\n", this->x+first-1, this->y, this->z); fflush(stdout);
+    printf("\t  %d %d %d\n", (this->x)+first-1, this->y, this->z); fflush(stdout);
   #else
-    printf("%d %d %d\n", this->x+first-1, this->y, this->z); fflush(stdout);
+    printf("\tREAL CELL:  %d %d %d\n", this->x, this->y, this->z); fflush(stdout);
+    printf("%d %d %d\n", (this->x)+first-1, this->y, this->z); fflush(stdout);
   #endif
 }
 
