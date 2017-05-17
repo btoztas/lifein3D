@@ -1493,10 +1493,14 @@ int main(int argc, char* argv[]){
     }
   }
 
+
   destroy_world(miniworld);
 
   fclose(file);
   free(file_name);
+
+  MPI_Finalize();
+
   exit(EXIT_SUCCESS);
 
 
