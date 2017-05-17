@@ -1414,7 +1414,6 @@ int main(int argc, char* argv[]){
     printf("[%d] ALLOCED SENT_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
     sent_upper_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
 
-    for
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, &sent_lower_bound_size, &sent_upper_bound_size);
 
