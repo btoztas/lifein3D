@@ -1319,7 +1319,7 @@ world * file_to_miniworld(FILE *file, int p, int id){
 }
 
 
-void free_bounds(world *miniworld. int id){
+void free_bounds(world *miniworld, int id){
 
 
   #ifdef DEBUG
@@ -1406,7 +1406,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int id)
 
 
 }
-void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size, int id{
+void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size, int id){
 
   #ifdef DEBUG
   printf("[%d] GOING FOR upper_bound\n", id); fflush(stdout);
