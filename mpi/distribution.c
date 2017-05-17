@@ -1263,7 +1263,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
 
     printf("LOWER BOUND: finished for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
 
-    printf("IN GET_BOUNDS ARRAY SENT_LOWER_BOUND: \n"); fflush(stdout);
+
 
   }
 
@@ -1428,18 +1428,6 @@ int main(int argc, char* argv[]){
 
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
 
-
-    printf("[%d] ARRAY SENT_LOWER_BOUND: \n", id); fflush(stdout);
-    for(int c = 0; c<sent_lower_bound_size; c++)
-      printf("%d", sent_lower_bound[c]); fflush(stdout);
-    printf("\n"); fflush(stdout);
-
-    printf("[%d] ARRAY SENT_UPPER_BOUND: \n", id); fflush(stdout);
-    for(int c = 0; c<sent_upper_bound_size; c++)
-      printf("%d", sent_upper_bound[c]); fflush(stdout);
-    printf("\n"); fflush(stdout);
-
-
     MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
@@ -1464,16 +1452,27 @@ int main(int argc, char* argv[]){
   	MPI_Wait(requests,statuses);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    printf("[%d] ARRAY RECV_LOWER_BOUND: \n", id); fflush(stdout);
+    printf("[%d] ARRAY SIZE %d SENT_LOWER_BOUND: \n", id, sent_lower_bound_size); fflush(stdout);
+    for(int c = 0; c<sent_lower_bound_size; c++)
+      printf("%d", sent_lower_bound[c]); fflush(stdout);
+    printf("\n"); fflush(stdout);
+
+    printf("[%d] ARRAY SIZE %d SENT_UPPER_BOUND: \n", id, sent_upper_bound_size); fflush(stdout);
+    for(int c = 0; c<sent_upper_bound_size; c++)
+      printf("%d", sent_upper_bound[c]); fflush(stdout);
+    printf("\n"); fflush(stdout);
+
+    printf("[%d] ARRAY SIZE %d RECV_LOWER_BOUND: \n", id, recv_lower_bound_size); fflush(stdout);
     for(int c = 0; c<recv_lower_bound_size; c++)
       printf("%d", recv_lower_bound[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
 
-    printf("[%d] ARRAY RECV_UPPER_BOUND: \n", id); fflush(stdout);
+    printf("[%d] ARRAY SIZE %d RECV_UPPER_BOUND: \n", id, recv_upper_bound_size); fflush(stdout);
     for(int c = 0; c<recv_upper_bound_size; c++)
       printf("%d", recv_upper_bound[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
 
+    MPI_Barrier(MPI_COMM_WORLD);
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
 
