@@ -1246,18 +1246,25 @@ void free_bounds(world *miniworld){
 
 
 
-void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lower_bound_size, int *upper_bound_size){
+void get_bounds(world * miniworld, int * lower_bound, int * upper_bound){
   int aux=0;
 
 
 
   for(int j=0; j<miniworld->size_y; j++){
+
     printf("LOWER BOUND: going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
+
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       print_bintree(miniworld->cells[miniworld->size_y+j]);
 
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       no_struct_bintree(miniworld->cells[miniworld->size_y+j], lower_bound, &aux);
+
+    printf("LOWER BOUND: finished for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
+
+    printf("IN GET_BOUNDS ARRAY SENT_LOWER_BOUND: \n"); fflush(stdout);
+
   }
 
   aux=0;
@@ -1409,13 +1416,15 @@ int main(int argc, char* argv[]){
     free_bounds(next_miniworld);
 
     printf("[%d] ALLOCED SENT_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
-    sent_lower_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[1]*3);
+    sent_lower_bound_size = next_miniworld->n_alive_cells[1]*3;
+    sent_lower_bound = (int*)malloc(sizeof(int)*sent_lower_bound_size);
 
     printf("[%d] ALLOCED SENT_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
-    sent_upper_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
+    sent_upper_bound_size = next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3;
+    sent_upper_bound = (int*)malloc(sizeof(int)*sent_upper_bound_size);
 
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
-    get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, &sent_lower_bound_size, &sent_upper_bound_size);
+    get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound);
 
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
 
