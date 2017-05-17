@@ -290,7 +290,7 @@ void print_bintree(node *root){
 void print_bintree_miniworld(node *root, int first){
 
   if(root->left != NULL){
-    print_bintree(root->left, first);
+    print_bintree_miniworld(root->left, first);
   }
   #ifdef DEBUG
     printf("\t  Height: %d", root->height); fflush(stdout);
@@ -298,7 +298,7 @@ void print_bintree_miniworld(node *root, int first){
   print_cell_mintree(root->this, first);
 
   if(root->right != NULL){
-    print_bintree(root->right, first);
+    print_bintree_miniworld(root->right, first);
   }
 
 }
@@ -1381,7 +1381,7 @@ void print_miniworld(world *miniworld, int p, int id){
 
   int first_x = NEEDED_FIRST_X(id,p,size_y);
 
-  for(int i=0; i < game->size_x; i++)
+  for(int i=0; i < miniworld->size_x; i++)
     printf("x = %d - %d cells\n", i, game->n_alive_cells[i]); fflush(stdout);
 
   for(int i=size_y; i < (miniworld->size_x-2)*miniworld->size_y+miniworld->size_y; i++)
