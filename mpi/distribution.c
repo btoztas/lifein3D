@@ -580,9 +580,9 @@ void usage(){
 }
 
 
-int check_alive(int size_x, int x, int y, int z, node **tree ){
+int check_alive(int size_y, int x, int y, int z, node **tree ){
 
-  node *aux = tree[x * size_x + y];
+  node *aux = tree[x * size_y + y];
   int ret;
 
   while(aux!=NULL){
@@ -1647,6 +1647,11 @@ int main(int argc, char* argv[]){
     #endif
 
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
+
+    #ifdef DEBUG
+    printf("[%d] FINISHED COLLECTION BOUNDS:\n", id); fflush(stdout);
+    print_world(next_miniworld);
+    #endif
 
     free(sent_upper_bound);
     free(sent_lower_bound);
