@@ -261,6 +261,16 @@ void print_cell(cell *this){
 }
 
 
+void print_cell_mintree(cell *this, int first){
+
+  #ifdef DEBUG
+    printf("\t  %d %d %d\n", this->x+first-1, this->y, this->z); fflush(stdout);
+  #else
+    printf("%d %d %d\n", this->x+first-1, this->y, this->z); fflush(stdout);
+  #endif
+}
+
+
 void print_bintree(node *root){
 
   if(root->left != NULL){
@@ -277,6 +287,21 @@ void print_bintree(node *root){
 
 }
 
+void print_bintree_miniworld(node *root, int first){
+
+  if(root->left != NULL){
+    print_bintree(root->left, first);
+  }
+  #ifdef DEBUG
+    printf("\t  Height: %d", root->height); fflush(stdout);
+  #endif
+  print_cell_mintree(root->this, first);
+
+  if(root->right != NULL){
+    print_bintree(root->right, first);
+  }
+
+}
 void print_bintree_hash(node **tree, int size_x, int size_y){
 
   for(int i=0; i<size_x*size_y; i++)
@@ -1351,6 +1376,23 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 	fflush(stdout);
 }
 
+void print_miniworld(world *miniworld, p, id){
+  int size_y = miniworld->size_y;
+
+  int first_x = NEEDED_FIRST_X(id,p,size_y);
+
+  for(int i=0; i < game->size_x; i++)
+    printf("x = %d - %d cells\n", i, game->n_alive_cells[i]); fflush(stdout);
+
+  for(int i=size_y; i < (miniworld->size_x-2)*miniworld->size_y+miniworld->size_y; i++)
+    if(miniworld->cells[i]!=NULL)
+      print_bintree_miniworld(miniworld->cells[i], first_x);
+
+
+
+
+}
+
 int main(int argc, char* argv[]){
 
   world *next_miniworld, *miniworld;
@@ -1473,6 +1515,7 @@ int main(int argc, char* argv[]){
     printf("\n"); fflush(stdout);
 
     MPI_Barrier(MPI_COMM_WORLD);
+
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size);
 
@@ -1487,23 +1530,22 @@ int main(int argc, char* argv[]){
 
   	MPI_Barrier(MPI_COMM_WORLD);
 
-    for(int i = 0; i < p; i++) {
+    /*for(int i = 0; i < p; i++) {
   		MPI_Barrier(MPI_COMM_WORLD);
   		if (i == id) {
         print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id);
 		  }
-  	}
+  	}*/
 
   }
 
-  free_bounds(miniworld);
 
   printf("FINAL WORLD\n");
   MPI_Barrier(MPI_COMM_WORLD);
   for(int i = 0; i < p; i++) {
     MPI_Barrier(MPI_COMM_WORLD);
     if (i == id) {
-      print_world(miniworld);
+      print_miniworld(miniworld);
     }
   }
 
