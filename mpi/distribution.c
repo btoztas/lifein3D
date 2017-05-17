@@ -42,7 +42,7 @@ cell *create_cell(int x, int y, int z){
 
   cell *new = (cell*)malloc(sizeof(cell));
   if(new == NULL)
-    printf("Error allocating memory for a new cell.\n"); stdflush(stdout);
+    printf("Error allocating memory for a new cell.\n"); fflush(stdout);
   new->x    = x;
   new->y    = y;
   new->z    = z;
@@ -54,7 +54,7 @@ node *create_bintree_node(cell *this){
 
   node *new   = (node*)malloc(sizeof(node));
   if(new == NULL)
-    printf("Error allocating memory for a new node.\n"); stdflush(stdout);
+    printf("Error allocating memory for a new node.\n"); fflush(stdout);
   new->this   = this;
   new->left   = NULL;
   new->right  = NULL;
@@ -75,7 +75,7 @@ world *create_world(int size_x, int size_y){
 
   world *new       = (world*)malloc(sizeof(world));
   if(new == NULL)
-    printf("Error allocating memory for a new world.\n"); stdflush(stdout);
+    printf("Error allocating memory for a new world.\n"); fflush(stdout);
   new->alive_cells   = 0;
   new->size_x        = size_x;
   new->size_y        = size_y;
@@ -169,12 +169,12 @@ void no_struct_game(world *game, int *array_world, int *array_world_indexes){
 void print_no_struct_game(int *array_world, int *array_world_indexes, int alive_cells, int size){
 
   for(int i=0; i<alive_cells*3; i++){
-    printf("INDEX: %d\tVALUE: %d\n", i, array_world[i]); stdflush(stdout);
+    printf("INDEX: %d\tVALUE: %d\n", i, array_world[i]); fflush(stdout);
     if((i+1)%3==0)
-      printf("\n"); stdflush(stdout);
+      printf("\n"); fflush(stdout);
   }
   for(int i=0; i<size; i++){
-    printf("X:%d INDEX:%d\n", i, array_world_indexes[i]); stdflush(stdout);
+    printf("X:%d INDEX:%d\n", i, array_world_indexes[i]); fflush(stdout);
   }
 
 }
@@ -196,13 +196,13 @@ void array_miniworl(int * array_world, int size, int n_alive, int threads){
   int divisao=0;
   int aux_step=0;
   divisao=n_alive/threads;
-  printf("%d\n",n_alive ); stdflush(stdout);
+  printf("%d\n",n_alive ); fflush(stdout);
   for(i=0;i<threads;i++){
 
 
     //resto=nums%threads;
 
-    printf("Thread %d - ", i); stdflush(stdout);
+    printf("Thread %d - ", i); fflush(stdout);
     if(i!=threads-1){
       if(i==0)
         aux_step=0;
@@ -210,17 +210,19 @@ void array_miniworl(int * array_world, int size, int n_alive, int threads){
         aux_step=(i*divisao)-1;
       for(j=i*divisao;j<(i+1)*divisao;j++){
         if(j==i*divisao){
-          if(j==0)
-            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[n_alive-6],array_world[n_alive-5],array_world[n_alive-4],array_world[n_alive-3],array_world[n_alive-2],array_world[n_alive-1]); stdflush(stdout);
-          else
-            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[aux_step-6],array_world[aux_step-5],array_world[aux_step-4],array_world[aux_step-3],array_world[aux_step-2],array_world[aux_step-1]); stdflush(stdout);
+          if(j==0){
+            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[n_alive-6],array_world[n_alive-5],array_world[n_alive-4],array_world[n_alive-3],array_world[n_alive-2],array_world[n_alive-1]); fflush(stdout);
+          }else{
+            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[aux_step-6],array_world[aux_step-5],array_world[aux_step-4],array_world[aux_step-3],array_world[aux_step-2],array_world[aux_step-1]); fflush(stdout);
+          }
         }
-        printf("(%d,%d,%d),",array_world[aux_step],array_world[aux_step+1],array_world[aux_step+2]); stdflush(stdout);
+        printf("(%d,%d,%d),",array_world[aux_step],array_world[aux_step+1],array_world[aux_step+2]); fflush(stdout);
         if(j==(i+1)*divisao-1){
-          if(j==n_alive-1)
-            printf("(%d,%d,%d),(%d,%d,%d)]",array_world[0],array_world[1],array_world[2],array_world[3],array_world[4],array_world[5]); stdflush(stdout);
-          else
-            printf("(%d,%d,%d),(%d,%d,%d)]",array_world[aux_step+3],array_world[aux_step+4],array_world[aux_step+5],array_world[aux_step+6],array_world[aux_step+7],array_world[aux_step+8]); stdflush(stdout);
+          if(j==n_alive-1){
+            printf("(%d,%d,%d),(%d,%d,%d)]",array_world[0],array_world[1],array_world[2],array_world[3],array_world[4],array_world[5]); fflush(stdout);
+          }else{
+            printf("(%d,%d,%d),(%d,%d,%d)]",array_world[aux_step+3],array_world[aux_step+4],array_world[aux_step+5],array_world[aux_step+6],array_world[aux_step+7],array_world[aux_step+8]); fflush(stdout);
+          }
         }
         aux_step=aux_step+3;
       }
@@ -228,18 +230,18 @@ void array_miniworl(int * array_world, int size, int n_alive, int threads){
       aux_step=i*divisao-1;
 
       for(j=i*divisao;j<n_alive;j++){
-        printf("---%d---",aux_step ); stdflush(stdout);
+        printf("---%d---",aux_step ); fflush(stdout);
         if(j==i*divisao)
-            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[aux_step-6],array_world[aux_step-5],array_world[aux_step-4],array_world[aux_step-3],array_world[aux_step-2],array_world[aux_step-1]); stdflush(stdout);
-        printf("(%d,%d,%d),",array_world[aux_step],array_world[aux_step+1],array_world[aux_step+2]); stdflush(stdout);
+            printf("[(%d,%d,%d),(%d,%d,%d),",array_world[aux_step-6],array_world[aux_step-5],array_world[aux_step-4],array_world[aux_step-3],array_world[aux_step-2],array_world[aux_step-1]); fflush(stdout);
+        printf("(%d,%d,%d),",array_world[aux_step],array_world[aux_step+1],array_world[aux_step+2]); fflush(stdout);
         if(j==n_alive-1)
-          printf("(%d,%d,%d),(%d,%d,%d)]",array_world[0],array_world[1],array_world[2],array_world[3],array_world[4],array_world[5]); stdflush(stdout);
+          printf("(%d,%d,%d),(%d,%d,%d)]",array_world[0],array_world[1],array_world[2],array_world[3],array_world[4],array_world[5]); fflush(stdout);
         aux_step=aux_step+3;
       }
 
     }
 
-    printf("\n"); stdflush(stdout);
+    printf("\n"); fflush(stdout);
   }
 }
 
@@ -252,9 +254,9 @@ void array_miniworl(int * array_world, int size, int n_alive, int threads){
 void print_cell(cell *this){
 
   #ifdef DEBUG
-    printf("\t  %d %d %d\n", this->x, this->y, this->z); stdflush(stdout);
+    printf("\t  %d %d %d\n", this->x, this->y, this->z); fflush(stdout);
   #else
-    printf("%d %d %d\n", this->x, this->y, this->z); stdflush(stdout);
+    printf("%d %d %d\n", this->x, this->y, this->z); fflush(stdout);
   #endif
 }
 
@@ -265,7 +267,7 @@ void print_bintree(node *root){
     print_bintree(root->left);
   }
   #ifdef DEBUG
-    printf("\t  Height: %d", root->height); stdflush(stdout);
+    printf("\t  Height: %d", root->height); fflush(stdout);
   #endif
   print_cell(root->this);
 
@@ -287,18 +289,18 @@ void print_bintree_hash(node **tree, int size_x, int size_y){
 void print_world(world *game){
 
   #ifdef DEBUG
-    printf("################################\n\tWorld Size: x=%d y=%d\n\tAlive Cells: %d\n\tPrinting Cells\n", game->size_x, game->size_y, game->alive_cells); stdflush(stdout);
+    printf("################################\n\tWorld Size: x=%d y=%d\n\tAlive Cells: %d\n\tPrinting Cells\n", game->size_x, game->size_y, game->alive_cells); fflush(stdout);
 
 
   #endif
 
   for (int i = 0; i < game->size_x; i++)
-    printf("x = %d - %d cells\n", i, game->n_alive_cells[i]); stdflush(stdout);
+    printf("x = %d - %d cells\n", i, game->n_alive_cells[i]); fflush(stdout);
 
   print_bintree_hash(game->cells, game->size_x, game->size_y);
 
   #ifdef DEBUG
-    printf("################################\n"); stdflush(stdout);
+    printf("################################\n"); fflush(stdout);
   #endif
 }
 
@@ -397,7 +399,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells, int* n_alive_cel
 
     }else if(compare_cells(new_cell, root->this)==0){
       #ifdef DEBUG
-      printf("\t\t\t\t\t\t\t\t\tCELL %d %d %d ALREADY EXISTS\n", root->this->x, root->this->y, root->this->z); stdflush(stdout);
+      printf("\t\t\t\t\t\t\t\t\tCELL %d %d %d ALREADY EXISTS\n", root->this->x, root->this->y, root->this->z); fflush(stdout);
       #endif
       destroy_cell(new_cell);
       return root;
@@ -442,7 +444,7 @@ node  *insert_bintree(node *root, cell *new_cell, int* n_cells, int* n_alive_cel
     }
 
     #ifdef DEBUG
-      printf("        HEIGHT: %d\n", root->height); stdflush(stdout);
+      printf("        HEIGHT: %d\n", root->height); fflush(stdout);
     #endif
 
     return root;
@@ -456,7 +458,7 @@ void insert_cell(world *game, cell *new_cell){
 
 
   #ifdef DEBUG
-    printf("      Inserted in tree\n"); fflush(stdout); stdflush(stdout);
+    printf("      Inserted in tree\n"); fflush(stdout); fflush(stdout);
   #endif
 
 
@@ -472,9 +474,9 @@ void array_to_world(int * array_world, int n_alive, world * new_world){
   int counter=0;
 
   for(int i = 0; i<n_alive;i++){
-    printf("ADDING %d %d %d\n", array_world[counter], array_world[counter+1], array_world[counter+2]); stdflush(stdout);
+    printf("ADDING %d %d %d\n", array_world[counter], array_world[counter+1], array_world[counter+2]); fflush(stdout);
     new_cell = create_cell(array_world[counter], array_world[counter+1], array_world[counter+2]);
-    //printf("(%d,%d,%d)\n",array_world[counter], array_world[counter+1], array_world[counter+2]); stdflush(stdout);
+    //printf("(%d,%d,%d)\n",array_world[counter], array_world[counter+1], array_world[counter+2]); fflush(stdout);
     insert_cell(new_world, new_cell);
     counter=counter+3;
   }
@@ -493,33 +495,33 @@ world *file_to_world(FILE *file){
   fscanf(file, "%d", &size);
 
   #ifdef DEBUG
-    printf("World Size: %d\n\nCreating World\n", size); stdflush(stdout);
+    printf("World Size: %d\n\nCreating World\n", size); fflush(stdout);
   #endif
 
   new_world = create_world(size, size);
 
 
   #ifdef DEBUG
-    printf("Populating World\n"); stdflush(stdout);
+    printf("Populating World\n"); fflush(stdout);
   #endif
 
   while(fscanf(file, "%d %d %d", &x, &y, &z) != EOF){
 
     // handle coordinates read
     #ifdef DEBUG
-      printf("  Adding: %d %d %d\n", x, y, z); stdflush(stdout);
+      printf("  Adding: %d %d %d\n", x, y, z); fflush(stdout);
     #endif
 
     new_cell = create_cell(x, y, z);
 
     #ifdef DEBUG
-      printf("    Cell created\n"); stdflush(stdout);
+      printf("    Cell created\n"); fflush(stdout);
     #endif
 
     insert_cell(new_world, new_cell);
 
     #ifdef DEBUG
-      printf("    Cell inserted\n"); stdflush(stdout);
+      printf("    Cell inserted\n"); fflush(stdout);
     #endif
 
   }
@@ -533,7 +535,7 @@ world *file_to_world(FILE *file){
 FILE *open_file(char *file_name){
    FILE *fp = fopen(file_name,"r"); // read mode
    if(fp == NULL){
-      printf("Error while opening file %s.\n", file_name); stdflush(stdout);
+      printf("Error while opening file %s.\n", file_name); fflush(stdout);
       exit(EXIT_FAILURE);
    }
    return fp;
@@ -542,8 +544,8 @@ FILE *open_file(char *file_name){
 
 // function usage
 void usage(){
-  printf("Life 3D\t\tPARALLEL AND DISTRIBUTED COMPUTING\t\tTecnico Lisboa\n\n"); stdflush(stdout);
-  printf("usage:\t life3d <input.in> <number of iterations>\n\n\n"); stdflush(stdout);
+  printf("Life 3D\t\tPARALLEL AND DISTRIBUTED COMPUTING\t\tTecnico Lisboa\n\n"); fflush(stdout);
+  printf("usage:\t life3d <input.in> <number of iterations>\n\n\n"); fflush(stdout);
 }
 
 
@@ -647,7 +649,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", 0,y, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", 0,y, z); fflush(stdout);
         #endif
       }
     }
@@ -662,7 +664,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x+1,y, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x+1,y, z); fflush(stdout);
         #endif
       }
     }
@@ -679,7 +681,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", actual_world->size_x-1,y, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", actual_world->size_x-1,y, z); fflush(stdout);
         #endif
       }
     }
@@ -694,7 +696,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x-1,y, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x-1,y, z); fflush(stdout);
         #endif
       }
     }
@@ -711,7 +713,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,0, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,0, z); fflush(stdout);
         #endif
       }
     }
@@ -726,7 +728,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y+1, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y+1, z); fflush(stdout);
         #endif
       }
     }
@@ -743,7 +745,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,actual_world->size_y-1, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,actual_world->size_y-1, z); fflush(stdout);
         #endif
       }
     }
@@ -758,7 +760,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y-1, z); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y-1, z); fflush(stdout);
         #endif
       }
     }
@@ -775,7 +777,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,0); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,0); fflush(stdout);
         #endif
       }
     }
@@ -790,7 +792,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z+1); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z+1); fflush(stdout);
         #endif
       }
     }
@@ -807,7 +809,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,actual_world->size_y-1); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,actual_world->size_y-1); fflush(stdout);
         #endif
       }
     }
@@ -822,7 +824,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
         insert_cell(next_world, new_cell);
 
         #ifdef DEBUG
-        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z-1); stdflush(stdout);
+        printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z-1); fflush(stdout);
         #endif
       }
     }
@@ -833,7 +835,7 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
     insert_cell(next_world, new_cell);
 
     #ifdef DEBUG
-    printf("\t\t\t\t\tINSERTED LIVE CELL %d %d %d\n", x, y, z); stdflush(stdout);
+    printf("\t\t\t\t\tINSERTED LIVE CELL %d %d %d\n", x, y, z); fflush(stdout);
     #endif
   }
 
@@ -846,7 +848,7 @@ void solve_subtree(node *root, world* actual_world, world* next_world){
     solve_subtree(root->left, actual_world, next_world);
   }
   #ifdef DEBUG
-  printf("\t\t\t\t\tTESTING CELL %d %d %d\n", root->this->x, root->this->y, root->this->z); stdflush(stdout);
+  printf("\t\t\t\t\tTESTING CELL %d %d %d\n", root->this->x, root->this->y, root->this->z); fflush(stdout);
   #endif
   handle_node(root->this->x, root->this->y, root->this->z, actual_world, next_world);
 
@@ -859,36 +861,36 @@ void solve_subtree(node *root, world* actual_world, world* next_world){
 world *get_next_world(world *actual_world){
 
   #ifdef DEBUG
-    printf("    Creating next world\n"); stdflush(stdout);
+    printf("    Creating next world\n"); fflush(stdout);
   #endif
   world *next_world = create_world(actual_world->size_x, actual_world->size_y);
 
   #ifdef DEBUG
-    printf("    Testing cells\n"); stdflush(stdout);
+    printf("    Testing cells\n"); fflush(stdout);
   #endif
 
  //AQUI!!
   if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size_x)*(actual_world->size_y)*(actual_world->size_y)){
     #ifdef ITERATION
-    printf("   Choose live cells\n"); stdflush(stdout);
+    printf("   Choose live cells\n"); fflush(stdout);
     #endif
     for(int x=0; x<actual_world->size_x; x++)
       for(int y=0; y<actual_world->size_y; y++)
         if(actual_world->cells[x*actual_world->size_y+y] != NULL){
           #ifdef DEBUG
-          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y); stdflush(stdout);
+          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y); fflush(stdout);
           #endif
           //this function will analyzer every node of the subtree, and add to the new world the cells
           solve_subtree(actual_world->cells[x* actual_world->size_y+ y], actual_world, next_world);
 
         }
     #ifdef DEBUG
-    printf("\t\t\tFINISHED SUBTREE TESTS\n"); stdflush(stdout);
+    printf("\t\t\tFINISHED SUBTREE TESTS\n"); fflush(stdout);
     #endif
 
   }else{
     #ifdef ITERATION
-    printf("    Choose N^3\n"); stdflush(stdout);
+    printf("    Choose N^3\n"); fflush(stdout);
     #endif
     for(int x=0; x<next_world->size_x; x++)
       for(int y=0; y<next_world->size_y; y++)
@@ -896,21 +898,21 @@ world *get_next_world(world *actual_world){
 
           if(test_cell(x, y, z, actual_world, -1)){
             #ifdef DEBUG
-              printf("      %d %d %d will be alive\n",x, y, z); stdflush(stdout);
+              printf("      %d %d %d will be alive\n",x, y, z); fflush(stdout);
             #endif
             cell *new_cell = create_cell(x, y, z);
             insert_cell(next_world, new_cell);
           }
           else{
             #ifdef DEBUG
-              printf("      %d %d %d will be dead\n",x, y, z); stdflush(stdout);
+              printf("      %d %d %d will be dead\n",x, y, z); fflush(stdout);
             #endif
           }
         }
     }
 
   #ifdef DEBUG
-    printf("    Finished testing cells\n"); stdflush(stdout);
+    printf("    Finished testing cells\n"); fflush(stdout);
   #endif
   return next_world;
 
@@ -920,36 +922,36 @@ world *get_next_world(world *actual_world){
 world *get_next_miniworld(world *actual_world){
 
   #ifdef DEBUG
-    printf("    Creating next world\n"); stdflush(stdout);
+    printf("    Creating next world\n"); fflush(stdout);
   #endif
   world *next_world = create_world(actual_world->size_x, actual_world->size_y);
 
   #ifdef DEBUG
-    printf("    Testing cells\n"); stdflush(stdout);
+    printf("    Testing cells\n"); fflush(stdout);
   #endif
 
  //AQUI!!
   if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size_x)*(actual_world->size_y)*(actual_world->size_y)){
     #ifdef ITERATION
-    printf("   Choose live cells\n"); stdflush(stdout);
+    printf("   Choose live cells\n"); fflush(stdout);
     #endif
     for(int x=0; x<actual_world->size_x; x++)
       for(int y=0; y<actual_world->size_y; y++)
         if(actual_world->cells[x*actual_world->size_y+ y] != NULL){
           #ifdef DEBUG
-          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y); stdflush(stdout);
+          printf("\t\t\t\tTESTING SUBTREE %d %d\n", x, y); fflush(stdout);
           #endif
           //this function will analyzer every node of the subtree, and add to the new world the cells
           solve_subtree(actual_world->cells[x*actual_world->size_y+ y], actual_world, next_world);
 
         }
     #ifdef DEBUG
-    printf("\t\t\tFINISHED SUBTREE TESTS\n"); stdflush(stdout);
+    printf("\t\t\tFINISHED SUBTREE TESTS\n"); fflush(stdout);
     #endif
 
   }else{
     #ifdef ITERATION
-    printf("    Choose N^3\n"); stdflush(stdout);
+    printf("    Choose N^3\n"); fflush(stdout);
     #endif
     for(int x=0; x<next_world->size_x; x++)
       for(int y=0; y<next_world->size_y; y++)
@@ -957,21 +959,21 @@ world *get_next_miniworld(world *actual_world){
 
           if(test_cell(x, y, z, actual_world, -1)){
             #ifdef DEBUG
-              printf("      %d %d %d will be alive\n",x, y, z); stdflush(stdout);
+              printf("      %d %d %d will be alive\n",x, y, z); fflush(stdout);
             #endif
             cell *new_cell = create_cell(x, y, z);
             insert_cell(next_world, new_cell);
           }
           else{
             #ifdef DEBUG
-              printf("      %d %d %d will be dead\n",x, y, z); stdflush(stdout);
+              printf("      %d %d %d will be dead\n",x, y, z); fflush(stdout);
             #endif
           }
         }
     }
 
   #ifdef DEBUG
-    printf("    Finished testing cells\n"); stdflush(stdout);
+    printf("    Finished testing cells\n"); fflush(stdout);
   #endif
   return next_world;
 
@@ -996,7 +998,7 @@ void print_tree_padding ( node *root, int level ){
   } else {
     print_tree_padding ( root->right, level + 1 );
     padding ( '\t', level );
-    printf ( "%d %d %d\n", root->this->x, root->this->y, root->this->z ); stdflush(stdout);
+    printf ( "%d %d %d\n", root->this->x, root->this->y, root->this->z ); fflush(stdout);
     print_tree_padding ( root->left, level + 1 );
   }
 }
@@ -1007,7 +1009,7 @@ void distribute_payload(int p, int world_size, int alive_cells, int * array_worl
   int last_x;
   int i, j, w;
 
-  printf("\nDIVISION:\n"); stdflush(stdout);
+  printf("\nDIVISION:\n"); fflush(stdout);
   for(i=0; i<p; i++){
 
     first_x = NEEDED_FIRST_X(i,p,world_size);
@@ -1016,7 +1018,7 @@ void distribute_payload(int p, int world_size, int alive_cells, int * array_worl
 
     if(first_x !=-1 && last_x != world_size){
 
-      printf("PC %d X=[%d,%d] - [%d,%d]\n", i, first_x, last_x, array_world_indexes[first_x], array_world_indexes[last_x+1]-1); stdflush(stdout);
+      printf("PC %d X=[%d,%d] - [%d,%d]\n", i, first_x, last_x, array_world_indexes[first_x], array_world_indexes[last_x+1]-1); fflush(stdout);
 
       mini_array_worlds[i] = (int *)malloc(sizeof(int) * (array_world_indexes[last_x+1]-1 - array_world_indexes[first_x] +1));
       size[i] = array_world_indexes[last_x+1]-1 - array_world_indexes[first_x] +1;
@@ -1031,7 +1033,7 @@ void distribute_payload(int p, int world_size, int alive_cells, int * array_worl
     }
     else if(first_x == -1){
 
-      printf("PC %d X=[%d,%d]U{%d} - [%d,%d]U[%d,%d]\n",i,0,last_x,world_size-1,array_world_indexes[0],array_world_indexes[last_x+1]-1,array_world_indexes[world_size-1],alive_cells*3-1); stdflush(stdout);
+      printf("PC %d X=[%d,%d]U{%d} - [%d,%d]U[%d,%d]\n",i,0,last_x,world_size-1,array_world_indexes[0],array_world_indexes[last_x+1]-1,array_world_indexes[world_size-1],alive_cells*3-1); fflush(stdout);
       mini_array_worlds[i] = (int *)malloc(sizeof(int) * ((array_world_indexes[last_x+1]-1 - array_world_indexes[0]) + (alive_cells*3-1 - array_world_indexes[world_size-1])+2));
       size[i] = ((array_world_indexes[last_x+1]-1 - array_world_indexes[0]) + (alive_cells*3-1 - array_world_indexes[world_size-1])+2);
 
@@ -1055,7 +1057,7 @@ void distribute_payload(int p, int world_size, int alive_cells, int * array_worl
     }
     else if(last_x == world_size){
 
-      printf("PC %d X={0}U[%d,%d] - [%d,%d]U[%d,%d]\n",i,first_x,world_size-1,array_world_indexes[0],array_world_indexes[1]-1,array_world_indexes[first_x],alive_cells*3-1); stdflush(stdout);
+      printf("PC %d X={0}U[%d,%d] - [%d,%d]U[%d,%d]\n",i,first_x,world_size-1,array_world_indexes[0],array_world_indexes[1]-1,array_world_indexes[first_x],alive_cells*3-1); fflush(stdout);
       mini_array_worlds[i] = (int *)malloc(sizeof(int) * ((array_world_indexes[1]-1 - array_world_indexes[0]) + (alive_cells*3-1 - array_world_indexes[first_x])+2));
       size[i] = ((array_world_indexes[1]-1 - array_world_indexes[0]) + (alive_cells*3-1 - array_world_indexes[first_x])+2);
 
@@ -1075,21 +1077,21 @@ void distribute_payload(int p, int world_size, int alive_cells, int * array_worl
       }
 
     }
-    printf("\n"); stdflush(stdout);
+    printf("\n"); fflush(stdout);
   }
 
 
   for(i = 0; i<p; i++){
-    printf("PC %d has %d CELLS:\n", i, size[i]/3); stdflush(stdout);
+    printf("PC %d has %d CELLS:\n", i, size[i]/3); fflush(stdout);
 
     for(j=0; j<size[i]; j++){
 
-      printf("INDEX: %d\tVALUE: %d\n", j, mini_array_worlds[i][j]); stdflush(stdout);
+      printf("INDEX: %d\tVALUE: %d\n", j, mini_array_worlds[i][j]); fflush(stdout);
       if((j+1)%3==0)
-        printf("\n"); stdflush(stdout);
+        printf("\n"); fflush(stdout);
 
     }
-    printf("\n"); stdflush(stdout);
+    printf("\n"); fflush(stdout);
   }
 }
 
@@ -1115,29 +1117,29 @@ world * file_to_miniworld(FILE *file, int p, int id){
 
   if(first_x !=-1 && last_x != size_y){
 
-    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]\n", id, first_x+1, last_x-1, first_x, last_x); stdflush(stdout);
+    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]\n", id, first_x+1, last_x-1, first_x, last_x); fflush(stdout);
     size_x = last_x - first_x + 1;
 
   }
   else if(first_x == -1){
 
-    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]U{%d}\n",id,0, last_x-1,  0,last_x,size_y-1); stdflush(stdout);
+    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]U{%d}\n",id,0, last_x-1,  0,last_x,size_y-1); fflush(stdout);
     size_x = last_x + 2;
 
   }
   else if(last_x == size_y){
 
-    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X={%d}U[%d,%d]\n",id,first_x+1, size_y-1, 0,first_x,size_y-1); stdflush(stdout);
+    printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X={%d}U[%d,%d]\n",id,first_x+1, size_y-1, 0,first_x,size_y-1); fflush(stdout);
     size_x = size_y - 1 - first_x + 2;
 
   }
 
   #ifdef DEBUG
-    printf("World Size: X=%d, Y=%d\n\nCreated Mini World\n", size_x, size_y); stdflush(stdout);
+    printf("World Size: X=%d, Y=%d\n\nCreated Mini World\n", size_x, size_y); fflush(stdout);
   #endif
 
   #ifdef DEBUG
-    printf("Populating World\n"); stdflush(stdout);
+    printf("Populating World\n"); fflush(stdout);
   #endif
 
   new_mini_world = create_world(size_x, size_y);
@@ -1149,18 +1151,18 @@ world * file_to_miniworld(FILE *file, int p, int id){
 
     if(first_x !=-1 && last_x != size_y){
       #ifdef DEBUG
-        printf("  Read      %d %d %d\n", x, y, z); stdflush(stdout);
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
       #endif
       if(x>=first_x && x<=last_x){
         add = 1;
         x = x - first_x;
-        //printf("PC %d X=[%d,%d]\n", i, first_x, last_x); stdflush(stdout);
+        //printf("PC %d X=[%d,%d]\n", i, first_x, last_x); fflush(stdout);
       }
     }
 
     else if(first_x == -1){
       #ifdef DEBUG
-        printf("  Read      %d %d %d\n", x, y, z); stdflush(stdout);
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
       #endif
       if(x==size_y-1 || (x>=0 && x<=last_x)){
         add = 1;
@@ -1169,13 +1171,13 @@ world * file_to_miniworld(FILE *file, int p, int id){
         else
           x++;
 
-        //printf("PC %d X=[%d,%d]U{%d}",i,0,last_x,size_y-1); stdflush(stdout);
+        //printf("PC %d X=[%d,%d]U{%d}",i,0,last_x,size_y-1); fflush(stdout);
       }
     }
 
     else if(last_x == size_y){
       #ifdef DEBUG
-        printf("  Read      %d %d %d\n", x, y, z); stdflush(stdout);
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
       #endif
       if(x==0 || (x>=first_x && x<=size_y-1)){
         add = 1;
@@ -1183,26 +1185,26 @@ world * file_to_miniworld(FILE *file, int p, int id){
           x = last_x - first_x;
         else
           x = x - first_x;
-        //printf("PC %d X={%d}U[%d,%d]\n",i,0,first_x,size_y-1); stdflush(stdout);
+        //printf("PC %d X={%d}U[%d,%d]\n",i,0,first_x,size_y-1); fflush(stdout);
 
       }
     }
 
     if(add){
       #ifdef DEBUG
-        printf("  Adding as %d %d %d\n", x, y, z); stdflush(stdout);
+        printf("  Adding as %d %d %d\n", x, y, z); fflush(stdout);
       #endif
 
       new_cell = create_cell(x, y, z);
 
       #ifdef DEBUG
-        printf("    Cell created\n"); stdflush(stdout);
+        printf("    Cell created\n"); fflush(stdout);
       #endif
 
       insert_cell(new_mini_world, new_cell);
 
       #ifdef DEBUG
-        printf("    Cell inserted\n"); stdflush(stdout);
+        printf("    Cell inserted\n"); fflush(stdout);
       #endif
     }
 
@@ -1213,10 +1215,10 @@ world * file_to_miniworld(FILE *file, int p, int id){
 
 void free_bounds(world *miniworld){
 
-  printf("starting free bounds \n"); stdflush(stdout);
+  printf("starting free bounds \n"); fflush(stdout);
   for(int i=0; i<miniworld->size_y; i++){
 
-    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, i); stdflush(stdout);
+    printf("freeing tree size_x = %d size_y = %d free bounds (0,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y, i, i); fflush(stdout);
     if(miniworld->cells[i] != NULL)
       print_bintree(miniworld->cells[i]);
     if(miniworld->cells[i] != NULL){
@@ -1225,7 +1227,7 @@ void free_bounds(world *miniworld){
       miniworld->n_alive_cells[0]=0;
     }
 
-    printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i); stdflush(stdout);
+    printf("freeing tree size_x = %d size_y = %d free bounds (%d,%d) who is on index %d:\n", miniworld->size_x, miniworld->size_y, miniworld->size_x-1, i, (miniworld->size_x-1)*miniworld->size_y + i); fflush(stdout);
     if(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i] != NULL)
       print_bintree(miniworld->cells[(miniworld->size_x-1)*miniworld->size_y + i]);
 
@@ -1237,7 +1239,7 @@ void free_bounds(world *miniworld){
 
   }
 
-  printf("finish free bounds\n"); stdflush(stdout);
+  printf("finish free bounds\n"); fflush(stdout);
 
 
 }
@@ -1250,7 +1252,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 
 
   for(int j=0; j<miniworld->size_y; j++){
-    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); stdflush(stdout);
+    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,1, j, miniworld->size_y+j); fflush(stdout);
     if(miniworld->cells[(miniworld->size_y)+j]!=NULL)
       print_bintree(miniworld->cells[miniworld->size_y+j]);
 
@@ -1263,7 +1265,7 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 
   for(int j=0; j<miniworld->size_y; j++){
 
-    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); stdflush(stdout);
+    printf("going for tree size_x = %d size_y = %d who is (%d,%d) who is on index %d: \n", miniworld->size_x, miniworld->size_y,miniworld->size_x-2, j, (miniworld->size_x-2)*miniworld->size_y+j); fflush(stdout);
     if(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]!=NULL)
       print_bintree(miniworld->cells[(miniworld->size_x-2)*miniworld->size_y+j]);
 
@@ -1275,26 +1277,26 @@ void get_bounds(world * miniworld, int * lower_bound, int * upper_bound, int *lo
 }
 void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lower_bound_size, int upper_bound_size){
 
-  printf("GOING FOR upper_bound\n"); stdflush(stdout);
+  printf("GOING FOR upper_bound\n"); fflush(stdout);
 
   cell *new_cell;
   int counter=0;
 
   for(int i = 0; i<upper_bound_size/3;i++){
-    printf("ADDING %d %d %d\n",miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); stdflush(stdout);
+    printf("ADDING %d %d %d\n",miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     new_cell = create_cell(miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]);
-    //printf("(%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); stdflush(stdout);
+    //printf("(%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
 
   counter=0;
 
-  printf("GOING FOR lower_bound\n"); stdflush(stdout);
+  printf("GOING FOR lower_bound\n"); fflush(stdout);
   for(int i = 0; i<lower_bound_size/3;i++){
-    printf("ADDING %d %d %d\n", 0, lower_bound[counter+1], lower_bound[counter+2]); stdflush(stdout);
+    printf("ADDING %d %d %d\n", 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
-    //printf("(%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); stdflush(stdout);
+    //printf("(%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
@@ -1302,39 +1304,39 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
 }
 void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, int s3,int s4, int after, int before,int rank){
 	int i;
-	printf("\nPC %d:\n\n",rank); stdflush(stdout);
+	printf("\nPC %d:\n\n",rank); fflush(stdout);
 	fflush(stdout);
-	printf("Mandei para o PC %d:[ ",before); stdflush(stdout);
+	printf("Mandei para o PC %d:[ ",before); fflush(stdout);
 	fflush(stdout);
 	for(i=0;i<s1;i++){
-		printf("%d ",bound1[i]); stdflush(stdout);
+		printf("%d ",bound1[i]); fflush(stdout);
 		fflush(stdout);
 	}
-	printf("]\n"); stdflush(stdout);
+	printf("]\n"); fflush(stdout);
 	fflush(stdout);
-	printf("Mandei para o PC %d:[ ",after); stdflush(stdout);
+	printf("Mandei para o PC %d:[ ",after); fflush(stdout);
 	fflush(stdout);
 	for(i=0;i<s2;i++){
-		printf("%d ",bound2[i]); stdflush(stdout);
+		printf("%d ",bound2[i]); fflush(stdout);
 		fflush(stdout);
 	}
-	printf("]\n"); stdflush(stdout);
+	printf("]\n"); fflush(stdout);
 	fflush(stdout);
-	printf("Recebi do PC %d:[ ",before); stdflush(stdout);
+	printf("Recebi do PC %d:[ ",before); fflush(stdout);
 	fflush(stdout);
 	for(i=0;i<s3;i++){
-		printf("%d ",bound3[i]); stdflush(stdout);
+		printf("%d ",bound3[i]); fflush(stdout);
 		fflush(stdout);
 	}
-	printf("]\n"); stdflush(stdout);
+	printf("]\n"); fflush(stdout);
 	fflush(stdout);
-	printf("Recebi do PC %d:[ ",after); stdflush(stdout);
+	printf("Recebi do PC %d:[ ",after); fflush(stdout);
 	fflush(stdout);
 	for(i=0;i<s4;i++){
-		printf("%d ",bound4[i]); stdflush(stdout);
+		printf("%d ",bound4[i]); fflush(stdout);
 		fflush(stdout);
 	}
-	printf("]\n"); stdflush(stdout);
+	printf("]\n"); fflush(stdout);
 	fflush(stdout);
 }
 
@@ -1370,12 +1372,12 @@ int main(int argc, char* argv[]){
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
   if(file_name == NULL)
-    printf("Error allocating memory for filename.\n"); stdflush(stdout);
+    printf("Error allocating memory for filename.\n"); fflush(stdout);
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
 
   #ifdef DEBUG
-    printf("[%d] Iterations to do: %d\n\n", id, num_iterations); stdflush(stdout);
+    printf("[%d] Iterations to do: %d\n\n", id, num_iterations); fflush(stdout);
   #endif
 
 
@@ -1383,13 +1385,13 @@ int main(int argc, char* argv[]){
   FILE *file;
 
   #ifdef DEBUG
-    printf("[%d] Opening file\n", id); stdflush(stdout);
+    printf("[%d] Opening file\n", id); fflush(stdout);
   #endif
 
   file = open_file(file_name);
   miniworld = file_to_miniworld(file, p, id);
 
-  printf("[%d] FINISHED READING FILE\n", id); stdflush(stdout);
+  printf("[%d] FINISHED READING FILE\n", id); fflush(stdout);
 
   for(int i=0; i<num_iterations; i++){
 
@@ -1397,10 +1399,10 @@ int main(int argc, char* argv[]){
 
     free_bounds(next_miniworld);
 
-    printf("[%d] ALLOCED LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); stdflush(stdout);
+    printf("[%d] ALLOCED LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
     sent_lower_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[1]*3);
 
-    printf("[%d] ALLOCED UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); stdflush(stdout);
+    printf("[%d] ALLOCED UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
     sent_upper_bound = (int*)malloc(sizeof(int)*next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3);
 
     get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, &sent_lower_bound_size, &sent_upper_bound_size);
