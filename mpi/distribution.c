@@ -1423,6 +1423,7 @@ int main(int argc, char* argv[]){
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, &sent_lower_bound_size, &sent_upper_bound_size);
 
+    printf("[%d] FINISHEDN GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
