@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpi.h>
 
 #define MATRIX_INDEX(x, y, size_y)  (x*size_y+y)
 
@@ -1455,11 +1454,12 @@ void print_sendings(int*bound1,int*bound2,int*bound3,int*bound4,int s1, int s2, 
 }
 
 void print_miniworld(world *miniworld, int p, int id){
+
   int size_y = miniworld->size_y;
 
   int first_x = TREATED_FIRST_X(id,p,size_y);
-{
-  for(int i=0; i < miniworld->size_x; i++)
+
+  for(int i=0; i < miniworld->size_x; i++){
     printf("x = %d - %d cells\n", i, miniworld->n_alive_cells[i]); fflush(stdout);
   }
   for(int i=size_y; i < (miniworld->size_x-2)*miniworld->size_y+miniworld->size_y; i++)
@@ -1478,12 +1478,71 @@ int main(int argc, char* argv[]){
   int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound;
   int sent_lower_bound_size, sent_upper_bound_size, recv_lower_bound_size, recv_upper_bound_size;
 
+
+
   // if argc not expected, print program usage
-  if(argc!=3){
+  if(argc!=4){
     usage();
     exit(EXIT_FAILURE);
   }
 
+  p = atoi(argv[3]);
+
+  // handle file_name
+  char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
+  if(file_name == NULL)
+    printf("Error allocating memory for filename.\n");
+  strcpy(file_name, argv[1]);
+  int num_iterations = atoi(argv[2]);
+  #ifdef DEBUG
+    printf("Iterations to do: %d\n\n", num_iterations);
+  #endif
+
+
+  // read file
+  FILE *file;
+
+  #ifdef DEBUG
+    printf("Opening file\n");
+  #endif
+
+  file = open_file(file_name);
+
+  world ** miniworlds = (world**)malloc(sizeof(world*)*p);
+  world ** next_miniworlds = (world**)malloc(sizeof(world*)*p);
+
+
+  printf("NORMAL WOOOOOOOOOORLDS\n");
+  for(int i=0; i<p; i++){
+    rewind(file);
+    miniworlds[i] = file_to_miniworld(file, p, i);
+    printf("### DUMMY WOOOOOOOOOORLDS ###\n");
+    print_world(miniworlds[i]);
+    printf("### FINAL WOOOOOOOOOORLDS ###\n");
+    print_miniworld(miniworlds[i], p, i);
+  }
+
+  printf("NEXT WOOOOOOOOOORLDS\n");
+  for(int i=0; i<p; i++){
+    rewind(file);
+    next_miniworlds[i] = get_next_miniworld(miniworlds[i]);
+    printf("### DUMMY WOOOOOOOOOORLDS ###\n");
+    print_world(next_miniworlds[i]);
+    printf("### FINAL WOOOOOOOOOORLDS ###\n");
+    print_miniworld(next_miniworlds[i], p, i);
+  }
+
+
+
+
+
+   /*
+
+   // if argc not expected, print program usage
+   if(argc!=3){
+     usage();
+     exit(EXIT_FAILURE);
+   }
 
   MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&id);
@@ -1502,9 +1561,8 @@ int main(int argc, char* argv[]){
 
   // handle file_name
   char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
-  if(file_name == NULL){
+  if(file_name == NULL)
     printf("Error allocating memory for filename.\n"); fflush(stdout);
-  }
   strcpy(file_name, argv[1]);
   int num_iterations = atoi(argv[2]);
 
@@ -1610,12 +1668,12 @@ int main(int argc, char* argv[]){
 
 
 
-    /*for(int i = 0; i < p; i++) {
+    for(int i = 0; i < p; i++) {
   		MPI_Barrier(MPI_COMM_WORLD);
   		if (i == id) {
         print_sendings(sent_lower_bound ,sent_upper_bound ,recv_lower_bound ,recv_upper_bound ,sent_lower_bound_size ,sent_upper_bound_size ,recv_lower_bound_size ,recv_upper_bound_size, after, before, id);
 		  }
-  	}*/
+  	}
 
   }
 
@@ -1638,6 +1696,6 @@ int main(int argc, char* argv[]){
   MPI_Finalize();
 
   exit(EXIT_SUCCESS);
-
+  */
 
 }
