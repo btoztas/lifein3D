@@ -1219,20 +1219,23 @@ world * file_to_miniworld(FILE *file, int p, int id){
 
 
   if(first_x !=-1 && last_x != size_y){
-
+    #ifdef DEBUG
     printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]\n", id, first_x+1, last_x-1, first_x, last_x); fflush(stdout);
+    #endif
     size_x = last_x - first_x + 1;
 
   }
   else if(first_x == -1){
-
+    #ifdef DEBUG
     printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]U{%d}\n",id,0, last_x-1,  0,last_x,size_y-1); fflush(stdout);
+    #endif
     size_x = last_x + 2;
 
   }
   else if(last_x == size_y){
-
+    #ifdef DEBUG
     printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X={%d}U[%d,%d]\n",id,first_x+1, size_y-1, 0,first_x,size_y-1); fflush(stdout);
+    #endif
     size_x = size_y - 1 - first_x + 2;
 
   }
@@ -1665,8 +1668,9 @@ int main(int argc, char* argv[]){
 
   }
 
-
-  printf("FINAL WORLD\n");
+  #ifdef DEBUG
+  printf("[%d] FINAL WORLD\n", id);
+  #endif
 
   for(int i = 0; i < p; i++) {
     MPI_Barrier(MPI_COMM_WORLD);
