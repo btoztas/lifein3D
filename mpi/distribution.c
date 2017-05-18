@@ -1642,8 +1642,8 @@ int main(int argc, char* argv[]){
 
   	MPI_Send(&sent_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD);
   	MPI_Send(&sent_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD);
-    MPI_Recv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD);
-  	MPI_Recv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD);
+    MPI_Recv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD, &statuses[0]);
+  	MPI_Recv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD, &statuses[1]);
 
 
     #if defined(DEBUG) || defined(BOUNDS)
@@ -1656,8 +1656,8 @@ int main(int argc, char* argv[]){
 
   	MPI_Send(sent_lower_bound,sent_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD);
   	MPI_Send(sent_upper_bound,sent_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD);
-  	MPI_Recv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD);
-  	MPI_Recv(recv_upper_bound,recv_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD);
+  	MPI_Recv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD, &statuses[0]);
+  	MPI_Recv(recv_upper_bound,recv_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD, &statuses[1]);
 
 
     #if defined(DEBUG) || defined(BOUNDS)
