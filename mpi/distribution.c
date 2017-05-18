@@ -1825,7 +1825,7 @@ int main(int argc, char* argv[]){
       printf("%d", miniworld_array[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
 
-    MPI_Send(&miniworld_array,miniworld_size,MPI_INT,0,4,MPI_COMM_WORLD);
+    MPI_Send(miniworld_array,miniworld_size,MPI_INT,0,4,MPI_COMM_WORLD);
     free(miniworld_array);
   }
 
