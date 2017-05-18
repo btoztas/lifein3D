@@ -1583,8 +1583,8 @@ void print_miniworld(world *miniworld, int p, int id){
 int main(int argc, char* argv[]){
 
   world *next_miniworld, *miniworld;
-  int id, p;
-  int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound;
+  int id, p, miniworld_size=0;
+  int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound, * miniworld_array;
   int sent_lower_bound_size, sent_upper_bound_size, recv_lower_bound_size, recv_upper_bound_size;
 
   // if argc not expected, print program usage
@@ -1742,17 +1742,41 @@ int main(int argc, char* argv[]){
 
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
   #if defined(DEBUG) || defined(BOUNDS)
   printf("[%d] FINAL WORLD\n", id);
   #endif
 
-  for(int i = 0; i < p; i++) {
-    MPI_Barrier(MPI_COMM_WORLD);
-    if (i == id) {
-      print_miniworld(miniworld, p, id);
+  if(id==0){
+    print_miniworld(miniworld, p, id);
+    for(int i=1; i<p; i++){
+      MPI_Recv(&miniworld_size,1,MPI_INT,i,3,MPI_COMM_WORLD, &statuses[0]);
+      miniworld_array=(int *)malloc(sizeof(int)*miniworld_size);
+      MPI_Recv(miniworld_array,miniworld_size,MPI_INT,i,4,MPI_COMM_WORLD, &statuses[0]);
+      for(int i=0;i<miniworld_size; i++ ){
+        printf("%d", miniworld_array[i]);
+        if(i%3==0){
+          printf("\n" );
+        }else{
+          printf(" ");
+        }
+      }
+      free(miniworld_array);
     }
-  }
 
+  }else{
+    for(int i=1; i<miniworld->size_x-1; i++){
+
+      miniworld_size=0 = miniworld_size=0 + miniworld->n_alive_cells[i];
+
+    }
+    miniworld_array = (int*)malloc(sizeof(int)*miniworld_array);
+    int aux = 0;
+    for(int j=miniworld->size_y; j<miniworld->size_x*miniworld->size_y; j++)
+      no_struct_bintree(miniworld->cells[j],miniworld_array, &aux);
+    MPI_Send(&miniworld_size=0,1,MPI_INT,0,3,MPI_COMM_WORLD);
+    MPI_Send(&miniworld_array,miniworld_size=0,MPI_INT,0,4,MPI_COMM_WORLD);
+  }
 
   destroy_world(miniworld);
 
