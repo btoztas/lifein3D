@@ -1844,9 +1844,14 @@ int main(int argc, char* argv[]){
     printf("[%d] GETTING MINIWORLD VALUES\n", id);fflush(stdout);
     #endif
 
-    for(int j=miniworld->size_y; j<(miniworld->size_x-1)*miniworld->size_y; j++)
+    for(int j=miniworld->size_y; j<(miniworld->size_x-1)*miniworld->size_y; j++){
+
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
+      printf("[%d] GETTING X VALUES OF INDEX %d X=%d Y=%d\n", id, j, j/miniworld->size_y, j%miniworld->size_y);fflush(stdout);
+      #endif
       no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
 
+    }
     #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     #endif
