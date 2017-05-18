@@ -1784,10 +1784,10 @@ int main(int argc, char* argv[]){
     }
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
-    for(int j=miniworld->size_y; j<miniworld->size_x*miniworld->size_y; j++)
+    for(int j=miniworld->size_y; j<(miniworld->size_x-2)*miniworld->size_y; j++)
       no_struct_bintree(miniworld->cells[j],miniworld_array, &aux);
 
-    printf("[%d] SENDING WORLD SIZE\n", id);fflush(stdout);
+    printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     MPI_Send(&miniworld_size,1,MPI_INT,0,3,MPI_COMM_WORLD);
 
     printf("[%d] SENDING WORLD\n", id);fflush(stdout);
