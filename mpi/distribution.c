@@ -1808,7 +1808,7 @@ int main(int argc, char* argv[]){
         printf("%d", miniworld_array[j]); fflush(stdout);
         if(j==0){
           printf(" "); fflush(stdout);
-        }else if(j%3==0){
+        }else if((j+1)%3==0){
           printf("\n" ); fflush(stdout);
         }else{
           printf(" "); fflush(stdout);
