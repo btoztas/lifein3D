@@ -1829,7 +1829,7 @@ int main(int argc, char* argv[]){
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
 
-    for(int j=miniworld->size_y; j<(miniworld->size_x-2)*miniworld->size_y; j++)
+    for(int j=miniworld->size_y; j<(miniworld->size_x-1)*miniworld->size_y; j++)
       no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
 
     #if defined(DEBUG) || defined(BOUNDS)
@@ -1840,6 +1840,8 @@ int main(int argc, char* argv[]){
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] SENDING WORLD:\n", id);fflush(stdout);
+    print_miniworld(miniworld, p, id);
+    printf("[%d] SENDING AS:\n", id);fflush(stdout);
     for(int c = 0; c<miniworld_size; c++)
       printf("%d", miniworld_array[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
