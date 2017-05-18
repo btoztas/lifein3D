@@ -608,7 +608,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   int live = 0;
 
   if(x+1 == game->size_x) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 1: CELL %d %d %d \n", 0,y, z);
+    #endif
     if(check_alive(game->size_y, 0,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 1: CELL %d %d %d is alive\n", 0,y, z);
@@ -617,7 +619,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 1: CELL %d %d %d \n", x+1,y, z);
+    #endif
     if(check_alive(game->size_y, x+1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 1: CELL %d %d %d is alive\n", x+1,y, z);
@@ -628,7 +632,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(x-1 == -1) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 2: CELL %d %d %d \n", game->size_x-1,y, z);
+    #endif
     if(check_alive(game->size_y, game->size_x-1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 2: CELL %d %d %d is alive\n", game->size_x-1,y, z);
@@ -637,7 +643,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 2: CELL %d %d %d \n", x-1,y, z);
+    #endif
     if(check_alive(game->size_y, x-1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 2: CELL %d %d %d is alive\n", x-1,y, z);
@@ -648,7 +656,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(y+1 == game->size_y) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 3: CELL %d %d %d \n", x,0, z);
+    #endif
     if(check_alive(game->size_y, x,0, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 3: CELL %d %d %d is alive\n", x,0, z);
@@ -657,7 +667,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 3: CELL %d %d %d \n", x,y+1, z);
+    #endif
     if(check_alive(game->size_y, x,y+1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 3: CELL %d %d %d is alive\n", x,y+1, z);
@@ -668,7 +680,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(y-1 == -1) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 4: CELL %d %d %d \n", x,game->size_y-1, z);
+    #endif
     if(check_alive(game->size_y, x,game->size_y-1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 4: CELL %d %d %d is alive\n", x,game->size_y-1, z);
@@ -677,7 +691,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 4: CELL %d %d %d \n", x,y-1, z);
+    #endif
     if(check_alive(game->size_y, x,y-1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 4: CELL %d %d %d is alive\n", x,y-1, z);
@@ -688,7 +704,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(z+1 == game->size_y) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 5: CELL %d %d %d \n", x,y,0);
+    #endif
     if(check_alive(game->size_y, x,y,0, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 5: CELL %d %d %d is alive\n", x,y,0);
@@ -697,7 +715,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 5: CELL %d %d %d \n", x,y,z+1);
+    #endif
     if(check_alive(game->size_y, x,y,z+1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 5: CELL %d %d %d is alive\n", x,y,z+1);
@@ -708,7 +728,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(z-1 == -1) {
+    #ifdef DEBUG
     printf("\t\t\tTEST 6: CELL %d %d %d \n", x,y,game->size_y-1);
+    #endif
     if(check_alive(game->size_y, x,y,game->size_y-1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 6: CELL %d %d %d is alive\n", x,y,game->size_y-1);
@@ -717,7 +739,9 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    #ifdef DEBUG
     printf("\t\t\tTEST 6: CELL %d %d %d \n", x,y,z-1);
+    #endif
     if(check_alive(game->size_y, x,y,z-1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 6: CELL %d %d %d is alive\n", x,y,z-1);
@@ -771,8 +795,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(0,y, z, actual_world, 0)){
         new_cell = create_cell(0,y, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", 0,y, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", 0,y, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", 0,y, z); fflush(stdout);
         #endif
       }
@@ -795,8 +819,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x+1,y, z, actual_world, 0)){
         new_cell = create_cell(x+1,y, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x+1,y, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x+1,y, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x+1,y, z); fflush(stdout);
         #endif
       }
@@ -821,8 +845,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(actual_world->size_x-1,y, z, actual_world, 0)){
         new_cell = create_cell(actual_world->size_x-1,y, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", actual_world->size_x-1,y, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", actual_world->size_x-1,y, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", actual_world->size_x-1,y, z); fflush(stdout);
         #endif
       }
@@ -845,8 +869,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x-1,y, z, actual_world, 0)){
         new_cell = create_cell(x-1,y, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x-1,y, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x-1,y, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x-1,y, z); fflush(stdout);
         #endif
       }
@@ -871,8 +895,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,0, z, actual_world, 0)){
         new_cell = create_cell(x,0, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,0, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,0, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,0, z); fflush(stdout);
         #endif
       }
@@ -895,8 +919,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y+1, z, actual_world, 0)){
         new_cell = create_cell(x,y+1, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y+1, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y+1, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y+1, z); fflush(stdout);
         #endif
       }
@@ -921,8 +945,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,actual_world->size_y-1, z, actual_world, 0)){
         new_cell = create_cell(x,actual_world->size_y-1, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,actual_world->size_y-1, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,actual_world->size_y-1, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,actual_world->size_y-1, z); fflush(stdout);
         #endif
       }
@@ -945,8 +969,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y-1, z, actual_world, 0)){
         new_cell = create_cell(x,y-1, z);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y-1, z);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y-1, z);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y-1, z); fflush(stdout);
         #endif
       }
@@ -971,8 +995,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y,0, actual_world, 0)){
         new_cell = create_cell(x,y,0);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y,0);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y,0);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,0); fflush(stdout);
         #endif
       }
@@ -995,8 +1019,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y,z+1, actual_world, 0)){
         new_cell = create_cell(x,y,z+1);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y,z+1);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y,z+1);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z+1); fflush(stdout);
         #endif
       }
@@ -1021,8 +1045,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y,actual_world->size_y-1, actual_world, 0)){
         new_cell = create_cell(x,y,actual_world->size_y-1);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y,actual_world->size_y-1);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y,actual_world->size_y-1);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,actual_world->size_y-1); fflush(stdout);
         #endif
       }
@@ -1045,8 +1069,8 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       if(test_cell(x,y,z-1, actual_world, 0)){
         new_cell = create_cell(x,y,z-1);
         insert_cell(next_world, new_cell);
-        printf("\t\t%d %d %d IS DEAD\n", x,y,z-1);
         #ifdef DEBUG
+        printf("\t\t%d %d %d IS DEAD\n", x,y,z-1);
         printf("\t\t\t\t\t\t INSERTED DEAD CELL %d %d %d\n", x,y,z-1); fflush(stdout);
         #endif
       }
