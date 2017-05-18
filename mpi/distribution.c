@@ -1774,32 +1774,32 @@ int main(int argc, char* argv[]){
   #endif
 
   if(id==0){
-    #if defined(DEBUG) || defined(BOUNDS)
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] PRINTING MY WORLD\n", id);fflush(stdout);
     #endif
     print_miniworld(miniworld, p, id);
 
     for(int i=1; i<p; i++){
 
-      #if defined(DEBUG) || defined(BOUNDS)
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] RECEIVING %d WORLD SIZE\n", id, i);fflush(stdout);
       #endif
 
       MPI_Recv(&miniworld_size,1,MPI_INT,i,3,MPI_COMM_WORLD, &statuses[0]);
 
-      #if defined(DEBUG) || defined(BOUNDS)
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] RECEIVED %d WORLD SIZE = %d\n", id, i, miniworld_size);fflush(stdout);
       #endif
 
       miniworld_array=(int*)malloc(sizeof(int)*miniworld_size);
 
-      #if defined(DEBUG) || defined(BOUNDS)
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] RECEIVING %d WORLD\n", id, i);fflush(stdout);
       #endif
 
       MPI_Recv(miniworld_array,miniworld_size,MPI_INT,i,4,MPI_COMM_WORLD, &statuses[1]);
 
-      #if defined(DEBUG) || defined(BOUNDS)
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] RECEIVED %d WORLD:\n", id, i);fflush(stdout);
       #endif
 
@@ -1832,13 +1832,13 @@ int main(int argc, char* argv[]){
     for(int j=miniworld->size_y; j<(miniworld->size_x-1)*miniworld->size_y; j++)
       no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
 
-    #if defined(DEBUG) || defined(BOUNDS)
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     #endif
 
     MPI_Send(&miniworld_size,1,MPI_INT,0,3,MPI_COMM_WORLD);
 
-    #if defined(DEBUG) || defined(BOUNDS)
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] SENDING WORLD:\n", id);fflush(stdout);
     print_miniworld(miniworld, p, id);
     printf("[%d] SENDING AS:\n", id);fflush(stdout);
