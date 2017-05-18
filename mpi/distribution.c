@@ -1420,7 +1420,7 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
     printf("[%d] READ %d %d %d\n ADDING AS %d %d %d\n",id,upper_bound[counter],upper_bound[counter+1], upper_bound[counter+2], miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     #endif
 
-    new_cell = create_cell(miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]);
+    new_cell = create_cell(0, upper_bound[counter+1], upper_bound[counter+2]);
     //printf("[%d] (%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
@@ -1435,7 +1435,7 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
     #ifdef DEBUG
     printf("[%d] READ %d %d %d\n ADDING %d %d %d\n",id, lower_bound[counter],lower_bound[counter+1], lower_bound[counter+2], 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     #endif
-    new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
+    new_cell = create_cell(miniworld->size_x-1, lower_bound[counter+1], lower_bound[counter+2]);
     //printf("[%d] (%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
@@ -1592,7 +1592,6 @@ int main(int argc, char* argv[]){
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     #endif
 
-    MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
   	MPI_Irecv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD,&requests[1]);
@@ -1660,6 +1659,7 @@ int main(int argc, char* argv[]){
     miniworld = next_miniworld;
 
 
+ MPI_Barrier(MPI_COMM_WORLD);
 
     /*for(int i = 0; i < p; i++) {
   		MPI_Barrier(MPI_COMM_WORLD);
