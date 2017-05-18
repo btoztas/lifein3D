@@ -1695,7 +1695,7 @@ int main(int argc, char* argv[]){
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
-    printf("[%d] FINISHED COLLECTION BOUNDS:\n", id); fflush(stdout);
+    printf("[%d] FINISHED COLLECTING BOUNDS:\n", id); fflush(stdout);
     print_world(next_miniworld);
     #endif
 
