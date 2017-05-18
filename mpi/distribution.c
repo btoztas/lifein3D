@@ -1784,6 +1784,7 @@ int main(int argc, char* argv[]){
     }
 
     miniworld_size = miniworld_size * 3;
+
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
 
@@ -1799,6 +1800,7 @@ int main(int argc, char* argv[]){
     printf("\n"); fflush(stdout);
 
     MPI_Send(&miniworld_array,miniworld_size,MPI_INT,0,4,MPI_COMM_WORLD);
+    free(miniworld_array);
   }
 
   destroy_world(miniworld);
