@@ -1787,6 +1787,7 @@ int main(int argc, char* argv[]){
     #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] PRINTING MY WORLD\n", id);fflush(stdout);
     #endif
+
     print_miniworld(miniworld, p, id);
 
     for(int i=1; i<p; i++){
@@ -1795,7 +1796,7 @@ int main(int argc, char* argv[]){
       printf("[%d] RECEIVING %d WORLD SIZE\n", id, i);fflush(stdout);
       #endif
 
-      MPI_Recv(&miniworld_size,1,MPI_INT,i,3,MPI_COMM_WORLD, &statuses[0]);
+      MPI_Recv(&miniworld_size, 1, MPI_INT, i, 3, MPI_COMM_WORLD, &statuses[0]);
 
       #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] RECEIVED %d WORLD SIZE = %d\n", id, i, miniworld_size);fflush(stdout);
@@ -1815,7 +1816,9 @@ int main(int argc, char* argv[]){
 
 
       for(int j=0; j<miniworld_size; j++){
+
         printf("%d", miniworld_array[j]); fflush(stdout);
+
         if(j==0){
           printf(" "); fflush(stdout);
         }else if((j+1)%3==0){
@@ -1823,6 +1826,7 @@ int main(int argc, char* argv[]){
         }else{
           printf(" "); fflush(stdout);
         }
+
       }
 
       free(miniworld_array);
@@ -1859,14 +1863,15 @@ int main(int argc, char* argv[]){
       #if defined(DEBUG) || defined(PRINTBOUNDS)
       printf("[%d] GETTING X VALUES OF INDEX %d X=%d Y=%d\n", id, j, j/miniworld->size_y, j%miniworld->size_y);fflush(stdout);
       #endif
-      no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
+      if(miniworld->cells[j]!=NULL)
+        no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
 
     }
     #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     #endif
 
-    MPI_Send(&miniworld_size,1,MPI_INT,0,3,MPI_COMM_WORLD);
+    MPI_Send(&miniworld_size, 1, MPI_INT, 0, 3, MPI_COMM_WORLD);
 
     #if defined(DEBUG) || defined(PRINTBOUNDS)
     printf("[%d] SENDING WORLD:\n", id);fflush(stdout);
