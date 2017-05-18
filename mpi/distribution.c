@@ -608,6 +608,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   int live = 0;
 
   if(x+1 == game->size_x) {
+    printf("\t\t\tTEST 1: CELL %d %d %d", 0,y, z);
     if(check_alive(game->size_y, 0,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 1: CELL %d %d %d is alive\n", 0,y, z);
@@ -616,6 +617,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 1: CELL %d %d %d", x+1,y, z);
     if(check_alive(game->size_y, x+1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 1: CELL %d %d %d is alive\n", x+1,y, z);
@@ -626,6 +628,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(x-1 == -1) {
+    printf("\t\t\tTEST 2: CELL %d %d %d", game->size_x-1,y, z);
     if(check_alive(game->size_y, game->size_x-1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 2: CELL %d %d %d is alive\n", game->size_x-1,y, z);
@@ -634,6 +637,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 2: CELL %d %d %d", x-1,y, z);
     if(check_alive(game->size_y, x-1,y, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 2: CELL %d %d %d is alive\n", x-1,y, z);
@@ -644,6 +648,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(y+1 == game->size_y) {
+    printf("\t\t\tTEST 3: CELL %d %d %d", x,0, z);
     if(check_alive(game->size_y, x,0, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 3: CELL %d %d %d is alive\n", x,0, z);
@@ -652,6 +657,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 3: CELL %d %d %d", x,y+1, z);
     if(check_alive(game->size_y, x,y+1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 3: CELL %d %d %d is alive\n", x,y+1, z);
@@ -662,6 +668,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(y-1 == -1) {
+    printf("\t\t\tTEST 4: CELL %d %d %d", x,game->size_y-1, z);
     if(check_alive(game->size_y, x,game->size_y-1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 4: CELL %d %d %d is alive\n", x,game->size_y-1, z);
@@ -670,6 +677,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 4: CELL %d %d %d", x,y-1, z);
     if(check_alive(game->size_y, x,y-1, z, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 4: CELL %d %d %d is alive\n", x,y-1, z);
@@ -680,6 +688,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(z+1 == game->size_y) {
+    printf("\t\t\tTEST 5: CELL %d %d %d", x,y,0);
     if(check_alive(game->size_y, x,y,0, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 5: CELL %d %d %d is alive\n", x,y,0);
@@ -688,6 +697,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 5: CELL %d %d %d", x,y,z+1);
     if(check_alive(game->size_y, x,y,z+1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 5: CELL %d %d %d is alive\n", x,y,z+1);
@@ -698,6 +708,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
   }
 
   if(z-1 == -1) {
+    printf("\t\t\tTEST 6: CELL %d %d %d", x,y,game->size_y-1);
     if(check_alive(game->size_y, x,y,game->size_y-1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 6: CELL %d %d %d is alive\n", x,y,game->size_y-1);
@@ -706,6 +717,7 @@ int test_cell(int x, int y, int z, world* game, int status) {
 
     }
   } else {
+    printf("\t\t\tTEST 6: CELL %d %d %d", x,y,z-1);
     if(check_alive(game->size_y, x,y,z-1, game->cells)){
       #ifdef DEBUG
       printf("\t\t\tTEST 6: CELL %d %d %d is alive\n", x,y,z-1);
