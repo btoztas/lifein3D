@@ -764,6 +764,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", 0,y, z);
+      #endif
+
       if(test_cell(0,y, z, actual_world, 0)){
         new_cell = create_cell(0,y, z);
         insert_cell(next_world, new_cell);
@@ -784,6 +788,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x+1,y, z);
+      #endif
+
       if(test_cell(x+1,y, z, actual_world, 0)){
         new_cell = create_cell(x+1,y, z);
         insert_cell(next_world, new_cell);
@@ -806,7 +814,11 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
-      if(test_cell(actual_world->size_y-1,y, z, actual_world, 0)){
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", actual_world->size_x-1,y, z);
+      #endif
+
+      if(test_cell(actual_world->size_x-1,y, z, actual_world, 0)){
         new_cell = create_cell(actual_world->size_x-1,y, z);
         insert_cell(next_world, new_cell);
         printf("\t\t%d %d %d IS DEAD\n", actual_world->size_x-1,y, z);
@@ -826,6 +838,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x-1,y, z);
+      #endif
+
       if(test_cell(x-1,y, z, actual_world, 0)){
         new_cell = create_cell(x-1,y, z);
         insert_cell(next_world, new_cell);
@@ -848,6 +864,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,0, z);
+      #endif
+
       if(test_cell(x,0, z, actual_world, 0)){
         new_cell = create_cell(x,0, z);
         insert_cell(next_world, new_cell);
@@ -868,6 +888,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y+1, z);
+      #endif
+
       if(test_cell(x,y+1, z, actual_world, 0)){
         new_cell = create_cell(x,y+1, z);
         insert_cell(next_world, new_cell);
@@ -890,6 +914,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,actual_world->size_y-1, z);
+      #endif
+
       if(test_cell(x,actual_world->size_y-1, z, actual_world, 0)){
         new_cell = create_cell(x,actual_world->size_y-1, z);
         insert_cell(next_world, new_cell);
@@ -910,6 +938,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y-1, z);
+      #endif
+
       if(test_cell(x,y-1, z, actual_world, 0)){
         new_cell = create_cell(x,y-1, z);
         insert_cell(next_world, new_cell);
@@ -932,6 +964,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y,0);
+      #endif
+
       if(test_cell(x,y,0, actual_world, 0)){
         new_cell = create_cell(x,y,0);
         insert_cell(next_world, new_cell);
@@ -952,6 +988,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y,z+1);
+      #endif
+
       if(test_cell(x,y,z+1, actual_world, 0)){
         new_cell = create_cell(x,y,z+1);
         insert_cell(next_world, new_cell);
@@ -974,6 +1014,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y,actual_world->size_y-1);
+      #endif
+
       if(test_cell(x,y,actual_world->size_y-1, actual_world, 0)){
         new_cell = create_cell(x,y,actual_world->size_y-1);
         insert_cell(next_world, new_cell);
@@ -994,6 +1038,10 @@ void handle_node(int x, int y, int z, world *actual_world, world *next_world){
       live++;
 
     }else{
+      #ifdef DEBUG
+      printf("\t\tTESTING IF %d %d %d CELL IS DEAD... TESTING IT'S NEIGHBOURS\n", x,y,z-1);
+      #endif
+
       if(test_cell(x,y,z-1, actual_world, 0)){
         new_cell = create_cell(x,y,z-1);
         insert_cell(next_world, new_cell);
