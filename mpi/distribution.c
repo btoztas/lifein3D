@@ -1763,9 +1763,11 @@ int main(int argc, char* argv[]){
       MPI_Recv(miniworld_array,miniworld_size,MPI_INT,i,4,MPI_COMM_WORLD, &statuses[0]);
       printf("[%d] RECEIVED %d WORLD:\n", id, i);fflush(stdout);
 
-      for(int j=0;j<miniworld_size; j++ ){
+      for(int j=0; j<miniworld_size; j++){
         printf("%d", miniworld_array[j]); fflush(stdout);
-        if(j%3==0){
+        if(j==0){
+          printf(" "); fflush(stdout);
+        }else if(j%3==0){
           printf("\n" ); fflush(stdout);
         }else{
           printf(" "); fflush(stdout);
@@ -1778,20 +1780,24 @@ int main(int argc, char* argv[]){
   }else{
 
     for(int i=1; i<miniworld->size_x-1; i++){
-
       miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
-
     }
+
     miniworld_size = miniworld_size * 3;
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
+
     for(int j=miniworld->size_y; j<(miniworld->size_x-2)*miniworld->size_y; j++)
       no_struct_bintree(miniworld->cells[j],miniworld_array, &aux);
 
     printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     MPI_Send(&miniworld_size,1,MPI_INT,0,3,MPI_COMM_WORLD);
 
-    printf("[%d] SENDING WORLD\n", id);fflush(stdout);
+    printf("[%d] SENDING WORLD:\n", id);fflush(stdout);
+    for(int c = 0; c<miniworld_size; c++)
+      printf("%d", miniworld_array[c]); fflush(stdout);
+    printf("\n"); fflush(stdout);
+
     MPI_Send(&miniworld_array,miniworld_size,MPI_INT,0,4,MPI_COMM_WORLD);
   }
 
