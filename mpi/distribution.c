@@ -1116,7 +1116,7 @@ world *get_next_miniworld(world *actual_world){
   #endif
 
  //AQUI!!
-  //if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size_x)*(actual_world->size_y)*(actual_world->size_y)){
+  if(actual_world->alive_cells * 6 * 6 < 6*(actual_world->size_x)*(actual_world->size_y)*(actual_world->size_y)){
     #if defined(ITERATION) || defined(DEBUG)
     printf("   Choose live cells\n"); fflush(stdout);
     #endif
@@ -1134,7 +1134,7 @@ world *get_next_miniworld(world *actual_world){
     printf("\t\t\tFINISHED SUBTREE TESTS\n"); fflush(stdout);
     #endif
 
-/*  }else{
+  }else{
     #if defined(ITERATION) || defined(DEBUG)
     printf("    Choose N^3\n"); fflush(stdout);
     #endif
@@ -1156,7 +1156,7 @@ world *get_next_miniworld(world *actual_world){
           }
         }
     }
-*/
+
   #ifdef DEBUG
     printf("    Finished testing cells\n"); fflush(stdout);
   #endif
