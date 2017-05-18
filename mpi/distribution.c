@@ -1667,7 +1667,7 @@ int main(int argc, char* argv[]){
 
   for(int i=0; i<num_iterations; i++){
 
-    #if defined(DEBUG) || defined(BOUNDS)
+    #if defined(DEBUG) || defined(BOUNDS) || defined(ITERATION)
 
     printf("[%d] ## ITERATION NUMBER %d ##" id, i); fflush(stdout);
     #endif
