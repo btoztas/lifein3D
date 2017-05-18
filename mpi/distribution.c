@@ -1497,13 +1497,13 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
   cell *new_cell;
   int counter=0;
 
-  for(int i = 0; i<upper_bound_size/3;i++){
+  for(int i = 0; i<lower_bound_size/3;i++){
     #ifdef DEBUG
-    printf("[%d] READ %d %d %d\n ADDING AS %d %d %d\n",id,upper_bound[counter],upper_bound[counter+1], upper_bound[counter+2], miniworld->size_x-1 , upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
+    printf("[%d] READ %d %d %d\nADDING AS %d %d %d\n",id,lower_bound[counter],lower_bound[counter+1], lower_bound[counter+2], 0 , lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     #endif
 
-    new_cell = create_cell(0, upper_bound[counter+1], upper_bound[counter+2]);
-    //printf("[%d] (%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
+    new_cell = create_cell(0, lower_bound[counter+1], lower_bound[counter+2]);
+    //printf("[%d] (%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
@@ -1513,12 +1513,12 @@ void collectbounds(world *miniworld,  int *lower_bound, int *upper_bound, int lo
   #ifdef DEBUG
   printf("[%d] GOING FOR lower_bound\n", id); fflush(stdout);
   #endif
-  for(int i = 0; i<lower_bound_size/3;i++){
+  for(int i = 0; i<upper_bound_size/3;i++){
     #ifdef DEBUG
-    printf("[%d] READ %d %d %d\n ADDING %d %d %d\n",id, lower_bound[counter],lower_bound[counter+1], lower_bound[counter+2], 0, lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
+    printf("[%d] READ %d %d %d\nADDING %d %d %d\n",id, upper_bound[counter],upper_bound[counter+1], upper_bound[counter+2], miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     #endif
-    new_cell = create_cell(miniworld->size_x-1, lower_bound[counter+1], lower_bound[counter+2]);
-    //printf("[%d] (%d,%d,%d)\n",lower_bound[counter], lower_bound[counter+1], lower_bound[counter+2]); fflush(stdout);
+    new_cell = create_cell(miniworld->size_x-1, upper_bound[counter+1], upper_bound[counter+2]);
+    //printf("[%d] (%d,%d,%d)\n",upper_bound[counter], upper_bound[counter+1], upper_bound[counter+2]); fflush(stdout);
     insert_cell(miniworld, new_cell);
     counter=counter+3;
   }
