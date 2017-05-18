@@ -1770,7 +1770,7 @@ int main(int argc, char* argv[]){
       miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
 
     }
-    miniworld_array = (int*)malloc(sizeof(int)*miniworld_array);
+    miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
     for(int j=miniworld->size_y; j<miniworld->size_x*miniworld->size_y; j++)
       no_struct_bintree(miniworld->cells[j],miniworld_array, &aux);
