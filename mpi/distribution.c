@@ -1782,6 +1782,7 @@ int main(int argc, char* argv[]){
       miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
 
     }
+    miniworld_size = miniworld_size * 3;
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
     for(int j=miniworld->size_y; j<(miniworld->size_x-2)*miniworld->size_y; j++)
