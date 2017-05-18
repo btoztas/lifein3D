@@ -1602,6 +1602,8 @@ int main(int argc, char* argv[]){
     print_world(miniworld);
   #endif
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   for(int i=0; i<num_iterations; i++){
 
     next_miniworld = get_next_miniworld(miniworld);
@@ -1636,7 +1638,7 @@ int main(int argc, char* argv[]){
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     #endif
 
-    MPI_Barrier(MPI_COMM_WORLD);
+
 
     MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
   	MPI_Irecv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD,&requests[1]);
@@ -1688,6 +1690,7 @@ int main(int argc, char* argv[]){
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
     #endif
+    MPI_Barrier(MPI_COMM_WORLD);
 
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
 
