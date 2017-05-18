@@ -1723,7 +1723,7 @@ int main(int argc, char* argv[]){
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
+    collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id, p);
 
     #if defined(DEBUG) || defined(BOUNDS)
       printf("[%d] FINISHED COLLECTING BOUNDS:\n", id); fflush(stdout);
