@@ -1608,22 +1608,18 @@ int main(int argc, char* argv[]){
 
     next_miniworld = get_next_miniworld(miniworld);
 
-
     #if defined(DEBUG) || defined(BOUNDS)
-    if(id==1){
+
     printf("[%d] FINISHED NEXT WORLD\n[%d] NEXTWORLD WORLD:\n", id, id); fflush(stdout);
     print_world(next_miniworld);
     printf("[%d] FREEING BOUNDS...\n", id); fflush(stdout);
-  }
     #endif
 
     free_bounds(next_miniworld, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] ALLOCED SENT_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
     printf("[%d] ALLOCED SENT_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
-  }
     #endif
 
 
@@ -1633,17 +1629,13 @@ int main(int argc, char* argv[]){
     sent_upper_bound = (int*)malloc(sizeof(int)*sent_upper_bound_size);
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] GETTING BOUNDS TO SEND\n", id); fflush(stdout);
-  }
     #endif
 
     get_bounds(next_miniworld, sent_lower_bound, sent_upper_bound, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
-  }
     #endif
 
 
@@ -1655,10 +1647,8 @@ int main(int argc, char* argv[]){
 
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] ALLOCED RECV_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
     printf("[%d] ALLOCED RECV_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
-  }
     #endif
 
     recv_lower_bound=(int*)malloc(recv_lower_bound_size*sizeof(int));
@@ -1671,7 +1661,6 @@ int main(int argc, char* argv[]){
 
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] ARRAY SIZE %d SENT_LOWER_BOUND: \n", id, sent_lower_bound_size); fflush(stdout);
     for(int c = 0; c<sent_lower_bound_size; c++)
       printf("%d", sent_lower_bound[c]); fflush(stdout);
@@ -1691,13 +1680,10 @@ int main(int argc, char* argv[]){
     for(int c = 0; c<recv_upper_bound_size; c++)
       printf("%d", recv_upper_bound[c]); fflush(stdout);
     printf("\n"); fflush(stdout);
-  }
     #endif
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
     printf("[%d] COLLECTING RECV BOUNDS\n", id); fflush(stdout);
-  }
     #endif
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -1705,10 +1691,8 @@ int main(int argc, char* argv[]){
     collectbounds(next_miniworld, recv_lower_bound, recv_upper_bound, recv_lower_bound_size, recv_upper_bound_size, id);
 
     #if defined(DEBUG) || defined(BOUNDS)
-      if(id==1){
       printf("[%d] FINISHED COLLECTING BOUNDS:\n", id); fflush(stdout);
       print_world(next_miniworld);
-    }
     #endif
 
     free(sent_upper_bound);
@@ -1724,9 +1708,7 @@ int main(int argc, char* argv[]){
   }
 
   #if defined(DEBUG) || defined(BOUNDS)
-    if(id==1){
   printf("[%d] FINAL WORLD\n", id);
-}
   #endif
 
   for(int i = 0; i < p; i++) {
