@@ -1820,14 +1820,26 @@ int main(int argc, char* argv[]){
 
   }else{
 
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
+    printf("[%d] GETTING MY MINIWORLD SIZE\n", id);fflush(stdout);
+    #endif
+
     for(int i=1; i<miniworld->size_x-1; i++){
       miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
     }
 
     miniworld_size = miniworld_size * 3;
 
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
+    printf("[%d] ALLOCING MY MINIWORLD ARRAY SIZE %d\n", id, miniworld_size);fflush(stdout);
+    #endif
+
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_size);
     int aux = 0;
+
+    #if defined(DEBUG) || defined(PRINTBOUNDS)
+    printf("[%d] GETTING MINIWORLD VALUES\n", id);fflush(stdout);
+    #endif
 
     for(int j=miniworld->size_y; j<(miniworld->size_x-1)*miniworld->size_y; j++)
       no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
