@@ -1636,6 +1636,7 @@ int main(int argc, char* argv[]){
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     #endif
 
+    MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD,&requests[0]);
   	MPI_Irecv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD,&requests[1]);
