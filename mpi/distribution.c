@@ -1669,7 +1669,7 @@ int main(int argc, char* argv[]){
 
     #if defined(DEBUG) || defined(BOUNDS) || defined(ITERATION)
 
-    printf("[%d] ## ITERATION NUMBER %d ##" id, i); fflush(stdout);
+    printf("[%d] ## ITERATION NUMBER %d ##", id, i); fflush(stdout);
     #endif
 
     next_miniworld = get_next_miniworld(miniworld);
