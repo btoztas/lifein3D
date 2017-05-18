@@ -1786,7 +1786,7 @@ int main(int argc, char* argv[]){
       miniworld_array=(int*)malloc(sizeof(int)*miniworld_size);
 
       printf("[%d] RECEIVING %d WORLD\n", id, i);fflush(stdout);
-      MPI_Recv(miniworld_array,miniworld_size,MPI_INT,i,4,MPI_COMM_WORLD, &statuses[0]);
+      MPI_Recv(miniworld_array,miniworld_size,MPI_INT,i,4,MPI_COMM_WORLD, &statuses[1]);
       printf("[%d] RECEIVED %d WORLD:\n", id, i);fflush(stdout);
 
       for(int j=0; j<miniworld_size; j++){
