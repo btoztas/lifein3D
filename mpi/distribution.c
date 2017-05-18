@@ -1825,6 +1825,9 @@ int main(int argc, char* argv[]){
     #endif
 
     for(int i=1; i<miniworld->size_x-1; i++){
+      #if defined(DEBUG) || defined(PRINTBOUNDS)
+      printf("[%d] ALIVE CELLS AT %d: %d\n", id, i, miniworld->n_alive_cells[i]);fflush(stdout);
+      #endif
       miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
     }
 
