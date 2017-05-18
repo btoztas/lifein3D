@@ -1580,6 +1580,32 @@ void print_miniworld(world *miniworld, int p, int id){
 
 }
 
+void no_struct_cell_array(cell *this, int *array_world, int *aux, int first){
+
+
+  array_world[*aux]=(this->x)+first-1;
+  (*aux)++;
+  array_world[*aux]=this->y;
+  (*aux)++;
+  array_world[*aux]=this->z;
+  (*aux)++;
+
+}
+
+void no_struct_bintree_array(node *root, int *array_world, int *aux, int first){
+
+  if(root->left != NULL){
+    no_struct_bintree_array(root->left, array_world, aux, first);
+  }
+
+  no_struct_cell_array(root->this, array_world, aux, first);
+
+  if(root->right != NULL){
+    no_struct_bintree_array(root->right, array_world, aux, first);
+  }
+
+}
+
 int main(int argc, char* argv[]){
 
   world *next_miniworld, *miniworld;
@@ -1789,7 +1815,7 @@ int main(int argc, char* argv[]){
     int aux = 0;
 
     for(int j=miniworld->size_y; j<(miniworld->size_x-2)*miniworld->size_y; j++)
-      no_struct_bintree(miniworld->cells[j],miniworld_array, &aux);
+      no_struct_bintree_array(miniworld->cells[j],miniworld_array, &aux, TREATED_FIRST_X(id,p,miniworld->size_y));
 
     printf("[%d] SENDING WORLD SIZE %d\n", id, miniworld_size);fflush(stdout);
     MPI_Send(&miniworld_size,1,MPI_INT,0,3,MPI_COMM_WORLD);
