@@ -1625,6 +1625,7 @@ int main(int argc, char* argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD,&p);
 	MPI_Status statuses[2];
 	MPI_Request requests[2];
+	MPI_Request requests1[2];
 
 	int before=id-1;
 	int after=id+1;
@@ -1704,13 +1705,11 @@ int main(int argc, char* argv[]){
     printf("[%d] FINISHED GETTING BOUNDS TO SEND\n", id); fflush(stdout);
     #endif
 
-
-
+    	MPI_Irecv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD, &requests[0]);
+  	MPI_Irecv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD, &requests[1]);
   	MPI_Send(&sent_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD);
   	MPI_Send(&sent_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD);
-    MPI_Recv(&recv_lower_bound_size,1,MPI_INT,before,1,MPI_COMM_WORLD, &statuses[0]);
-  	MPI_Recv(&recv_upper_bound_size,1,MPI_INT,after,1,MPI_COMM_WORLD, &statuses[1]);
-
+	MPI_Waitall(2,requests,statuses);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] ALLOCED RECV_LOWER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[1]*3); fflush(stdout);
@@ -1725,11 +1724,11 @@ int main(int argc, char* argv[]){
       printf("[%d] ALLOCED RECV_UPPER_BOUND WITH SIZE %d\n", id, next_miniworld->n_alive_cells[next_miniworld->size_x-2]*3); fflush(stdout);
     #endif
 
+  	MPI_Irecv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD, &requests1[0]);
+  	MPI_Irecv(recv_upper_bound,recv_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD, &requests1[1]);
   	MPI_Send(sent_lower_bound,sent_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD);
   	MPI_Send(sent_upper_bound,sent_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD);
-  	MPI_Recv(recv_lower_bound,recv_lower_bound_size,MPI_INT,before,2,MPI_COMM_WORLD, &statuses[0]);
-  	MPI_Recv(recv_upper_bound,recv_upper_bound_size,MPI_INT,after,2,MPI_COMM_WORLD, &statuses[1]);
-
+	MPI_Waitall(2,requests1,statuses);
 
     #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] ARRAY SIZE %d SENT_LOWER_BOUND: \n", id, sent_lower_bound_size); fflush(stdout);
