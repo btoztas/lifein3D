@@ -1401,7 +1401,7 @@ world * file_to_miniworld(FILE *file, int p, int id){
 }
 
 
-int * file_to_array_broadcast(FILE *file, int size, int *array_to_broadcast){
+void file_to_array_broadcast(FILE *file, int size, int *array_to_broadcast){
 
   int x, y, z;
   for(int i=0; i<size; i++){
@@ -1787,7 +1787,7 @@ int main(int argc, char* argv[]){
     MPI_Bcast(&size_y, 1, MPI_INT, 0,  MPI_COMM_WORLD );
 
     while (1) {
-      array_to_broadcast=file_to_array_broadcast(file,size_y);
+      file_to_array_broadcast(file,size_y, array_to_broadcast);
       MPI_Bcast(array_to_broadcast, size_y, MPI_INT, 0, MPI_COMM_WORLD );
       if(array_to_broadcast[(3*size_y)-1]==-1){
         free(array_to_broadcast);
@@ -1799,7 +1799,7 @@ int main(int argc, char* argv[]){
     array_to_broadcast=(int *)malloc(size_y*3*sizeof(int));
     while (1) {
       MPI_Bcast(array_to_broadcast, size_y, MPI_INT, 0,  MPI_COMM_WORLD );
-      miniworld = insert_array_broadcast(array_to_broadcast, p, id, size, &flag, &last);
+      miniworld = insert_array_broadcast(array_to_broadcast, p, id, size_y, &flag, &last);
       if(last==1)
         break;
     }
@@ -1942,7 +1942,7 @@ int main(int argc, char* argv[]){
   }else{
     for(int i=1; i<miniworld->size_x-1; i++){
 
-      miniworld_size=0 = miniworld_size=0 + miniworld->n_alive_cells[i];
+      miniworld_size = miniworld_size + miniworld->n_alive_cells[i];
 
     }
     miniworld_array = (int*)malloc(sizeof(int)*miniworld_array);
