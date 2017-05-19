@@ -1761,7 +1761,11 @@ int main(int argc, char* argv[]){
 
 
   // read file
+  int num_iterations = atoi(argv[2]);
 
+  #ifdef DEBUG
+    printf("[%d] Iterations to do: %d\n\n", id, num_iterations); fflush(stdout);
+  #endif
 
   #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] Opening file\n", id); fflush(stdout);
@@ -1773,11 +1777,7 @@ int main(int argc, char* argv[]){
       printf("Error allocating memory for filename.\n"); fflush(stdout);
     }
     strcpy(file_name, argv[1]);
-    int num_iterations = atoi(argv[2]);
 
-    #ifdef DEBUG
-      printf("[%d] Iterations to do: %d\n\n", id, num_iterations); fflush(stdout);
-    #endif
     FILE *file;
     file = open_file(file_name);
     fscanf(file, "%d", &size_y);
