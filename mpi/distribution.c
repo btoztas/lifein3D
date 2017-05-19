@@ -1416,7 +1416,6 @@ void file_to_array_broadcast(FILE *file, int size, int *array_to_broadcast){
       array_to_broadcast[(3*i)+2]=-1;
     }
   }
-  return array_to_broadcast;
 
 }
 
