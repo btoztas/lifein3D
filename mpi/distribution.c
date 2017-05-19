@@ -1757,26 +1757,28 @@ int main(int argc, char* argv[]){
 	}
 
   // handle file_name
-  char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
-  if(file_name == NULL){
-    printf("Error allocating memory for filename.\n"); fflush(stdout);
-  }
-  strcpy(file_name, argv[1]);
-  int num_iterations = atoi(argv[2]);
 
-  #ifdef DEBUG
-    printf("[%d] Iterations to do: %d\n\n", id, num_iterations); fflush(stdout);
-  #endif
 
 
   // read file
-  FILE *file;
+
 
   #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] Opening file\n", id); fflush(stdout);
   #endif
 
   if(id==0){
+    char *file_name = (char*)malloc(sizeof(char)*strlen(argv[1])+1);
+    if(file_name == NULL){
+      printf("Error allocating memory for filename.\n"); fflush(stdout);
+    }
+    strcpy(file_name, argv[1]);
+    int num_iterations = atoi(argv[2]);
+
+    #ifdef DEBUG
+      printf("[%d] Iterations to do: %d\n\n", id, num_iterations); fflush(stdout);
+    #endif
+    FILE *file;
     file = open_file(file_name);
     fscanf(file, "%d", &size_y);
     array_to_broadcast=(int *)malloc(size_y*3*sizeof(int));
@@ -1787,6 +1789,8 @@ int main(int argc, char* argv[]){
       MPI_Bcast(array_to_broadcast, size_y, MPI_INT, 0, MPI_COMM_WORLD );
       if(array_to_broadcast[(3*size_y)-1]==-1){
         free(array_to_broadcast);
+        free(file_name);
+        fclose(file);
         break;
       }
     }
@@ -1951,8 +1955,6 @@ int main(int argc, char* argv[]){
 
   destroy_world(miniworld);
 
-  fclose(file);
-  free(file_name);
 
   MPI_Finalize();
 
