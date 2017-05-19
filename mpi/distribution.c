@@ -1748,6 +1748,7 @@ int main(int argc, char* argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD,&p);
 	MPI_Status statuses[2];
 	MPI_Request requests[2];
+  int size_y;
   int flag=0;
   int last=0;
 	int before=id-1;
@@ -1794,10 +1795,10 @@ int main(int argc, char* argv[]){
       }
     }
   }else{
-    MPI_Recv(&size_y,1,MPI_INT,0,MPI_TAG_ANY,MPI_COMM_WORLD, &statuses[0]);
+    MPI_Bcast(&size_y, 1, MPI_INT, 0,  MPI_COMM_WORLD);
     array_to_broadcast=(int *)malloc(size_y*3*sizeof(int));
     while (1) {
-      MPI_Recv(array_to_broadcast,1,MPI_INT,0,MPI_TAG_ANY,MPI_COMM_WORLD, &statuses[0]);
+      MPI_Bcast(array_to_broadcast, size_y, MPI_INT, 0,  MPI_COMM_WORLD );
       miniworld = insert_array_broadcast(array_to_broadcast, p, id, size, &flag, &last);
       if(last==1)
         break;
