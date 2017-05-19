@@ -1419,9 +1419,6 @@ void file_to_array_broadcast(FILE *file, int size, int *array_to_broadcast){
 
 }
 
-
-
-
 world * insert_array_broadcast(int *array_broadcast, int p, int id, int size, int *flag, int *last){
 
   int size_x, size_y;
@@ -1735,6 +1732,9 @@ int main(int argc, char* argv[]){
   int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound, * miniworld_array;
   int sent_lower_bound_size, sent_upper_bound_size, recv_lower_bound_size, recv_upper_bound_size;
   int *array_to_broadcast;
+  int size_y;
+  int flag=0;
+  int last=0;
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
@@ -1747,9 +1747,6 @@ int main(int argc, char* argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD,&p);
 	MPI_Status statuses[2];
 	MPI_Request requests[2];
-  int size_y;
-  int flag=0;
-  int last=0;
 	int before=id-1;
 	int after=id+1;
 	if(before==-1){
