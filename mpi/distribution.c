@@ -1401,6 +1401,155 @@ world * file_to_miniworld(FILE *file, int p, int id){
 }
 
 
+int * file_to_array_broadcast(FILE *file, int size, int *array_to_broadcast){
+
+  int x, y, z;
+  for(int i=0; i<size; i++){
+
+    if(fscanf(file, "%d %d %d", &x, &y, &z) != EOF){
+      array_to_broadcast[i*3]=x;
+      array_to_broadcast[(3*i)+1]=y;
+      array_to_broadcast[(3*i)+2]=z;
+    }else{
+      array_to_broadcast[i*3]=-1;
+      array_to_broadcast[(3*i)+1]=-1;
+      array_to_broadcast[(3*i)+2]=-1;
+    }
+  }
+  return array_to_broadcast;
+
+}
+
+
+
+
+world * insert_array_broadcast(int *array_broadcast, int p, int id, int size, int *flag, int *last){
+
+  int size_x, size_y;
+  int x, y, z;
+  int first_x, last_x;
+  world *new_mini_world;
+  cell *new_cell;
+  int add;
+  size_y=size;
+
+  first_x = NEEDED_FIRST_X(id,p,size_y);
+  last_x  = NEEDED_LAST_X(id,p,size_y);
+
+  if(flag==0){
+    if(first_x !=-1 && last_x != size_y){
+      #ifdef DEBUG
+      printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]\n", id, first_x+1, last_x-1, first_x, last_x); fflush(stdout);
+      #endif
+      size_x = last_x - first_x + 1;
+
+    }
+    else if(first_x == -1){
+      #ifdef DEBUG
+      printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X=[%d,%d]U{%d}\n",id,0, last_x-1,  0,last_x,size_y-1); fflush(stdout);
+      #endif
+      size_x = last_x + 2;
+
+    }
+    else if(last_x == size_y){
+      #ifdef DEBUG
+      printf("\nPC %d\n TREATING X=[%d,%d]\n NEEDING  X={%d}U[%d,%d]\n",id,first_x+1, size_y-1, 0,first_x,size_y-1); fflush(stdout);
+      #endif
+      size_x = size_y - 1 - first_x + 2;
+
+    }
+
+    #ifdef DEBUG
+      printf("World Size: X=%d, Y=%d\n\nCreated Mini World\n", size_x, size_y); fflush(stdout);
+    #endif
+
+    #ifdef DEBUG
+      printf("Populating World\n"); fflush(stdout);
+    #endif
+    *flag=1;
+    new_mini_world = create_world(size_x, size_y);
+  }
+
+  for(int i=0; i<size_y; i++){
+    x=array_broadcast[i*3];
+    y=array_broadcast[(i*3)+1];
+    z=array_broadcast[(i*3)+2];
+    add = 0;
+    if(x==-1){
+      *last=0;
+      return new_mini_world;
+    }
+    else if(first_x !=-1 && last_x != size_y){
+      #ifdef DEBUG
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
+      #endif
+      if(x>=first_x && x<=last_x){
+        add = 1;
+        x = x - first_x;
+        //printf("PC %d X=[%d,%d]\n", i, first_x, last_x); fflush(stdout);
+      }
+    }
+
+    else if(first_x == -1){
+      #ifdef DEBUG
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
+      #endif
+      if(x==size_y-1 || (x>=0 && x<=last_x)){
+        add = 1;
+        if(x == size_y-1)
+          x = 0;
+        else
+          x++;
+
+        //printf("PC %d X=[%d,%d]U{%d}",i,0,last_x,size_y-1); fflush(stdout);
+      }
+    }
+
+    else if(last_x == size_y){
+      #ifdef DEBUG
+        printf("  Read      %d %d %d\n", x, y, z); fflush(stdout);
+      #endif
+      if(x==0 || (x>=first_x && x<=size_y-1)){
+        add = 1;
+        if(x==0)
+          x = last_x - first_x;
+        else
+          x = x - first_x;
+        //printf("PC %d X={%d}U[%d,%d]\n",i,0,first_x,size_y-1); fflush(stdout);
+
+      }
+    }
+
+    if(add){
+      #ifdef DEBUG
+        printf("  Adding as %d %d %d\n", x, y, z); fflush(stdout);
+      #endif
+
+      new_cell = create_cell(x, y, z);
+
+      #ifdef DEBUG
+        printf("    Cell created\n"); fflush(stdout);
+      #endif
+
+      insert_cell(new_mini_world, new_cell);
+
+      #ifdef DEBUG
+        printf("    Cell inserted\n"); fflush(stdout);
+      #endif
+    }
+
+  }
+  return new_mini_world;
+}
+
+
+
+
+
+
+
+
+
 void free_bounds(world *miniworld, int id){
 
 
@@ -1586,7 +1735,7 @@ int main(int argc, char* argv[]){
   int id, p, miniworld_size=0;
   int *sent_lower_bound, *sent_upper_bound, *recv_lower_bound, *recv_upper_bound, * miniworld_array;
   int sent_lower_bound_size, sent_upper_bound_size, recv_lower_bound_size, recv_upper_bound_size;
-
+  int *array_to_broadcast;
   // if argc not expected, print program usage
   if(argc!=3){
     usage();
@@ -1599,7 +1748,8 @@ int main(int argc, char* argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD,&p);
 	MPI_Status statuses[2];
 	MPI_Request requests[2];
-
+  int flag=0;
+  int last=0;
 	int before=id-1;
 	int after=id+1;
 	if(before==-1){
@@ -1629,8 +1779,32 @@ int main(int argc, char* argv[]){
     printf("[%d] Opening file\n", id); fflush(stdout);
   #endif
 
-  file = open_file(file_name);
-  miniworld = file_to_miniworld(file, p, id);
+  if(id==0){
+    file = open_file(file_name);
+    fscanf(file, "%d", &size_y);
+    array_to_broadcast=(int *)malloc(size_y*3*sizeof(int));
+    MPI_Bcast(&size_y, 1, MPI_INT, 0,  MPI_COMM_WORLD );
+
+    while (1) {
+      array_to_broadcast=file_to_array_broadcast(file,size_y);
+      MPI_Bcast(array_to_broadcast, size_y, MPI_INT, 0, MPI_COMM_WORLD );
+      if(array_to_broadcast[(3*size_y)-1]==-1){
+        free(array_to_broadcast);
+        break;
+      }
+    }
+  }else{
+    MPI_Recv(&size_y,1,MPI_INT,0,MPI_TAG_ANY,MPI_COMM_WORLD, &statuses[0]);
+    array_to_broadcast=(int *)malloc(size_y*3*sizeof(int));
+    while (1) {
+      MPI_Recv(array_to_broadcast,1,MPI_INT,0,MPI_TAG_ANY,MPI_COMM_WORLD, &statuses[0]);
+      miniworld = insert_array_broadcast(array_to_broadcast, p, id, size, &flag, &last);
+      if(last==1)
+        break;
+    }
+  }
+
+
 
   #if defined(DEBUG) || defined(BOUNDS)
     printf("[%d] FINISHED READING FILE\n[%d] MY WORLD:\n", id, id); fflush(stdout);
